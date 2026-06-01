@@ -1,0 +1,56 @@
+# Dolibarr core (download fresh or via submodule)
+dolibarr-core/
+
+# WAMP local files
+www/
+
+# Local environment variables (DO NOT COMMIT)
+.env
+.env.local
+.env.*.local
+
+# Dolibarr auto-generated config
+conf/conf.php
+htdocs/conf/conf.php
+dolibarr-core/htdocs/conf/conf.php
+
+# Runtime logs and caches
+logs/
+*.log
+cache/
+tmp/
+
+# Database backups (store securely elsewhere)
+backups/
+*.sql
+*.sql.gz
+*.backup
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/settings.json
+
+# Node/PHP dependencies (if added later)
+node_modules/
+vendor/
+
+# Archives
+*.zip
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/
+
+# Real business data (only commit test samples)
+imports/raw_samples/
+imports/cleaned_samples/
+imports/archived/
+
+# Sensitive/temporary files
+*.bak
+.env.bak
