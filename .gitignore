@@ -10,6 +10,10 @@ documents/
 
 # Dolibarr core (third-party, not your code)
 htdocs/
+dolibarr-scripts/
+
+# Setup screenshots
+images/
 
 # Logs
 *.log
