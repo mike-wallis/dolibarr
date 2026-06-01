@@ -1,0 +1,15 @@
+# Credentials
+.env
+
+# Dolibarr config (contains DB password)
+conf/conf.php
+htdocs/conf/conf.php
+
+# Dolibarr data files
+documents/
+
+# Dolibarr core (third-party, not your code)
+htdocs/
+
+# Logs
+*.log
