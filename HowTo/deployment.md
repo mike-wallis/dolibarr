@@ -177,7 +177,7 @@ Week 3: Stock levels/values snapshot (can't finalise until 30 June)
 Week 4: UAT, manually enter outstanding bills/invoices, go-live prep
 1 July: Import final stock snapshot, go live
 
-- [ ] Export products from Reckon → anonymise → map columns → test import
+- [x] Export products from Reckon → import complete (473 created, 10 skipped, 0 errors)
 - [ ] Export customers from Reckon → anonymise → map columns → test import
 - [ ] Export suppliers from Reckon → anonymise → map columns → test import
 - [ ] Chart of accounts: map Reckon COA to Dolibarr accounts (accountant review required)
