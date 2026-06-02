@@ -160,7 +160,7 @@ All of the above are in `.gitignore`.
 ## To Do
 
 ### Immediate
-- [ ] Enable STOCK_CALCULATE_ON_SHIPMENT and test shipment workflow — verify stock drops to 12 after 3-unit sale
+- [x] Enable STOCK_CALCULATE_ON_SHIPMENT and test shipment workflow — stock confirmed at 12 after 3-unit sale
 - [ ] Disable or scope Chrome extension so Incognito isn't needed for rich-text forms
 
 ### This week
@@ -200,7 +200,7 @@ All of the above are in `.gitignore`.
 | Purchase Order → Reception → Stock increase | ✅ Stock at 15 (added 5) |
 | Supplier Invoice → Payment | ✅ SI2606-0001 Paid |
 | Sales Order → Customer Invoice → Payment | ✅ IN2606-0001 Paid |
-| Shipment → Stock decrease on sale | ❌ Stock still 15, should be 12 |
+| Shipment → Stock decrease on sale | ✅ Stock at 12 (sold 3) |
 | REST API test | ⬜ Not started |
 | Customer-specific pricing | ⬜ Not started |
 | BAS / VAT report | ⬜ Not started |
