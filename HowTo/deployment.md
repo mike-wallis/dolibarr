@@ -178,8 +178,8 @@ Week 4: UAT, manually enter outstanding bills/invoices, go-live prep
 1 July: Import final stock snapshot, go live
 
 - [x] Export products from Reckon → import complete (473 created, 10 skipped, 0 errors)
-- [ ] Export customers from Reckon → anonymise → map columns → test import
-- [ ] Export suppliers from Reckon → anonymise → map columns → test import
+- [x] Export customers from Reckon → import complete (20 created, 0 errors)
+- [x] Export suppliers from Reckon → import complete (78 created, 0 errors)
 - [ ] Chart of accounts: map Reckon COA to Dolibarr accounts (accountant review required)
 - [ ] Confirm FIFO→AVCO switch with accountant (see inventory-decisions.md)
 - [ ] Stock valuation snapshot from Reckon as at 30 June → import as opening stock
