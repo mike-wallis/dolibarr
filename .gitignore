@@ -16,7 +16,7 @@ dolibarr-scripts/
 images/
 
 # Import data (may contain real business data)
-import/
+/imports/
 
 # Logs
 *.log

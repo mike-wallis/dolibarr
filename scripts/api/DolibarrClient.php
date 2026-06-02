@@ -31,12 +31,9 @@ class DolibarrClient
     }
 
     /**
-     * POST request. Returns decoded array or throws on error.
-     *
-     * @param  string $endpoint  e.g. 'orders'
-     * @param  array  $body      data to send as JSON
+     * POST request. Returns decoded value (int ID or array) or throws on error.
      */
-    public function post(string $endpoint, array $body): array
+    public function post(string $endpoint, array $body): mixed
     {
         return $this->request('POST', $endpoint, [], $body);
     }
@@ -44,12 +41,20 @@ class DolibarrClient
     /**
      * PUT request (update existing record).
      */
-    public function put(string $endpoint, array $body): array
+    public function put(string $endpoint, array $body): mixed
     {
         return $this->request('PUT', $endpoint, [], $body);
     }
 
-    private function request(string $method, string $endpoint, array $params = [], ?array $body = null): array
+    /**
+     * DELETE request.
+     */
+    public function delete(string $endpoint): mixed
+    {
+        return $this->request('DELETE', $endpoint);
+    }
+
+    private function request(string $method, string $endpoint, array $params = [], ?array $body = null): mixed
     {
         $params['DOLAPIKEY'] = $this->apiKey;
         $url = $this->baseUrl . '/' . ltrim($endpoint, '/') . '?' . http_build_query($params);
@@ -78,10 +83,10 @@ class DolibarrClient
         $data = json_decode($raw, true);
 
         if ($code < 200 || $code >= 300) {
-            $msg = $data['error']['message'] ?? $raw;
+            $msg = is_array($data) ? ($data['error']['message'] ?? $raw) : $raw;
             throw new RuntimeException("Dolibarr API error $code: $msg");
         }
 
-        return $data ?? [];
+        return $data;
     }
 }
