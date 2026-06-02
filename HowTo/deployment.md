@@ -186,8 +186,12 @@ Week 4: UAT, manually enter outstanding bills/invoices, go-live prep
 - [ ] Manually enter outstanding bills and invoices at cutover
 
 ### Before go-live
-- [ ] Set TAX_MODE to 2 (payment date) and verify BAS VAT report output
-- [ ] Add real bank account details to bank01
+- [x] Set TAX_MODE to 2 (payment date / cash basis) ← selected in accounting module setup
+- [x] Accounting default accounts configured (AR, AP, GST, sales, COGS, bank)
+- [x] VAT accounts: GST and FRE linked to account 2200
+- [x] Bank account (bank01 / Macquarie) linked to COA account 1101, journal BQ
+- [ ] Assign product-level accounting accounts (4010.01 Chemicals, 4010.04 Bin Liners, etc.)
+- [ ] Test BAS / VAT report output for a sample quarter
 - [ ] Test PDF invoice output — create two templates (South Side Supplies + Bright Cleaning Solutions branding)
 - [ ] Backup strategy for production: database dumps + documents/ folder
 
