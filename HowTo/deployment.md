@@ -180,7 +180,7 @@ Week 4: UAT, manually enter outstanding bills/invoices, go-live prep
 - [x] Export products from Reckon → import complete (473 created, 10 skipped, 0 errors)
 - [x] Export customers from Reckon → import complete (20 created, 0 errors)
 - [x] Export suppliers from Reckon → import complete (78 created, 0 errors)
-- [ ] Chart of accounts: map Reckon COA to Dolibarr accounts (accountant review required)
+- [x] Chart of accounts: 279 accounts imported (AU-SSS-2026), accountant signed off
 - [ ] Confirm FIFO→AVCO switch with accountant (see inventory-decisions.md)
 - [ ] Stock valuation snapshot from Reckon as at 30 June → import as opening stock
 - [ ] Manually enter outstanding bills and invoices at cutover
