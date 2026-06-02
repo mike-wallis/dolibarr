@@ -15,5 +15,8 @@ dolibarr-scripts/
 # Setup screenshots
 images/
 
+# Import data (may contain real business data)
+import/
+
 # Logs
 *.log
