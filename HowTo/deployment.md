@@ -164,24 +164,35 @@ All of the above are in `.gitignore`.
 - [ ] Disable or scope Chrome extension so Incognito isn't needed for rich-text forms
 
 ### This week
-- [ ] Generate REST API key (Setup > API/Web services)
-- [ ] Test REST API: GET /products, GET /orders, POST /invoices from PHP
+- [x] Generate REST API key
+- [x] Test REST API: GET /products, GET /customers, GET /invoices from PHP
 - [ ] Test customer-specific pricing (price list per customer)
 - [ ] Configure cash accounting mode and verify BAS VAT report output
 
-### Before go-live
-- [ ] Export Reckon data as CSV, anonymise samples, map columns to Dolibarr import format
-- [ ] Chart of accounts: map Reckon COA to Dolibarr accounts (accountant review)
+### Migration (cutover 1 July 2026)
+Week 1: Export from Reckon, anonymise samples, analyse column structure
+Week 2: COA mapping + import (accountant input required)
+Week 2-3: Products, customers, suppliers import + verify
+Week 3: Stock levels/values snapshot (can't finalise until 30 June)
+Week 4: UAT, manually enter outstanding bills/invoices, go-live prep
+1 July: Import final stock snapshot, go live
+
+- [ ] Export products from Reckon → anonymise → map columns → test import
+- [ ] Export customers from Reckon → anonymise → map columns → test import
+- [ ] Export suppliers from Reckon → anonymise → map columns → test import
+- [ ] Chart of accounts: map Reckon COA to Dolibarr accounts (accountant review required)
 - [ ] Confirm FIFO→AVCO switch with accountant (see inventory-decisions.md)
-- [ ] Set TAX_MODE to 2 (payment date) and test BAS output
+- [ ] Stock valuation snapshot from Reckon as at 30 June → import as opening stock
+- [ ] Manually enter outstanding bills and invoices at cutover
+
+### Before go-live
+- [ ] Set TAX_MODE to 2 (payment date) and verify BAS VAT report output
 - [ ] Add real bank account details to bank01
-- [ ] Load real products, customers, suppliers
-- [ ] Test PDF invoice output matches required format
+- [ ] Test PDF invoice output — create two templates (South Side Supplies + Bright Cleaning Solutions branding)
 - [ ] Backup strategy for production: database dumps + documents/ folder
 
 ### Deferred / Nice to have
 - [ ] Custom translation to replace "VAT" with "GST" in UI
-- [ ] Custom PDF template with GST wording for customer invoices
 - [ ] CLAUDE.md in repo root
 
 ---
