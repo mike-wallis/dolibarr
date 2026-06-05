@@ -1,14 +1,16 @@
-# Credentials
+# Credentials — never commit
 .env
 
 # Dolibarr config (contains DB password)
 conf/conf.php
 htdocs/conf/conf.php
 
-# Dolibarr data files
+# Dolibarr data files (generated documents, uploads)
 documents/
 
-# Dolibarr core (third-party, not your code)
+# Dolibarr core — third-party code, not ours.
+# Custom source files live in custom/ and are tracked.
+# Deploy scripts copy them into htdocs/ at install/update time.
 htdocs/
 dolibarr-scripts/
 
@@ -16,7 +18,12 @@ dolibarr-scripts/
 images/
 
 # Import data (may contain real business data)
-/imports/
+imports/*.csv
+imports/*.xlsx
+imports/*.xls
 
 # Logs
 *.log
+
+# Claude Code local memory (not project code)
+.claude/
