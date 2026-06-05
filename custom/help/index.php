@@ -61,5 +61,14 @@ llxHeader('', 'Help — South Side Supplies');
 
 </div>
 
+<?php if ($user->admin): ?>
+<div style="margin-top:1.5rem;max-width:900px;">
+  <div class="div-table-responsive" style="border:1px solid #c00;border-radius:6px;padding:1.5rem;background:#fff8f8;">
+    <h3 style="margin-top:0;color:#c00;">🔒 <a href="tfn.php" style="color:#c00;">Tax File Numbers</a> <small style="font-size:0.6em;font-weight:normal;">(admin only)</small></h3>
+    <p>Encrypt TFNs for employee records, verify existing encrypted values, view all employee TFNs.</p>
+  </div>
+</div>
+<?php endif; ?>
+
 </div>
 <?php llxFooter(); ?>
