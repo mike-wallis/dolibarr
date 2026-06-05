@@ -146,37 +146,33 @@ $journal_sum = function(array $accounts, string $col) use ($db, $qs, $qe, $entit
 
 // ── GST: invoice/payment queries (always run for G1, G11, fallback 1A/1B) ────
 
+// ── G1 / G11: informational totals from invoice/payment records ──────────────
+// These are always available and show total sales/purchases volume.
+// 1A and 1B are calculated ONLY from journal accounts (configured in Setup).
+
 if ($basis === 'cash') {
     $sql_sales =
-        "SELECT COALESCE(SUM(pf.amount),0) AS g1,"
-        ."  COALESCE(SUM(pf.amount * f.total_tva / NULLIF(f.total_ttc,0)),0) AS gst_1a,"
-        ."  COUNT(DISTINCT p.rowid) AS cnt"
+        "SELECT COALESCE(SUM(pf.amount),0) AS g1, COUNT(DISTINCT p.rowid) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."paiement p"
         ." INNER JOIN ".MAIN_DB_PREFIX."paiement_facture pf ON pf.fk_paiement=p.rowid"
         ." INNER JOIN ".MAIN_DB_PREFIX."facture f ON f.rowid=pf.fk_facture"
         ." WHERE DATE(p.datep) BETWEEN '$qs' AND '$qe' AND f.entity=$entity";
 
     $sql_purch =
-        "SELECT COALESCE(SUM(pf.amount),0) AS g11,"
-        ."  COALESCE(SUM(pf.amount * f.total_tva / NULLIF(f.total_ttc,0)),0) AS gst_1b,"
-        ."  COUNT(DISTINCT p.rowid) AS cnt"
+        "SELECT COALESCE(SUM(pf.amount),0) AS g11, COUNT(DISTINCT p.rowid) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."paiementfourn p"
         ." INNER JOIN ".MAIN_DB_PREFIX."paiementfourn_facture pf ON pf.fk_paiementfourn=p.rowid"
         ." INNER JOIN ".MAIN_DB_PREFIX."facture_fourn f ON f.rowid=pf.fk_facturefourn"
         ." WHERE DATE(p.datep) BETWEEN '$qs' AND '$qe' AND f.entity=$entity";
 } else {
     $sql_sales =
-        "SELECT COALESCE(SUM(total_ttc),0) AS g1,"
-        ."  COALESCE(SUM(total_tva),0) AS gst_1a,"
-        ."  COUNT(*) AS cnt"
+        "SELECT COALESCE(SUM(total_ttc),0) AS g1, COUNT(*) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."facture"
         ." WHERE DATE(datef) BETWEEN '$qs' AND '$qe'"
         ." AND fk_statut >= 1 AND entity=$entity";
 
     $sql_purch =
-        "SELECT COALESCE(SUM(total_ttc),0) AS g11,"
-        ."  COALESCE(SUM(total_tva),0) AS gst_1b,"
-        ."  COUNT(*) AS cnt"
+        "SELECT COALESCE(SUM(total_ttc),0) AS g11, COUNT(*) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."facture_fourn"
         ." WHERE DATE(datef) BETWEEN '$qs' AND '$qe'"
         ." AND fk_statut >= 1 AND entity=$entity";
@@ -187,25 +183,24 @@ $rs  = ($r1 && ($tmp = $db->fetch_object($r1)) instanceof stdClass) ? $tmp : nul
 $r2  = $db->query($sql_purch);
 $rp  = ($r2 && ($tmp = $db->fetch_object($r2)) instanceof stdClass) ? $tmp : null;
 
-$g1         = round((float)($rs?->g1      ?? 0), 2);
-$gst_1a     = round((float)($rs?->gst_1a  ?? 0), 2);
-$sales_cnt  = (int)($rs?->cnt ?? 0);
-$g11        = round((float)($rp?->g11     ?? 0), 2);
-$gst_1b     = round((float)($rp?->gst_1b  ?? 0), 2);
-$purch_cnt  = (int)($rp?->cnt ?? 0);
+$g1        = round((float)($rs?->g1  ?? 0), 2);
+$sales_cnt = (int)($rs?->cnt ?? 0);
+$g11       = round((float)($rp?->g11 ?? 0), 2);
+$purch_cnt = (int)($rp?->cnt ?? 0);
 
-// ── Full-mode GST extras from journal ────────────────────────────────────────
+// ── Full-mode extras (G2, G3, G10) from journal ───────────────────────────────
 
 $g2  = $full && !empty($acct['g2'])  ? $journal_sum([$acct['g2']],  'credit') : 0.0;
 $g3  = $full && !empty($acct['g3'])  ? $journal_sum([$acct['g3']],  'credit') : 0.0;
 $g10 = $full && !empty($acct['g10']) ? $journal_sum($acct['g10'],   'debit')  : 0.0;
 
-// Override 1A/1B from journal if accounts configured
-$gst_source = 'invoices';
-if (!empty($acct['gst_collected'])) { $gst_1a = $journal_sum([$acct['gst_collected']], 'credit'); $gst_source = 'journal'; }
-if (!empty($acct['gst_itc']))       { $gst_1b = $journal_sum([$acct['gst_itc']],       'debit');  $gst_source = 'journal'; }
+// ── 1A and 1B: REQUIRED from journal accounts — null if not configured ────────
 
-$net_gst = round($gst_1a - $gst_1b, 2);
+$gst_1a = !empty($acct['gst_collected']) ? $journal_sum([$acct['gst_collected']], 'credit') : null;
+$gst_1b = !empty($acct['gst_itc'])       ? $journal_sum([$acct['gst_itc']],       'debit')  : null;
+
+$gst_ready = ($gst_1a !== null && $gst_1b !== null);
+$net_gst   = $gst_ready ? round($gst_1a - $gst_1b, 2) : null;
 
 // ── PAYG from journal ─────────────────────────────────────────────────────────
 
@@ -238,8 +233,8 @@ $w5 = round($w2 + $w3 + $w4, 2);  // W5 = W2 + W3 + W4
 
 // Field 4 = W5 (PAYG withholding transferred to BAS payment section)
 $field_4 = $w5;
-// Field 9 = net GST + PAYG withholding
-$field_9 = round($net_gst + $field_4, 2);
+// Field 9 only available when GST accounts are configured
+$field_9 = $gst_ready ? round($net_gst + $field_4, 2) : null;
 
 $w_source = $has_saved ? 'saved' : ($has_payg_config ? 'journal' : 'manual');
 
@@ -422,18 +417,29 @@ print load_fiche_titre('Australian BAS &amp; PAYG Activity Statement', '', 'acco
 
 <?php
 // ── Section 1: GST ──────────────────────────────────────────────────────────
-$gst_note = $gst_source === 'journal'
-    ? '&#9432; 1A/1B from journal entries'
-    : ($basis==='cash' ? 'cash basis — '.$sales_cnt.' customer payment'.($sales_cnt!==1?'s':'').', '.$purch_cnt.' supplier payment'.($purch_cnt!==1?'s':'') : 'accrual — '.$sales_cnt.' customer invoice'.($sales_cnt!==1?'s':'').', '.$purch_cnt.' supplier invoice'.($purch_cnt!==1?'s':''));
+$vol_note = $basis === 'cash'
+    ? $sales_cnt.' customer payment'.($sales_cnt!==1?'s':'').', '.$purch_cnt.' supplier payment'.($purch_cnt!==1?'s':'')
+    : $sales_cnt.' customer invoice'.($sales_cnt!==1?'s':'').', '.$purch_cnt.' supplier invoice'.($purch_cnt!==1?'s':'');
 ?>
 <div class="div-table-responsive" style="margin-bottom:1.5rem;">
+
+<?php if (!$gst_ready): ?>
+<div style="padding:0.75rem 1rem;background:#fff3cd;border-left:4px solid #e6a817;border-radius:3px;margin-bottom:0.75rem;max-width:620px;">
+  <strong>&#9888; GST accounts not configured.</strong>
+  G1 and G11 (volume totals) are shown below, but <strong>1A, 1B, and Net GST cannot be calculated</strong>
+  until you configure the GST Collected and GST ITC accounts in
+  <a href="<?=DOL_URL_ROOT?>/custom/bas/admin/setup.php"><strong>Setup</strong></a>.
+</div>
+<?php endif; ?>
+
 <table class="noborder" style="max-width:620px;">
 <thead><tr class="liste_titre">
   <th colspan="3">
-    GST
-    <span style="font-weight:normal;font-size:0.8em;margin-left:1rem;color:<?=$gst_source==='journal'?'#2a7':'#888'?>;">
-      <?=$gst_note?>
-    </span>
+    GST &mdash; <?=$basis==='cash'?'cash basis':'accrual basis'?>
+    <span style="font-weight:normal;font-size:0.8em;margin-left:1rem;color:#888;"><?=$vol_note?></span>
+    <?php if ($gst_ready): ?>
+    <span style="font-weight:normal;font-size:0.8em;margin-left:0.5rem;color:#2a7;">&#9432; 1A/1B from journal</span>
+    <?php endif; ?>
   </th>
 </tr></thead>
 <tbody>
@@ -442,10 +448,11 @@ $gst_note = $gst_source === 'journal'
   <?=bas_tr('G2', 'Export sales (GST-free)', $g2)?>
   <?=bas_tr('G3', 'Other GST-free sales', $g3)?>
   <?php endif; ?>
-  <?=bas_tr('G11','Total purchases (inc. GST)', $g11)?>
+  <?=bas_tr('G11', 'Total purchases (inc. GST)', $g11)?>
   <?php if ($full): ?>
-  <?=bas_tr('G10','Capital purchases (inc. GST)', $g10)?>
+  <?=bas_tr('G10', 'Capital purchases (inc. GST)', $g10)?>
   <?php endif; ?>
+  <?php if ($gst_ready): ?>
   <tr><td colspan="3" style="padding:0.2rem;border:none;"></td></tr>
   <?=bas_tr('1A', 'GST on sales', $gst_1a, true, '#f0fff0')?>
   <?=bas_tr('1B', 'GST credits on purchases', $gst_1b, true, '#f0fff0')?>
@@ -454,15 +461,15 @@ $gst_note = $gst_source === 'journal'
     <td><strong>Net GST <small style="font-weight:normal">(1A &minus; 1B)</small></strong></td>
     <td class="right nowrap"><strong><?=bas_fmt($net_gst)?></strong></td>
   </tr>
+  <?php endif; ?>
 </tbody>
 </table>
-<?php if ($net_gst < 0): ?>
+<?php if ($gst_ready && $net_gst < 0): ?>
 <p style="color:#c00;font-size:0.85em;margin-top:0.25rem;">&#9888; Net GST is negative — you have more credits than collected. Enter 0 for field 9 GST and apply for a refund.</p>
 <?php endif; ?>
 <?php if ($full && ($g2 > 0 || $g3 > 0)): ?>
 <p style="font-size:0.85em;color:#555;margin-top:0.25rem;">
   Note: G2 and G3 are subsets of G1. Taxable sales = G1 &minus; G2 &minus; G3 = <?=bas_fmt($g1-$g2-$g3)?>.
-  1A should equal taxable sales &divide; 11.
 </p>
 <?php endif; ?>
 </div>
@@ -548,35 +555,39 @@ if ($full) {
 // ── Section 3: BAS Summary ────────────────────────────────────────────────────
 ?>
 <div class="div-table-responsive" style="margin-bottom:2rem;">
+<?php if (!$gst_ready): ?>
+<div style="padding:0.75rem 1rem;background:#f8f8f8;border:1px solid #ddd;border-radius:3px;color:#888;max-width:620px;">
+  BAS Summary not available — configure GST accounts in
+  <a href="<?=DOL_URL_ROOT?>/custom/bas/admin/setup.php">Setup</a> first.
+</div>
+<?php else: ?>
 <table class="noborder" style="max-width:620px;">
 <thead><tr class="liste_titre"><th colspan="3">BAS Summary &mdash; enter these on the ATO portal</th></tr></thead>
 <tbody>
-  <?=bas_tr('1A', 'GST on sales',                    $gst_1a,  false, '#f9f9f9')?>
-  <?=bas_tr('1B', 'GST credits on purchases',        $gst_1b,  false, '#f9f9f9')?>
-  <?=bas_tr('',   'Net GST (1A − 1B)',               $net_gst, true)?>
+  <?=bas_tr('1A', 'GST on sales',             $gst_1a,  false, '#f9f9f9')?>
+  <?=bas_tr('1B', 'GST credits on purchases', $gst_1b,  false, '#f9f9f9')?>
+  <?=bas_tr('',   'Net GST (1A − 1B)',        $net_gst, true)?>
   <?php if ($w5 > 0 || $w1 > 0): ?>
   <tr><td colspan="3" style="padding:0.2rem;border:none;"></td></tr>
-  <?=bas_tr('W1', 'Total wages paid',                $w1,      false, '#f9f9f9')?>
-  <?=bas_tr('W2', 'PAYG withheld from wages',        $w2,      false, '#f9f9f9')?>
+  <?=bas_tr('W1', 'Total wages paid',          $w1,      false, '#f9f9f9')?>
+  <?=bas_tr('W2', 'PAYG withheld from wages',  $w2,      false, '#f9f9f9')?>
   <?php if ($full && ($w3 > 0 || $w4 > 0)): ?>
-  <?=bas_tr('W3', 'Other amounts withheld',          $w3,      false, '#f9f9f9')?>
-  <?=bas_tr('W4', 'Withheld — no ABN',               $w4,      false, '#f9f9f9')?>
+  <?=bas_tr('W3', 'Other amounts withheld',    $w3,      false, '#f9f9f9')?>
+  <?=bas_tr('W4', 'Withheld — no ABN',         $w4,      false, '#f9f9f9')?>
   <?php endif; ?>
-  <?=bas_tr('W5', 'Total PAYG withheld',             $w5,      true)?>
-  <?=bas_tr('4',  'PAYG withholding (= W5)',         $field_4, false, '#f9f9f9')?>
+  <?=bas_tr('W5', 'Total PAYG withheld',       $w5,      true)?>
+  <?=bas_tr('4',  'PAYG withholding (= W5)',   $field_4, false, '#f9f9f9')?>
   <?php endif; ?>
   <tr style="border-top:2px solid #aaa;background:#fffde7;">
     <td><strong>9</strong></td>
-    <td>
-      <strong>Total amount to pay ATO</strong>
-      <small style="font-weight:normal;"> (net GST + field 4)</small>
-    </td>
+    <td><strong>Total amount to pay ATO</strong> <small style="font-weight:normal;">(net GST + field 4)</small></td>
     <td class="right nowrap"><strong><?=bas_fmt($field_9)?></strong></td>
   </tr>
 </tbody>
 </table>
 <?php if ($field_9 < 0): ?>
 <p style="color:#2a7;font-size:0.85em;margin-top:0.25rem;">Field 9 is negative — the ATO owes you a refund of <?=bas_fmt(abs($field_9))?>.</p>
+<?php endif; ?>
 <?php endif; ?>
 </div>
 
