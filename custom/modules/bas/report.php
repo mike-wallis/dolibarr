@@ -2,11 +2,16 @@
 /**
  * BAS & PAYG Withholding Report
  *
- * GST figures (1A, 1B) are calculated automatically from Dolibarr payment records (cash basis).
- * PAYG figures (W1, W2) and super are calculated from the accounting journal when accounts
- * are configured in Setup; otherwise they can be entered manually.
+ * Calculates Australian Business Activity Statement fields:
  *
- * Accessed via Accounting > BAS & PAYG (left menu).
+ * GST:  G1, (G2, G3, G10, G11 — full mode), 1A, 1B
+ * PAYG: W1, W2, (W3, W4 — full mode), W5
+ * Summary: 1A, 1B, net GST, field 4 (=W5), field 9 (total payable)
+ *
+ * GST figures come from Dolibarr payment/invoice records (cash or accrual basis),
+ * overridden by journal entries when accounts are configured in Setup.
+ * PAYG figures come from the journal when accounts are configured, otherwise
+ * manual entry saved per quarter.
  */
 
 $res = 0;
@@ -20,9 +25,9 @@ if (!$user->admin) {
 
 $action = GETPOST('action', 'aZ09');
 
-// ── Australian FY / quarter helpers ───────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-function bas_fy(int $m, int $y): int          { return ($m >= 7) ? $y + 1 : $y; }
+function bas_fy(int $m, int $y): int { return ($m >= 7) ? $y + 1 : $y; }
 function bas_quarter(int $m): int
 {
     if ($m >= 7 && $m <= 9)  return 1;
@@ -40,68 +45,98 @@ function bas_dates(int $fy, int $q): array
         default => ['',''],
     };
 }
-function bas_parse_accounts(string $s): array
+function bas_parse(string $s): array
 {
     return array_values(array_filter(array_map('trim', explode(',', $s))));
+}
+function bas_fmt(float $v): string
+{
+    return ($v < 0 ? '−' : '').'$'.number_format(abs($v), 2);
 }
 
 $qlabels = [1=>'Q1 — Jul to Sep', 2=>'Q2 — Oct to Dec', 3=>'Q3 — Jan to Mar', 4=>'Q4 — Apr to Jun'];
 
-// ── Resolve period ────────────────────────────────────────────────────────────
+// ── Period ────────────────────────────────────────────────────────────────────
 
 $now_m  = (int) date('n');
 $now_y  = (int) date('Y');
 $cur_fy = bas_fy($now_m, $now_y);
 $cur_q  = bas_quarter($now_m);
 
-$fy    = max(2020, min(2035, (int)(GETPOST('fy',    'int')   ?: $cur_fy)));
-$q     = max(1,    min(4,    (int)(GETPOST('q',     'int')   ?: $cur_q)));
+$fy    = max(2020, min(2035, (int)(GETPOST('fy',    'int') ?: $cur_fy)));
+$q     = max(1,    min(4,    (int)(GETPOST('q',     'int') ?: $cur_q)));
 $basis = GETPOST('basis', 'alpha') === 'accrual' ? 'accrual' : 'cash';
 
 [$qstart, $qend] = bas_dates($fy, $q);
-$entity  = (int) $conf->entity;
-$qs      = $db->escape($qstart);
-$qe      = $db->escape($qend);
+$entity = (int) $conf->entity;
+$qs     = $db->escape($qstart);
+$qe     = $db->escape($qend);
 
-// ── Load account config from Setup ───────────────────────────────────────────
+// ── Load config ───────────────────────────────────────────────────────────────
 
-$acct_wages = bas_parse_accounts(getDolGlobalString('BAS_ACCOUNTS_WAGES'));
-$acct_payg  = trim(getDolGlobalString('BAS_ACCOUNT_PAYG'));
-$acct_super = bas_parse_accounts(getDolGlobalString('BAS_ACCOUNTS_SUPER'));
-$has_payg_config = (!empty($acct_wages) || !empty($acct_payg));
+$bas_type = getDolGlobalString('BAS_TYPE') ?: 'simpler';
+$full     = ($bas_type === 'full');
 
-// ── llx_const keys for saved overrides ───────────────────────────────────────
+$acct = [
+    'gst_collected' => trim(getDolGlobalString('BAS_ACCOUNT_GST_COLLECTED')),
+    'gst_itc'       => trim(getDolGlobalString('BAS_ACCOUNT_GST_ITC')),
+    'g2'            => trim(getDolGlobalString('BAS_ACCOUNT_G2')),
+    'g3'            => trim(getDolGlobalString('BAS_ACCOUNT_G3')),
+    'g10'           => bas_parse(getDolGlobalString('BAS_ACCOUNTS_G10')),
+    'wages'         => bas_parse(getDolGlobalString('BAS_ACCOUNTS_WAGES')),
+    'payg'          => trim(getDolGlobalString('BAS_ACCOUNT_PAYG')),
+    'w3'            => trim(getDolGlobalString('BAS_ACCOUNT_W3')),
+    'w4'            => trim(getDolGlobalString('BAS_ACCOUNT_W4')),
+    'super'         => bas_parse(getDolGlobalString('BAS_ACCOUNTS_SUPER')),
+];
 
-$key_w1    = 'BAS_W1_'    . $fy . $q;
-$key_w2    = 'BAS_W2_'    . $fy . $q;
-$key_recalc = 'recalc';   // GET param to force journal recalc
+// ── llx_const keys for saved PAYG overrides ───────────────────────────────────
 
-// ── Handle: save overrides ────────────────────────────────────────────────────
+$key = fn(string $f) => 'BAS_'.$f.'_'.$fy.$q;
+
+// ── Handle: save PAYG overrides ───────────────────────────────────────────────
 
 if ($action === 'save') {
-    $parse_amt = fn($k) => max(0.0, (float) str_replace(',', '', GETPOST($k, 'alpha')));
-    dolibarr_set_const($db, $key_w1, $parse_amt('w1'), 'chaine', 0, '', $entity);
-    dolibarr_set_const($db, $key_w2, $parse_amt('w2'), 'chaine', 0, '', $entity);
+    $amt = fn($k) => max(0.0, (float) str_replace(',', '', GETPOST($k, 'alpha')));
+    foreach (['w1','w2','w3','w4'] as $f) {
+        dolibarr_set_const($db, $key(strtoupper($f)), $amt($f), 'chaine', 0, '', $entity);
+    }
     setEventMessages('PAYG saved for FY'.$fy.' '.$qlabels[$q].'.', null, 'mesgs');
-    header('Location: '.$_SERVER['PHP_SELF'].'?fy='.$fy.'&q='.$q.'&mainmenu=accountancy&leftmenu=bas_report');
+    header('Location: '.$_SERVER['PHP_SELF'].'?fy='.$fy.'&q='.$q.'&basis='.$basis.'&mainmenu=accountancy&leftmenu=bas_report');
     exit;
 }
 
-// ── Handle: clear overrides (recalculate from journal) ────────────────────────
+// ── Handle: clear overrides ───────────────────────────────────────────────────
 
 if ($action === 'recalc') {
-    dolibarr_del_const($db, $key_w1, $entity);
-    dolibarr_del_const($db, $key_w2, $entity);
-    header('Location: '.$_SERVER['PHP_SELF'].'?fy='.$fy.'&q='.$q.'&mainmenu=accountancy&leftmenu=bas_report');
+    foreach (['W1','W2','W3','W4'] as $f) {
+        dolibarr_del_const($db, $key($f), $entity);
+    }
+    header('Location: '.$_SERVER['PHP_SELF'].'?fy='.$fy.'&q='.$q.'&basis='.$basis.'&mainmenu=accountancy&leftmenu=bas_report');
     exit;
 }
 
-// ── GST queries — cash basis uses payment dates; accrual uses invoice dates ───
+// ── Journal helper ────────────────────────────────────────────────────────────
+
+$journal_sum = function(array $accounts, string $col) use ($db, $qs, $qe, $entity): float {
+    if (empty($accounts)) return 0.0;
+    $col = ($col === 'debit') ? 'debit' : 'credit';
+    $in  = implode(',', array_map(fn($a) => "'".$db->escape($a)."'", $accounts));
+    $sql = "SELECT COALESCE(SUM($col),0) AS total"
+         . " FROM ".MAIN_DB_PREFIX."accounting_bookkeeping"
+         . " WHERE numero_compte IN ($in)"
+         . " AND DATE(doc_date) BETWEEN '$qs' AND '$qe'"
+         . " AND entity=$entity";
+    $r   = $db->query($sql);
+    $row = ($r && ($tmp = $db->fetch_object($r)) instanceof stdClass) ? $tmp : null;
+    return round((float)($row?->total ?? 0), 2);
+};
+
+// ── GST: invoice/payment queries (always run for G1, G11, fallback 1A/1B) ────
 
 if ($basis === 'cash') {
-    // Cash: sum amounts actually received/paid in the period
     $sql_sales =
-        "SELECT COALESCE(SUM(pf.amount),0) AS sales_inc,"
+        "SELECT COALESCE(SUM(pf.amount),0) AS g1,"
         ."  COALESCE(SUM(pf.amount * f.total_tva / NULLIF(f.total_ttc,0)),0) AS gst_1a,"
         ."  COUNT(DISTINCT p.rowid) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."paiement p"
@@ -110,7 +145,7 @@ if ($basis === 'cash') {
         ." WHERE DATE(p.datep) BETWEEN '$qs' AND '$qe' AND f.entity=$entity";
 
     $sql_purch =
-        "SELECT COALESCE(SUM(pf.amount),0) AS purch_inc,"
+        "SELECT COALESCE(SUM(pf.amount),0) AS g11,"
         ."  COALESCE(SUM(pf.amount * f.total_tva / NULLIF(f.total_ttc,0)),0) AS gst_1b,"
         ."  COUNT(DISTINCT p.rowid) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."paiementfourn p"
@@ -118,9 +153,8 @@ if ($basis === 'cash') {
         ." INNER JOIN ".MAIN_DB_PREFIX."facture_fourn f ON f.rowid=pf.fk_facturefourn"
         ." WHERE DATE(p.datep) BETWEEN '$qs' AND '$qe' AND f.entity=$entity";
 } else {
-    // Accrual: all validated invoices dated in the period (paid or not)
     $sql_sales =
-        "SELECT COALESCE(SUM(total_ttc),0) AS sales_inc,"
+        "SELECT COALESCE(SUM(total_ttc),0) AS g1,"
         ."  COALESCE(SUM(total_tva),0) AS gst_1a,"
         ."  COUNT(*) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."facture"
@@ -128,7 +162,7 @@ if ($basis === 'cash') {
         ." AND fk_statut >= 1 AND entity=$entity";
 
     $sql_purch =
-        "SELECT COALESCE(SUM(total_ttc),0) AS purch_inc,"
+        "SELECT COALESCE(SUM(total_ttc),0) AS g11,"
         ."  COALESCE(SUM(total_tva),0) AS gst_1b,"
         ."  COUNT(*) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."facture_fourn"
@@ -136,104 +170,87 @@ if ($basis === 'cash') {
         ." AND fk_statut >= 1 AND entity=$entity";
 }
 
-$r1 = $db->query($sql_sales); $rs = $r1 ? $db->fetch_object($r1) : null;
-$r2 = $db->query($sql_purch); $rp = $r2 ? $db->fetch_object($r2) : null;
+$r1  = $db->query($sql_sales);
+$rs  = ($r1 && ($tmp = $db->fetch_object($r1)) instanceof stdClass) ? $tmp : null;
+$r2  = $db->query($sql_purch);
+$rp  = ($r2 && ($tmp = $db->fetch_object($r2)) instanceof stdClass) ? $tmp : null;
 
-$sales_inc   = round((float)($rs?->sales_inc ?? 0), 2);
-$gst_1a      = round((float)($rs?->gst_1a   ?? 0), 2);
-$sales_cnt   = (int)($rs?->cnt ?? 0);
-$purch_inc   = round((float)($rp?->purch_inc ?? 0), 2);
-$gst_1b      = round((float)($rp?->gst_1b   ?? 0), 2);
-$purch_cnt   = (int)($rp?->cnt ?? 0);
+$g1         = round((float)($rs?->g1      ?? 0), 2);
+$gst_1a     = round((float)($rs?->gst_1a  ?? 0), 2);
+$sales_cnt  = (int)($rs?->cnt ?? 0);
+$g11        = round((float)($rp?->g11     ?? 0), 2);
+$gst_1b     = round((float)($rp?->gst_1b  ?? 0), 2);
+$purch_cnt  = (int)($rp?->cnt ?? 0);
 
-// ── Load GST account config ───────────────────────────────────────────────────
+// ── Full-mode GST extras from journal ────────────────────────────────────────
 
-$acct_gst_collected = trim(getDolGlobalString('BAS_ACCOUNT_GST_COLLECTED'));
-$acct_gst_itc       = trim(getDolGlobalString('BAS_ACCOUNT_GST_ITC'));
+$g2  = $full && !empty($acct['g2'])  ? $journal_sum([$acct['g2']],  'credit') : 0.0;
+$g3  = $full && !empty($acct['g3'])  ? $journal_sum([$acct['g3']],  'credit') : 0.0;
+$g10 = $full && !empty($acct['g10']) ? $journal_sum($acct['g10'],   'debit')  : 0.0;
 
-// ── PAYG / super: from accounting journal ────────────────────────────────────
-
-// Helper: sum debit or credit entries for given accounts in the period
-$journal_sum = function(array $accounts, string $col) use ($db, $qs, $qe, $entity): float {
-    if (empty($accounts)) return 0.0;
-    $col   = ($col === 'debit') ? 'debit' : 'credit';   // whitelist
-    $in    = implode(',', array_map(fn($a) => "'".$db->escape($a)."'", $accounts));
-    $sql   = "SELECT COALESCE(SUM($col),0) AS total"
-           . " FROM ".MAIN_DB_PREFIX."accounting_bookkeeping"
-           . " WHERE numero_compte IN ($in)"
-           . " AND DATE(doc_date) BETWEEN '$qs' AND '$qe'"
-           . " AND entity=$entity";
-    $r = $db->query($sql);
-    return $r ? round((float)($db->fetch_object($r)?->total ?? 0), 2) : 0.0;
-};
-
-$journal_w1    = $journal_sum($acct_wages,              'debit');
-$journal_w2    = !empty($acct_payg)           ? $journal_sum([$acct_payg],           'credit') : 0.0;
-$journal_super = $journal_sum($acct_super,             'debit');
-
-// Override invoice-total GST with journal figures if accounts are configured
+// Override 1A/1B from journal if accounts configured
 $gst_source = 'invoices';
-if (!empty($acct_gst_collected)) {
-    $gst_1a     = $journal_sum([$acct_gst_collected], 'credit');
-    $gst_source = 'journal';
-}
-if (!empty($acct_gst_itc)) {
-    $gst_1b     = $journal_sum([$acct_gst_itc],       'debit');
-    $gst_source = 'journal';
-}
+if (!empty($acct['gst_collected'])) { $gst_1a = $journal_sum([$acct['gst_collected']], 'credit'); $gst_source = 'journal'; }
+if (!empty($acct['gst_itc']))       { $gst_1b = $journal_sum([$acct['gst_itc']],       'debit');  $gst_source = 'journal'; }
+
 $net_gst = round($gst_1a - $gst_1b, 2);
 
-// Decide whether to use journal values or saved overrides
-$saved_w1 = getDolGlobalString($key_w1);
-$saved_w2 = getDolGlobalString($key_w2);
-$has_saved = ($saved_w1 !== '' || $saved_w2 !== '');
+// ── PAYG from journal ─────────────────────────────────────────────────────────
 
-if ($has_saved) {
-    // User has previously saved overrides — use those
-    $w1     = (float) $saved_w1;
-    $w2     = (float) $saved_w2;
-    $w_source = 'saved';
-} elseif ($has_payg_config) {
-    // No overrides yet — pre-fill from journal
-    $w1     = $journal_w1;
-    $w2     = $journal_w2;
-    $w_source = 'journal';
-} else {
-    // No config and no saves — blank manual entry
-    $w1     = 0.0;
-    $w2     = 0.0;
-    $w_source = 'manual';
+$journal_w1    = $journal_sum($acct['wages'],               'debit');
+$journal_w2    = !empty($acct['payg']) ? $journal_sum([$acct['payg']], 'credit') : 0.0;
+$journal_w3    = !empty($acct['w3'])   ? $journal_sum([$acct['w3']],   'credit') : 0.0;
+$journal_w4    = !empty($acct['w4'])   ? $journal_sum([$acct['w4']],   'credit') : 0.0;
+$journal_super = $journal_sum($acct['super'],               'debit');
+
+$has_payg_config = !empty($acct['wages']) || !empty($acct['payg']);
+
+// Load saved overrides; fall back to journal values if not saved
+$saved = [];
+foreach (['W1','W2','W3','W4'] as $f) {
+    $saved[$f] = getDolGlobalString($key($f));
 }
+$has_saved = array_filter($saved, fn($v) => $v !== '');
 
-$super_display = $has_payg_config ? $journal_super : 0.0;
-$total_payable = round($net_gst + $w2, 2);
+$resolve = function(string $f, float $journal_val) use ($saved, $has_payg_config): float {
+    if ($saved[$f] !== '') return (float) $saved[$f];
+    if ($has_payg_config)  return $journal_val;
+    return 0.0;
+};
 
-// ── Format helpers ────────────────────────────────────────────────────────────
+$w1 = $resolve('W1', $journal_w1);
+$w2 = $resolve('W2', $journal_w2);
+$w3 = $resolve('W3', $journal_w3);
+$w4 = $resolve('W4', $journal_w4);
+$w5 = round($w2 + $w3 + $w4, 2);  // W5 = W2 + W3 + W4
 
-function bas_fmt(float $v): string
-{
-    return ($v < 0 ? '−' : '') . '$' . number_format(abs($v), 2);
-}
-function bas_row(string $code, string $label, float $amt, bool $bold=false, string $bg=''): string
+// Field 4 = W5 (PAYG withholding transferred to BAS payment section)
+$field_4 = $w5;
+// Field 9 = net GST + PAYG withholding
+$field_9 = round($net_gst + $field_4, 2);
+
+$w_source = $has_saved ? 'saved' : ($has_payg_config ? 'journal' : 'manual');
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
+function bas_tr(string $code, string $label, float $amt, bool $bold = false, string $bg = ''): string
 {
     $s  = $bg ? ' style="background:'.$bg.'"' : '';
     $b  = $bold ? '<strong>' : '';
     $be = $bold ? '</strong>' : '';
     return '<tr'.$s.'>'
-        .'<td class="nowrap" style="width:3rem;color:#666;">'.$b.htmlspecialchars($code).$be.'</td>'
+        .'<td class="nowrap" style="width:3rem;color:#555;">'.$b.htmlspecialchars($code).$be.'</td>'
         .'<td>'.$b.htmlspecialchars($label).$be.'</td>'
         .'<td class="right nowrap">'.$b.bas_fmt($amt).$be.'</td>'
         .'</tr>';
 }
 
-// ── Page output ───────────────────────────────────────────────────────────────
-
-$title = 'BAS &amp; PAYG — FY'.$fy.' '.$qlabels[$q];
+$title = 'BAS &amp; PAYG — FY'.$fy.' '.$qlabels[$q].' ('.$bas_type.')';
 llxHeader('', strip_tags($title));
 print dol_get_fiche_head([], '', $title, -1, 'accountancy');
 ?>
 
-<!-- Period selector -->
+<!-- Period + basis selector -->
 <form method="get" action="report.php" style="margin-bottom:1.5rem;">
 <input type="hidden" name="mainmenu" value="accountancy">
 <input type="hidden" name="leftmenu" value="bas_report">
@@ -250,40 +267,41 @@ print dol_get_fiche_head([], '', $title, -1, 'accountancy');
 </select>&nbsp;
 <input type="submit" class="butAction" value="Show">
 &nbsp;&nbsp;
-<label style="font-weight:normal;">
-  <input type="radio" name="basis" value="cash"    <?=$basis==='cash'   ?'checked':''?>> Cash
-</label>
+<label style="font-weight:normal;"><input type="radio" name="basis" value="cash"    <?=$basis==='cash'   ?'checked':''?>> Cash</label>
 &nbsp;
-<label style="font-weight:normal;">
-  <input type="radio" name="basis" value="accrual" <?=$basis==='accrual'?'checked':''?>> Accrual
-</label>
-<span style="margin-left:1.5rem;color:#888;font-size:0.85em;"><?=$qstart?> to <?=$qend?></span>
+<label style="font-weight:normal;"><input type="radio" name="basis" value="accrual" <?=$basis==='accrual'?'checked':''?>> Accrual</label>
+<span style="margin-left:1rem;color:#888;font-size:0.85em;"><?=$qstart?> to <?=$qend?></span>
 </form>
 
-<?php // ── Section 1: GST ──────────────────────────────────────────────────── ?>
+<?php
+// ── Section 1: GST ──────────────────────────────────────────────────────────
+$gst_note = $gst_source === 'journal'
+    ? '&#9432; 1A/1B from journal entries'
+    : ($basis==='cash' ? 'cash basis — '.$sales_cnt.' customer payment'.($sales_cnt!==1?'s':'').', '.$purch_cnt.' supplier payment'.($purch_cnt!==1?'s':'') : 'accrual — '.$sales_cnt.' customer invoice'.($sales_cnt!==1?'s':'').', '.$purch_cnt.' supplier invoice'.($purch_cnt!==1?'s':''));
+?>
 <div class="div-table-responsive" style="margin-bottom:1.5rem;">
-<table class="noborder" style="max-width:600px;">
+<table class="noborder" style="max-width:620px;">
 <thead><tr class="liste_titre">
   <th colspan="3">
-    GST &mdash; <?=$basis==='cash'?'cash basis (payment dates)':'accrual basis (invoice dates)'?>
-    <?php if ($gst_source === 'journal'): ?>
-      <span style="font-weight:normal;font-size:0.8em;margin-left:0.5rem;color:#2a7;"
-            title="1A from account <?=htmlspecialchars($acct_gst_collected)?>, 1B from <?=htmlspecialchars($acct_gst_itc)?>">
-        &#9432; from journal
-      </span>
-    <?php else: ?>
-      <span style="font-weight:normal;font-size:0.8em;margin-left:1rem;">
-        <?=$sales_cnt?> customer <?=$basis==='cash'?'payment':'invoice'?><?=$sales_cnt!==1?'s':''?>,
-        <?=$purch_cnt?> supplier <?=$basis==='cash'?'payment':'invoice'?><?=$purch_cnt!==1?'s':''?>
-      </span>
-    <?php endif; ?>
+    GST
+    <span style="font-weight:normal;font-size:0.8em;margin-left:1rem;color:<?=$gst_source==='journal'?'#2a7':'#888'?>;">
+      <?=$gst_note?>
+    </span>
   </th>
 </tr></thead>
 <tbody>
-  <?=bas_row('G1',  'Total sales received (inc. GST)',   $sales_inc)?>
-  <?=bas_row('1A',  'GST on sales',                      $gst_1a,  true, '#f0fff0')?>
-  <?=bas_row('G11', 'Total purchases paid (inc. GST)',   $purch_inc)?>
-  <?=bas_row('1B',  'GST credits on purchases',          $gst_1b,  true, '#f0fff0')?>
+  <?=bas_tr('G1', 'Total sales (inc. GST)', $g1)?>
+  <?php if ($full): ?>
+  <?=bas_tr('G2', 'Export sales (GST-free)', $g2)?>
+  <?=bas_tr('G3', 'Other GST-free sales', $g3)?>
+  <?php endif; ?>
+  <?=bas_tr('G11','Total purchases (inc. GST)', $g11)?>
+  <?php if ($full): ?>
+  <?=bas_tr('G10','Capital purchases (inc. GST)', $g10)?>
+  <?php endif; ?>
+  <tr><td colspan="3" style="padding:0.2rem;border:none;"></td></tr>
+  <?=bas_tr('1A', 'GST on sales', $gst_1a, true, '#f0fff0')?>
+  <?=bas_tr('1B', 'GST credits on purchases', $gst_1b, true, '#f0fff0')?>
   <tr style="border-top:2px solid #ccc;">
     <td></td>
     <td><strong>Net GST <small style="font-weight:normal">(1A &minus; 1B)</small></strong></td>
@@ -292,40 +310,32 @@ print dol_get_fiche_head([], '', $title, -1, 'accountancy');
 </tbody>
 </table>
 <?php if ($net_gst < 0): ?>
-<p style="color:#c00;font-size:0.85em;">&#9888; Net GST is negative — enter 0 for field 9 GST and apply for a refund.</p>
+<p style="color:#c00;font-size:0.85em;margin-top:0.25rem;">&#9888; Net GST is negative — you have more credits than collected. Enter 0 for field 9 GST and apply for a refund.</p>
+<?php endif; ?>
+<?php if ($full && ($g2 > 0 || $g3 > 0)): ?>
+<p style="font-size:0.85em;color:#555;margin-top:0.25rem;">
+  Note: G2 and G3 are subsets of G1. Taxable sales = G1 &minus; G2 &minus; G3 = <?=bas_fmt($g1-$g2-$g3)?>.
+  1A should equal taxable sales &divide; 11.
+</p>
 <?php endif; ?>
 </div>
 
-<?php // ── Section 2: PAYG & Super ──────────────────────────────────────── ?>
-<div class="div-table-responsive" style="margin-bottom:1.5rem;">
-
 <?php
-// Source badge
+// ── Section 2: PAYG ──────────────────────────────────────────────────────────
 if ($w_source === 'journal') {
-    $acct_summary = [];
-    if (!empty($acct_wages)) $acct_summary[] = 'wages: '.implode(', ', $acct_wages);
-    if (!empty($acct_payg))  $acct_summary[] = 'PAYG payable: '.$acct_payg;
-    if (!empty($acct_super)) $acct_summary[] = 'super: '.implode(', ', $acct_super);
-    echo '<p style="font-size:0.85em;color:#2a6496;margin-bottom:0.5rem;">'
-        .'&#9432; Calculated from journal entries &mdash; '
-        .htmlspecialchars(implode('; ', $acct_summary))
-        .'. Edit and Save to override, or <a href="?fy='.$fy.'&q='.$q
-        .'&action=recalc&token='.newToken().'&mainmenu=accountancy&leftmenu=bas_report">Recalculate</a>.</p>';
+    $w_note = '&#9432; calculated from journal entries';
 } elseif ($w_source === 'saved') {
-    echo '<p style="font-size:0.85em;color:#888;margin-bottom:0.5rem;">'
-        .'Showing saved overrides. '
-        .($has_payg_config
-            ? '<a href="?fy='.$fy.'&q='.$q.'&action=recalc&token='.newToken()
-              .'&mainmenu=accountancy&leftmenu=bas_report">Recalculate from journal</a> (journal: W1 '
-              .bas_fmt($journal_w1).', W2 '.bas_fmt($journal_w2).').'
-            : '')
-        .'</p>';
+    $j_note = $has_payg_config
+        ? ' (journal: W1 '.bas_fmt($journal_w1).', W2 '.bas_fmt($journal_w2).')'
+        : '';
+    $recalc_url = '?fy='.$fy.'&q='.$q.'&basis='.$basis.'&action=recalc&token='.newToken().'&mainmenu=accountancy&leftmenu=bas_report';
+    $w_note = 'Showing saved overrides'.$j_note.'. <a href="'.$recalc_url.'">Recalculate from journal</a>.';
 } else {
-    echo '<p style="font-size:0.85em;color:#888;margin-bottom:0.5rem;">'
-        .'No accounts configured — enter manually, or <a href="'.DOL_URL_ROOT
-        .'/custom/bas/admin/setup.php">set up accounts</a>.</p>';
+    $w_note = 'No accounts configured — <a href="'.DOL_URL_ROOT.'/custom/bas/admin/setup.php">set up accounts</a> or enter manually.';
 }
 ?>
+<div class="div-table-responsive" style="margin-bottom:1.5rem;">
+<p style="font-size:0.85em;color:#<?=$w_source==='journal'?'2a7':'888'?>;margin-bottom:0.5rem;"><?=$w_note?></p>
 
 <form method="post" action="report.php">
 <input type="hidden" name="action"   value="save">
@@ -336,87 +346,104 @@ if ($w_source === 'journal') {
 <input type="hidden" name="mainmenu" value="accountancy">
 <input type="hidden" name="leftmenu" value="bas_report">
 
-<table class="noborder" style="max-width:600px;">
-<thead><tr class="liste_titre">
-  <th colspan="3">PAYG Withholding<?php if (!$has_payg_config): ?> &mdash; manual entry<?php endif; ?></th>
-</tr></thead>
+<table class="noborder" style="max-width:620px;">
+<thead><tr class="liste_titre"><th colspan="3">PAYG Withholding</th></tr></thead>
 <tbody>
-  <tr>
-    <td class="nowrap" style="width:3rem;color:#666;"><strong>W1</strong></td>
-    <td>Total salary &amp; wages paid (before tax)
-      <?php if ($has_payg_config && !empty($acct_wages)): ?>
-        <small style="color:#888;">— accounts: <?=htmlspecialchars(implode(', ', $acct_wages))?></small>
-      <?php endif; ?>
-    </td>
-    <td class="right">
-      <input type="text" name="w1" class="flat right" style="width:9rem;"
-             value="<?=$w1>0 ? number_format($w1,2) : ''?>" placeholder="0.00">
-    </td>
-  </tr>
-  <tr>
-    <td class="nowrap" style="width:3rem;color:#666;"><strong>W2</strong></td>
-    <td>Tax withheld (PAYG to remit to ATO)
-      <?php if (!empty($acct_payg)): ?>
-        <small style="color:#888;">— account: <?=htmlspecialchars($acct_payg)?></small>
-      <?php endif; ?>
-    </td>
-    <td class="right">
-      <input type="text" name="w2" class="flat right" style="width:9rem;"
-             value="<?=$w2>0 ? number_format($w2,2) : ''?>" placeholder="0.00">
-    </td>
-  </tr>
-  <?php if ($has_payg_config && !empty($acct_super)): ?>
-  <tr style="color:#666;">
-    <td class="nowrap"><em>Super</em></td>
-    <td><em>Superannuation expense (info only — not on BAS)
-      <small>— accounts: <?=htmlspecialchars(implode(', ', $acct_super))?></small>
-    </em></td>
-    <td class="right"><em><?=bas_fmt($super_display)?></em></td>
-  </tr>
-  <?php endif; ?>
+
+<?php
+// Helper: editable PAYG row
+function payg_row(string $code, string $label, float $val, ?string $acct_hint = null): string
+{
+    $hint = $acct_hint ? '<small style="color:#888;"> — account: '.htmlspecialchars($acct_hint).'</small>' : '';
+    return '<tr>'
+        .'<td class="nowrap" style="width:3rem;color:#555;"><strong>'.htmlspecialchars($code).'</strong></td>'
+        .'<td>'.htmlspecialchars($label).$hint.'</td>'
+        .'<td class="right"><input type="text" name="'.strtolower($code).'" class="flat right" style="width:9rem;"'
+        .' value="'.($val > 0 ? number_format($val, 2) : '').'" placeholder="0.00"></td>'
+        .'</tr>';
+}
+
+echo payg_row('W1', 'Total wages & salary paid (before tax)', $w1,
+    !empty($acct['wages']) ? implode(', ', $acct['wages']) : null);
+echo payg_row('W2', 'Withheld from wages (PAYG to ATO)', $w2,
+    $acct['payg'] ?: null);
+if ($full) {
+    echo payg_row('W3', 'Other amounts withheld (not W2 or W4)', $w3,
+        $acct['w3'] ?: null);
+    echo payg_row('W4', 'Withheld — no ABN quoted', $w4,
+        $acct['w4'] ?: null);
+}
+?>
+
+<tr style="border-top:1px solid #ccc;">
+  <td class="nowrap" style="width:3rem;color:#555;"><strong>W5</strong></td>
+  <td><strong>Total PAYG withheld</strong> <small style="font-weight:normal;">(W2<?=$full?' + W3 + W4':''?>)</small></td>
+  <td class="right nowrap"><strong><?=bas_fmt($w5)?></strong></td>
+</tr>
+
+<?php if (!empty($acct['super'])): ?>
+<tr style="color:#777;border-top:1px dashed #ddd;">
+  <td></td>
+  <td><em>Superannuation expense <small style="color:#888;">(informational — not on BAS)</small></em></td>
+  <td class="right nowrap"><em><?=bas_fmt($journal_super)?></em></td>
+</tr>
+<?php endif; ?>
+
 </tbody>
 </table>
 <div style="margin-top:0.5rem;">
-  <input type="submit" class="butAction" value="Save">
+  <input type="submit" class="butAction" value="Save PAYG">
 </div>
 </form>
 </div>
 
-<?php // ── Section 3: Summary ───────────────────────────────────────────── ?>
+<?php
+// ── Section 3: BAS Summary ────────────────────────────────────────────────────
+?>
 <div class="div-table-responsive" style="margin-bottom:2rem;">
-<table class="noborder" style="max-width:600px;">
-<thead><tr class="liste_titre">
-  <th colspan="3">BAS Summary &mdash; enter these on the ATO portal</th>
-</tr></thead>
+<table class="noborder" style="max-width:620px;">
+<thead><tr class="liste_titre"><th colspan="3">BAS Summary &mdash; enter these on the ATO portal</th></tr></thead>
 <tbody>
-  <?=bas_row('1A', 'GST on sales',           $gst_1a, false, '#f9f9f9')?>
-  <?=bas_row('1B', 'GST credits',            $gst_1b, false, '#f9f9f9')?>
-  <?=bas_row('',   'Net GST (1A − 1B)',      $net_gst, true)?>
-  <?php if ($w1 > 0 || $w2 > 0): ?>
-  <tr><td colspan="3" style="padding:0.2rem;"></td></tr>
-  <?=bas_row('W1', 'Wages paid (before tax)',  $w1, false, '#f9f9f9')?>
-  <?=bas_row('W2', 'PAYG withheld',            $w2, false, '#f9f9f9')?>
+  <?=bas_tr('1A', 'GST on sales',                    $gst_1a,  false, '#f9f9f9')?>
+  <?=bas_tr('1B', 'GST credits on purchases',        $gst_1b,  false, '#f9f9f9')?>
+  <?=bas_tr('',   'Net GST (1A − 1B)',               $net_gst, true)?>
+  <?php if ($w5 > 0 || $w1 > 0): ?>
+  <tr><td colspan="3" style="padding:0.2rem;border:none;"></td></tr>
+  <?=bas_tr('W1', 'Total wages paid',                $w1,      false, '#f9f9f9')?>
+  <?=bas_tr('W2', 'PAYG withheld from wages',        $w2,      false, '#f9f9f9')?>
+  <?php if ($full && ($w3 > 0 || $w4 > 0)): ?>
+  <?=bas_tr('W3', 'Other amounts withheld',          $w3,      false, '#f9f9f9')?>
+  <?=bas_tr('W4', 'Withheld — no ABN',               $w4,      false, '#f9f9f9')?>
+  <?php endif; ?>
+  <?=bas_tr('W5', 'Total PAYG withheld',             $w5,      true)?>
+  <?=bas_tr('4',  'PAYG withholding (= W5)',         $field_4, false, '#f9f9f9')?>
   <?php endif; ?>
   <tr style="border-top:2px solid #aaa;background:#fffde7;">
     <td><strong>9</strong></td>
-    <td><strong>Total payable to ATO</strong>
-      <?php if ($w1 == 0 && $w2 == 0): ?>
-        <small style="font-weight:normal;"> (enter W1 &amp; W2 above to include PAYG)</small>
-      <?php endif; ?>
+    <td>
+      <strong>Total amount to pay ATO</strong>
+      <small style="font-weight:normal;"> (net GST + field 4)</small>
     </td>
-    <td class="right nowrap"><strong><?=bas_fmt($total_payable)?></strong></td>
+    <td class="right nowrap"><strong><?=bas_fmt($field_9)?></strong></td>
   </tr>
 </tbody>
 </table>
+<?php if ($field_9 < 0): ?>
+<p style="color:#2a7;font-size:0.85em;margin-top:0.25rem;">Field 9 is negative — the ATO owes you a refund of <?=bas_fmt(abs($field_9))?>.</p>
+<?php endif; ?>
 </div>
 
 <div class="noprint">
   <button class="butAction" onclick="window.print()">Print / Save as PDF</button>
+  <span style="margin-left:1rem;font-size:0.85em;color:#888;">
+    BAS type: <?=htmlspecialchars(ucfirst($bas_type))?> &mdash;
+    <a href="<?=DOL_URL_ROOT?>/custom/bas/admin/setup.php">Change setup</a>
+  </span>
 </div>
 
 <style>
 @media print {
-  .noprint, form, .tabBar, .fiche .tabBar { display:none !important; }
+  .noprint, form, .tabBar { display:none !important; }
   body, .fiche { font-size:12pt; }
   table { border-collapse:collapse; width:100%; }
   td, th { padding:4px 8px; border-bottom:1px solid #ccc; }
