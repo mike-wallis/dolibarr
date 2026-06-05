@@ -150,29 +150,35 @@ $journal_sum = function(array $accounts, string $col) use ($db, $qs, $qe, $entit
 // These are always available and show total sales/purchases volume.
 // 1A and 1B are calculated ONLY from journal accounts (configured in Setup).
 
+// inv_1a / inv_1b are prorated GST from invoice records — used for reconciliation
+// against the journal figures, not for the actual BAS calculation.
 if ($basis === 'cash') {
     $sql_sales =
-        "SELECT COALESCE(SUM(pf.amount),0) AS g1, COUNT(DISTINCT p.rowid) AS cnt"
+        "SELECT COALESCE(SUM(pf.amount),0) AS g1,"
+        ."  COALESCE(SUM(pf.amount * f.total_tva / NULLIF(f.total_ttc,0)),0) AS inv_1a,"
+        ."  COUNT(DISTINCT p.rowid) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."paiement p"
         ." INNER JOIN ".MAIN_DB_PREFIX."paiement_facture pf ON pf.fk_paiement=p.rowid"
         ." INNER JOIN ".MAIN_DB_PREFIX."facture f ON f.rowid=pf.fk_facture"
         ." WHERE DATE(p.datep) BETWEEN '$qs' AND '$qe' AND f.entity=$entity";
 
     $sql_purch =
-        "SELECT COALESCE(SUM(pf.amount),0) AS g11, COUNT(DISTINCT p.rowid) AS cnt"
+        "SELECT COALESCE(SUM(pf.amount),0) AS g11,"
+        ."  COALESCE(SUM(pf.amount * f.total_tva / NULLIF(f.total_ttc,0)),0) AS inv_1b,"
+        ."  COUNT(DISTINCT p.rowid) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."paiementfourn p"
         ." INNER JOIN ".MAIN_DB_PREFIX."paiementfourn_facture pf ON pf.fk_paiementfourn=p.rowid"
         ." INNER JOIN ".MAIN_DB_PREFIX."facture_fourn f ON f.rowid=pf.fk_facturefourn"
         ." WHERE DATE(p.datep) BETWEEN '$qs' AND '$qe' AND f.entity=$entity";
 } else {
     $sql_sales =
-        "SELECT COALESCE(SUM(total_ttc),0) AS g1, COUNT(*) AS cnt"
+        "SELECT COALESCE(SUM(total_ttc),0) AS g1, COALESCE(SUM(total_tva),0) AS inv_1a, COUNT(*) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."facture"
         ." WHERE DATE(datef) BETWEEN '$qs' AND '$qe'"
         ." AND fk_statut >= 1 AND entity=$entity";
 
     $sql_purch =
-        "SELECT COALESCE(SUM(total_ttc),0) AS g11, COUNT(*) AS cnt"
+        "SELECT COALESCE(SUM(total_ttc),0) AS g11, COALESCE(SUM(total_tva),0) AS inv_1b, COUNT(*) AS cnt"
         ." FROM ".MAIN_DB_PREFIX."facture_fourn"
         ." WHERE DATE(datef) BETWEEN '$qs' AND '$qe'"
         ." AND fk_statut >= 1 AND entity=$entity";
@@ -183,9 +189,11 @@ $rs  = ($r1 && ($tmp = $db->fetch_object($r1)) instanceof stdClass) ? $tmp : nul
 $r2  = $db->query($sql_purch);
 $rp  = ($r2 && ($tmp = $db->fetch_object($r2)) instanceof stdClass) ? $tmp : null;
 
-$g1        = round((float)($rs?->g1  ?? 0), 2);
+$g1        = round((float)($rs?->g1     ?? 0), 2);
+$inv_1a    = round((float)($rs?->inv_1a ?? 0), 2);
 $sales_cnt = (int)($rs?->cnt ?? 0);
-$g11       = round((float)($rp?->g11 ?? 0), 2);
+$g11       = round((float)($rp?->g11    ?? 0), 2);
+$inv_1b    = round((float)($rp?->inv_1b ?? 0), 2);
 $purch_cnt = (int)($rp?->cnt ?? 0);
 
 // ── Full-mode extras (G2, G3, G10) from journal ───────────────────────────────
@@ -201,6 +209,15 @@ $gst_1b = !empty($acct['gst_itc'])       ? $journal_sum([$acct['gst_itc']],     
 
 $gst_ready = ($gst_1a !== null && $gst_1b !== null);
 $net_gst   = $gst_ready ? round($gst_1a - $gst_1b, 2) : null;
+
+// ── Reconciliation: journal vs invoice figures ────────────────────────────────
+// Amounts within $0.10 of each other are considered a match (handles rounding).
+$recon_tolerance = 0.10;
+$recon_1a_diff   = $gst_ready ? round($gst_1a - $inv_1a, 2) : null;
+$recon_1b_diff   = $gst_ready ? round($gst_1b - $inv_1b, 2) : null;
+$recon_1a_ok     = $recon_1a_diff !== null && abs($recon_1a_diff) <= $recon_tolerance;
+$recon_1b_ok     = $recon_1b_diff !== null && abs($recon_1b_diff) <= $recon_tolerance;
+$recon_ok        = $recon_1a_ok && $recon_1b_ok;
 
 // ── PAYG from journal ─────────────────────────────────────────────────────────
 
@@ -471,6 +488,43 @@ $vol_note = $basis === 'cash'
 <p style="font-size:0.85em;color:#555;margin-top:0.25rem;">
   Note: G2 and G3 are subsets of G1. Taxable sales = G1 &minus; G2 &minus; G3 = <?=bas_fmt($g1-$g2-$g3)?>.
 </p>
+<?php endif; ?>
+
+<?php if ($gst_ready): ?>
+<div style="margin-top:0.75rem;max-width:620px;padding:0.6rem 1rem;border-radius:3px;font-size:0.85em;
+     background:<?=$recon_ok?'#f0fff0':'#fff3cd'?>;border-left:4px solid <?=$recon_ok?'#4caf50':'#e6a817'?>;">
+  <?php if ($recon_ok): ?>
+    <strong>&#10003; Reconciled</strong> — journal figures match invoice totals
+    (1A <?=bas_fmt($gst_1a)?>, 1B <?=bas_fmt($gst_1b)?>).
+  <?php else: ?>
+    <strong>&#9888; Reconciliation difference detected</strong> — journal and invoice totals do not match.
+    Check for invoices not yet transferred to accounting.
+    <table style="margin-top:0.5rem;border-collapse:collapse;width:100%;">
+    <tr style="color:#555;">
+      <th style="text-align:left;font-weight:normal;padding:2px 8px 2px 0;width:3rem;"></th>
+      <th style="text-align:right;font-weight:normal;padding:2px 8px;">Journal (used)</th>
+      <th style="text-align:right;font-weight:normal;padding:2px 8px;">From invoices</th>
+      <th style="text-align:right;font-weight:normal;padding:2px 8px;">Difference</th>
+    </tr>
+    <tr>
+      <td style="padding:2px 8px 2px 0;color:#555;">1A</td>
+      <td style="text-align:right;padding:2px 8px;"><?=bas_fmt($gst_1a)?></td>
+      <td style="text-align:right;padding:2px 8px;"><?=bas_fmt($inv_1a)?></td>
+      <td style="text-align:right;padding:2px 8px;color:<?=$recon_1a_ok?'#4caf50':'#c00'?>;">
+        <?=$recon_1a_ok ? '&#10003;' : bas_fmt($recon_1a_diff)?>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:2px 8px 2px 0;color:#555;">1B</td>
+      <td style="text-align:right;padding:2px 8px;"><?=bas_fmt($gst_1b)?></td>
+      <td style="text-align:right;padding:2px 8px;"><?=bas_fmt($inv_1b)?></td>
+      <td style="text-align:right;padding:2px 8px;color:<?=$recon_1b_ok?'#4caf50':'#c00'?>;">
+        <?=$recon_1b_ok ? '&#10003;' : bas_fmt($recon_1b_diff)?>
+      </td>
+    </tr>
+    </table>
+  <?php endif; ?>
+</div>
 <?php endif; ?>
 </div>
 
