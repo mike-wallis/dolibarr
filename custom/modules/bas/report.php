@@ -384,7 +384,7 @@ print dol_get_fiche_head([], '', $title, -1, 'accountancy');
     <input type="date" name="to" id="bas_to" class="flat" value="<?=htmlspecialchars($qend)?>">
   </td>
   <td style="padding:0 10px 4px 0;">
-    <input type="submit" class="butAction" value="Show">
+    <input type="submit" class="butAction" value="Refresh">
   </td>
   <td style="padding:0 0 4px 0;white-space:nowrap;">
     <label style="font-weight:normal;margin-right:0.5rem;">
