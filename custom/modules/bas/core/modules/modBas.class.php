@@ -20,7 +20,8 @@ class modBas extends DolibarrModules
         $this->description = 'Australian BAS and PAYG Withholding report. Calculates GST from Dolibarr payments; manual PAYG entry saved per quarter.';
         $this->version     = '1.0';
         $this->const_name  = 'MAIN_MODULE_BAS';
-        $this->editor_name = 'South Side Supplies';
+        $this->editor_name  = 'South Side Supplies';
+        $this->config_page_url = ['setup.php@bas'];
 
         $r = 0;
         $this->menu[$r] = [
