@@ -152,6 +152,15 @@ print dol_get_fiche_head(
 );
 ?>
 
+<div style="margin-bottom:1.25rem;padding:0.75rem 1rem;background:#f0f4ff;border-left:4px solid #5b7fd4;border-radius:3px;max-width:820px;">
+  <strong>To run the BAS report:</strong>
+  click <strong>Accounting</strong> in the top menu &rarr; <strong>BAS &amp; PAYG</strong> in the left sidebar.
+  &nbsp;&nbsp;
+  <a href="<?php echo DOL_URL_ROOT; ?>/custom/bas/report.php?mainmenu=accountancy&leftmenu=bas_report">
+    Go to report &rarr;
+  </a>
+</div>
+
 <form method="post" action="setup.php">
 <input type="hidden" name="action" value="save">
 <input type="hidden" name="token"  value="<?php echo newToken(); ?>">
