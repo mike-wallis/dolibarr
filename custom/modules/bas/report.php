@@ -350,7 +350,8 @@ function bas_tr(string $code, string $label, float $amt, bool $bold = false, str
 
 $title = 'BAS &amp; PAYG — FY'.$fy.' '.$qlabels[$q].' ('.$bas_type.')';
 llxHeader('', strip_tags($title));
-print dol_get_fiche_head([], '', $title, -1, 'accountancy');
+print dol_get_fiche_head([], '', 'Australian BAS &amp; PAYG Activity Statement', -1, 'accountancy');
+print '<p style="margin:0 0 0.5rem;color:#555;font-size:0.9em;">'.$title.'</p>';
 ?>
 
 <!-- Period + basis selector -->
