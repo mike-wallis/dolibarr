@@ -21,6 +21,10 @@ images/
 imports/*.csv
 imports/*.xlsx
 imports/*.xls
+imports/raw_samples/
+
+# Database dumps
+*.sql
 
 # Logs
 *.log
