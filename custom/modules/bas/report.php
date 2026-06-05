@@ -427,7 +427,7 @@ $vol_note = $basis === 'cash'
 <div style="padding:0.75rem 1rem;background:#fff3cd;border-left:4px solid #e6a817;border-radius:3px;margin-bottom:0.75rem;max-width:620px;">
   <strong>&#9888; GST accounts not configured.</strong>
   G1 and G11 (volume totals) are shown below, but <strong>1A, 1B, and Net GST cannot be calculated</strong>
-  until you configure the GST Collected and GST ITC accounts in
+  until you configure the GST Collected and GST Paid (purchases) accounts in
   <a href="<?=DOL_URL_ROOT?>/custom/bas/admin/setup.php"><strong>Setup</strong></a>.
 </div>
 <?php endif; ?>

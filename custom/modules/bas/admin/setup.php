@@ -204,7 +204,7 @@ $wm = fn($k,$v,$p) => $has_accounts ? bas_select_multi($k,$accounts,$v)  : bas_t
 echo bas_row('1A', 'GST collected (sales)',
     $w('bas_account_gst_collected', $cfg['gst_collected'], 'e.g. 2-1100'),
     'Sum of <strong>CREDIT</strong> entries in the quarter');
-echo bas_row('1B', 'GST credits / ITC (purchases)',
+echo bas_row('1B', 'GST Paid (purchases)',
     $w('bas_account_gst_itc', $cfg['gst_itc'], 'e.g. 1-3300'),
     'Sum of <strong>DEBIT</strong> entries in the quarter');
 echo bas_row('G2', 'Export sales',
