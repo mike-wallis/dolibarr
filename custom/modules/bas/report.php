@@ -67,7 +67,14 @@ $fy    = max(2020, min(2035, (int)(GETPOST('fy',    'int') ?: $cur_fy)));
 $q     = max(1,    min(4,    (int)(GETPOST('q',     'int') ?: $cur_q)));
 $basis = GETPOST('basis', 'alpha') === 'accrual' ? 'accrual' : 'cash';
 
-[$qstart, $qend] = bas_dates($fy, $q);
+[$qstart_default, $qend_default] = bas_dates($fy, $q);
+
+// Allow manual date override — user can adjust the calculated quarter dates
+$from_raw = GETPOST('from', 'alpha');
+$to_raw   = GETPOST('to',   'alpha');
+$qstart   = ($from_raw && preg_match('/^\d{4}-\d{2}-\d{2}$/', $from_raw)) ? $from_raw : $qstart_default;
+$qend     = ($to_raw   && preg_match('/^\d{4}-\d{2}-\d{2}$/', $to_raw))   ? $to_raw   : $qend_default;
+
 $entity = (int) $conf->entity;
 $qs     = $db->escape($qstart);
 $qe     = $db->escape($qend);
@@ -90,9 +97,14 @@ $acct = [
     'super'         => bas_parse(getDolGlobalString('BAS_ACCOUNTS_SUPER')),
 ];
 
-// ── llx_const keys for saved PAYG overrides ───────────────────────────────────
+// ── llx_const keys for saved PAYG overrides (keyed by FY+Q, not custom dates) ──
 
 $key = fn(string $f) => 'BAS_'.$f.'_'.$fy.$q;
+
+// ── Handle: print (standalone HTML, no Dolibarr chrome) ──────────────────────
+
+// Deferred — rendered after calculations below. Flag it here so we skip llxHeader.
+$print_mode = ($action === 'print');
 
 // ── Handle: save PAYG overrides ───────────────────────────────────────────────
 
@@ -231,6 +243,97 @@ $field_9 = round($net_gst + $field_4, 2);
 
 $w_source = $has_saved ? 'saved' : ($has_payg_config ? 'journal' : 'manual');
 
+// ── Print mode — standalone HTML, no Dolibarr chrome ─────────────────────────
+
+if ($print_mode) {
+    $co_name = htmlspecialchars(getDolGlobalString('MAIN_INFO_SOCIETE_NOM') ?: 'South Side Supplies');
+    header('Content-Type: text/html; charset=utf-8');
+    ?><!DOCTYPE html><html lang="en"><head>
+    <meta charset="utf-8">
+    <title>BAS &amp; PAYG — FY<?=$fy?> <?=htmlspecialchars($qlabels[$q])?></title>
+    <style>
+      body  { font-family:Arial,sans-serif; font-size:11pt; margin:2cm; color:#000; }
+      h1    { font-size:14pt; margin-bottom:0.3rem; }
+      .meta { font-size:9pt; color:#666; margin-bottom:1.5rem; }
+      h2    { font-size:10pt; font-weight:bold; text-transform:uppercase; letter-spacing:0.05em;
+              margin:1.2rem 0 0.2rem; border-bottom:1px solid #ccc; padding-bottom:3px; }
+      table { width:100%; border-collapse:collapse; margin-bottom:0.5rem; }
+      td    { padding:4px 6px; border-bottom:1px solid #eee; }
+      td.code { width:3rem; color:#777; font-size:9pt; }
+      td.amt  { text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap; }
+      tr.sub td { font-weight:bold; }
+      tr.total td { font-weight:bold; border-top:2px solid #000; border-bottom:none; }
+      tr.payable td { font-weight:bold; font-size:12pt; background:#fffde7; border-top:2px solid #999; }
+      footer { margin-top:3rem; font-size:8pt; color:#aaa; border-top:1px solid #eee; padding-top:0.5rem; }
+    </style></head><body>
+    <h1><?=$co_name?> — Business Activity Statement</h1>
+    <p class="meta">
+      <?=htmlspecialchars($qlabels[$q])?> &nbsp;FY<?=$fy?> &nbsp;|&nbsp;
+      <?=$qstart?> to <?=$qend?> &nbsp;|&nbsp;
+      <?=ucfirst($basis)?> basis &nbsp;|&nbsp; <?=ucfirst($bas_type)?> BAS
+    </p>
+
+    <h2>GST</h2>
+    <table>
+      <tr><td class="code">G1</td><td>Total sales (inc. GST)</td><td class="amt"><?=bas_fmt($g1)?></td></tr>
+      <?php if ($full && ($g2 || $g3)): ?>
+      <tr><td class="code">G2</td><td>Export sales</td><td class="amt"><?=bas_fmt($g2)?></td></tr>
+      <tr><td class="code">G3</td><td>Other GST-free sales</td><td class="amt"><?=bas_fmt($g3)?></td></tr>
+      <?php endif; ?>
+      <tr><td class="code">G11</td><td>Total purchases (inc. GST)</td><td class="amt"><?=bas_fmt($g11)?></td></tr>
+      <?php if ($full && $g10): ?>
+      <tr><td class="code">G10</td><td>Capital purchases (inc. GST)</td><td class="amt"><?=bas_fmt($g10)?></td></tr>
+      <?php endif; ?>
+      <tr class="sub"><td class="code">1A</td><td>GST on sales</td><td class="amt"><?=bas_fmt($gst_1a)?></td></tr>
+      <tr class="sub"><td class="code">1B</td><td>GST credits on purchases</td><td class="amt"><?=bas_fmt($gst_1b)?></td></tr>
+      <tr class="total"><td></td><td>Net GST (1A &minus; 1B)</td><td class="amt"><?=bas_fmt($net_gst)?></td></tr>
+    </table>
+
+    <?php if ($w1 > 0 || $w5 > 0): ?>
+    <h2>PAYG Withholding</h2>
+    <table>
+      <tr><td class="code">W1</td><td>Total wages paid (before tax)</td><td class="amt"><?=bas_fmt($w1)?></td></tr>
+      <tr><td class="code">W2</td><td>Withheld from wages</td><td class="amt"><?=bas_fmt($w2)?></td></tr>
+      <?php if ($full && ($w3 || $w4)): ?>
+      <tr><td class="code">W3</td><td>Other amounts withheld</td><td class="amt"><?=bas_fmt($w3)?></td></tr>
+      <tr><td class="code">W4</td><td>Withheld — no ABN</td><td class="amt"><?=bas_fmt($w4)?></td></tr>
+      <?php endif; ?>
+      <tr class="total"><td class="code">W5</td><td>Total PAYG withheld</td><td class="amt"><?=bas_fmt($w5)?></td></tr>
+    </table>
+    <?php endif; ?>
+
+    <?php if (!empty($acct['super']) && $journal_super > 0): ?>
+    <h2>Superannuation (informational — not on BAS)</h2>
+    <table>
+      <tr><td></td><td>Superannuation expense</td><td class="amt"><?=bas_fmt($journal_super)?></td></tr>
+    </table>
+    <?php endif; ?>
+
+    <h2>BAS Summary — amounts to enter on the ATO portal</h2>
+    <table>
+      <tr><td class="code">1A</td><td>GST on sales</td><td class="amt"><?=bas_fmt($gst_1a)?></td></tr>
+      <tr><td class="code">1B</td><td>GST credits</td><td class="amt"><?=bas_fmt($gst_1b)?></td></tr>
+      <tr class="sub"><td></td><td>Net GST (1A &minus; 1B)</td><td class="amt"><?=bas_fmt($net_gst)?></td></tr>
+      <?php if ($w5 > 0): ?>
+      <tr><td class="code">W1</td><td>Wages paid</td><td class="amt"><?=bas_fmt($w1)?></td></tr>
+      <tr><td class="code">W5</td><td>Total PAYG withheld</td><td class="amt"><?=bas_fmt($w5)?></td></tr>
+      <tr><td class="code">4</td><td>PAYG withholding (= W5)</td><td class="amt"><?=bas_fmt($field_4)?></td></tr>
+      <?php endif; ?>
+      <tr class="payable"><td class="code">9</td><td>Total payable to ATO</td><td class="amt"><?=bas_fmt($field_9)?></td></tr>
+    </table>
+
+    <?php if ($field_9 < 0): ?>
+    <p style="color:#2a7;">ATO owes you a refund of <?=bas_fmt(abs($field_9))?>.</p>
+    <?php endif; ?>
+
+    <footer>
+      Prepared from <?=$co_name?> Dolibarr &mdash; printed <?=date('d/m/Y H:i')?>
+    </footer>
+    <script>window.print();</script>
+    </body></html><?php
+    exit;
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 function bas_tr(string $code, string $label, float $amt, bool $bold = false, string $bg = ''): string
@@ -251,27 +354,70 @@ print dol_get_fiche_head([], '', $title, -1, 'accountancy');
 ?>
 
 <!-- Period + basis selector -->
-<form method="get" action="report.php" style="margin-bottom:1.5rem;">
+<form method="get" action="report.php" style="margin-bottom:1rem;">
 <input type="hidden" name="mainmenu" value="accountancy">
 <input type="hidden" name="leftmenu" value="bas_report">
-<strong>Period:</strong>&nbsp;
-<select name="fy" class="flat">
-<?php for ($y=$cur_fy; $y>=$cur_fy-5; $y--): ?>
-  <option value="<?=$y?>" <?=$y===$fy?'selected':''?>>FY<?=$y?></option>
-<?php endfor; ?>
-</select>&nbsp;
-<select name="q" class="flat">
-<?php foreach ($qlabels as $n=>$lbl): ?>
-  <option value="<?=$n?>" <?=$n===$q?'selected':''?>><?=htmlspecialchars($lbl)?></option>
-<?php endforeach; ?>
-</select>&nbsp;
-<input type="submit" class="butAction" value="Show">
-&nbsp;&nbsp;
-<label style="font-weight:normal;"><input type="radio" name="basis" value="cash"    <?=$basis==='cash'   ?'checked':''?>> Cash</label>
-&nbsp;
-<label style="font-weight:normal;"><input type="radio" name="basis" value="accrual" <?=$basis==='accrual'?'checked':''?>> Accrual</label>
-<span style="margin-left:1rem;color:#888;font-size:0.85em;"><?=$qstart?> to <?=$qend?></span>
+<table style="border:none;margin:0;">
+<tr>
+  <td style="padding:0 6px 4px 0;white-space:nowrap;"><strong>Quarter:</strong></td>
+  <td style="padding:0 6px 4px 0;">
+    <select name="fy" id="bas_fy" class="flat">
+    <?php for ($y=$cur_fy; $y>=$cur_fy-5; $y--): ?>
+      <option value="<?=$y?>" <?=$y===$fy?'selected':''?>>FY<?=$y?></option>
+    <?php endfor; ?>
+    </select>
+  </td>
+  <td style="padding:0 6px 4px 0;">
+    <select name="q" id="bas_q" class="flat">
+    <?php foreach ($qlabels as $n=>$lbl): ?>
+      <option value="<?=$n?>" <?=$n===$q?'selected':''?>><?=htmlspecialchars($lbl)?></option>
+    <?php endforeach; ?>
+    </select>
+  </td>
+  <td style="padding:0 10px 4px 0;color:#aaa;">&#x2192;</td>
+  <td style="padding:0 4px 4px 0;white-space:nowrap;"><strong>From:</strong></td>
+  <td style="padding:0 6px 4px 0;">
+    <input type="date" name="from" id="bas_from" class="flat" value="<?=htmlspecialchars($qstart)?>">
+  </td>
+  <td style="padding:0 6px 4px 0;white-space:nowrap;"><strong>To:</strong></td>
+  <td style="padding:0 10px 4px 0;">
+    <input type="date" name="to" id="bas_to" class="flat" value="<?=htmlspecialchars($qend)?>">
+  </td>
+  <td style="padding:0 10px 4px 0;">
+    <input type="submit" class="butAction" value="Show">
+  </td>
+  <td style="padding:0 0 4px 0;white-space:nowrap;">
+    <label style="font-weight:normal;margin-right:0.5rem;">
+      <input type="radio" name="basis" value="cash"    <?=$basis==='cash'   ?'checked':''?>> Cash
+    </label>
+    <label style="font-weight:normal;">
+      <input type="radio" name="basis" value="accrual" <?=$basis==='accrual'?'checked':''?>> Accrual
+    </label>
+  </td>
+</tr>
+</table>
 </form>
+<script>
+(function () {
+    var qDates = {
+        1: function(fy) { return [fy-1+'-07-01', fy-1+'-09-30']; },
+        2: function(fy) { return [fy-1+'-10-01', fy-1+'-12-31']; },
+        3: function(fy) { return [fy+'-01-01',   fy+'-03-31']; },
+        4: function(fy) { return [fy+'-04-01',   fy+'-06-30']; }
+    };
+    function fillDates() {
+        var fy = parseInt(document.getElementById('bas_fy').value);
+        var q  = parseInt(document.getElementById('bas_q').value);
+        if (qDates[q]) {
+            var d = qDates[q](fy);
+            document.getElementById('bas_from').value = d[0];
+            document.getElementById('bas_to').value   = d[1];
+        }
+    }
+    document.getElementById('bas_fy').addEventListener('change', fillDates);
+    document.getElementById('bas_q').addEventListener('change',  fillDates);
+}());
+</script>
 
 <?php
 // ── Section 1: GST ──────────────────────────────────────────────────────────
@@ -433,22 +579,20 @@ if ($full) {
 <?php endif; ?>
 </div>
 
-<div class="noprint">
-  <button class="butAction" onclick="window.print()">Print / Save as PDF</button>
+<div class="noprint" style="margin-top:0.5rem;">
+  <?php
+  $print_url = DOL_URL_ROOT.'/custom/bas/report.php?action=print'
+      .'&fy='.$fy.'&q='.$q.'&from='.urlencode($qstart).'&to='.urlencode($qend)
+      .'&basis='.$basis.'&mainmenu=accountancy&leftmenu=bas_report';
+  ?>
+  <a href="<?=htmlspecialchars($print_url)?>" target="_blank" class="butAction">
+    Print / Save as PDF
+  </a>
   <span style="margin-left:1rem;font-size:0.85em;color:#888;">
-    BAS type: <?=htmlspecialchars(ucfirst($bas_type))?> &mdash;
-    <a href="<?=DOL_URL_ROOT?>/custom/bas/admin/setup.php">Change setup</a>
+    Opens a clean print-ready page &mdash; <?=htmlspecialchars(ucfirst($bas_type))?> BAS &mdash;
+    <a href="<?=DOL_URL_ROOT?>/custom/bas/admin/setup.php">Setup</a>
   </span>
 </div>
-
-<style>
-@media print {
-  .noprint, form, .tabBar { display:none !important; }
-  body, .fiche { font-size:12pt; }
-  table { border-collapse:collapse; width:100%; }
-  td, th { padding:4px 8px; border-bottom:1px solid #ccc; }
-}
-</style>
 
 <?php
 print dol_get_fiche_end();
