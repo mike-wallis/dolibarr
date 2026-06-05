@@ -60,6 +60,17 @@ for f in "$REPO_DIR"/custom/core/modules/propale/doc/*.php; do
     deploy_file "$f" "$HTDOCS_DIR/core/modules/propale/doc/$(basename "$f")"
 done
 
+# ── Custom modules ───────────────────────────────────────────────────────────
+echo "Custom modules:"
+for mod_dir in "$REPO_DIR"/custom/modules/*/; do
+    [ -d "$mod_dir" ] || continue
+    mod_name="$(basename "$mod_dir")"
+    dest="$HTDOCS_DIR/custom/$mod_name"
+    mkdir -p "$dest"
+    cp -rf "$mod_dir/." "$dest/"
+    echo "  modules/$mod_name/"
+done
+
 echo ""
 echo "Done."
 echo ""

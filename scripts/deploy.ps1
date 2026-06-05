@@ -57,6 +57,19 @@ Get-ChildItem (Join-Path $RepoRoot "custom\core\modules\propale\doc\*.php") | Fo
     Deploy-File $_.FullName (Join-Path $HtdocsDir "core\modules\propale\doc\$($_.Name)")
 }
 
+# ── Custom modules ───────────────────────────────────────────────────────────
+Write-Host "Custom modules:" -ForegroundColor Yellow
+$modulesPath = Join-Path $RepoRoot "custom\modules"
+if (Test-Path $modulesPath) {
+    Get-ChildItem $modulesPath -Directory | ForEach-Object {
+        $modName = $_.Name
+        $modDest = Join-Path $HtdocsDir "custom\$modName"
+        New-Item -ItemType Directory -Force $modDest | Out-Null
+        Copy-Item -Path "$($_.FullName)\*" -Destination $modDest -Recurse -Force
+        Write-Host "  modules\$modName\" -ForegroundColor Cyan
+    }
+}
+
 Write-Host ""
 Write-Host "Done." -ForegroundColor Green
 Write-Host ""

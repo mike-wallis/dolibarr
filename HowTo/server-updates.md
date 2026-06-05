@@ -74,6 +74,7 @@ HTDOCS_DIR=~/erp_dolibarr/public_html bash scripts/deploy.sh
 | `custom/core/modules/facture/doc/*.php` | `core/modules/facture/doc/` |
 | `custom/core/modules/supplier_order/doc/*.php` | `core/modules/supplier_order/doc/` |
 | `custom/core/modules/propale/doc/*.php` | `core/modules/propale/doc/` |
+| `custom/modules/brand/` | `custom/brand/` (Brand Router module) |
 
 ---
 
