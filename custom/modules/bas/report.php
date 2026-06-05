@@ -145,7 +145,11 @@ $sales_cnt   = (int)($rs?->cnt ?? 0);
 $purch_inc   = round((float)($rp?->purch_inc ?? 0), 2);
 $gst_1b      = round((float)($rp?->gst_1b   ?? 0), 2);
 $purch_cnt   = (int)($rp?->cnt ?? 0);
-$net_gst     = round($gst_1a - $gst_1b, 2);
+
+// ── Load GST account config ───────────────────────────────────────────────────
+
+$acct_gst_collected = trim(getDolGlobalString('BAS_ACCOUNT_GST_COLLECTED'));
+$acct_gst_itc       = trim(getDolGlobalString('BAS_ACCOUNT_GST_ITC'));
 
 // ── PAYG / super: from accounting journal ────────────────────────────────────
 
@@ -163,9 +167,21 @@ $journal_sum = function(array $accounts, string $col) use ($db, $qs, $qe, $entit
     return $r ? round((float)($db->fetch_object($r)?->total ?? 0), 2) : 0.0;
 };
 
-$journal_w1    = $journal_sum($acct_wages,        'debit');
-$journal_w2    = !empty($acct_payg) ? $journal_sum([$acct_payg], 'credit') : 0.0;
-$journal_super = $journal_sum($acct_super,        'debit');
+$journal_w1    = $journal_sum($acct_wages,              'debit');
+$journal_w2    = !empty($acct_payg)           ? $journal_sum([$acct_payg],           'credit') : 0.0;
+$journal_super = $journal_sum($acct_super,             'debit');
+
+// Override invoice-total GST with journal figures if accounts are configured
+$gst_source = 'invoices';
+if (!empty($acct_gst_collected)) {
+    $gst_1a     = $journal_sum([$acct_gst_collected], 'credit');
+    $gst_source = 'journal';
+}
+if (!empty($acct_gst_itc)) {
+    $gst_1b     = $journal_sum([$acct_gst_itc],       'debit');
+    $gst_source = 'journal';
+}
+$net_gst = round($gst_1a - $gst_1b, 2);
 
 // Decide whether to use journal values or saved overrides
 $saved_w1 = getDolGlobalString($key_w1);
@@ -250,10 +266,17 @@ print dol_get_fiche_head([], '', $title, -1, 'accountancy');
 <thead><tr class="liste_titre">
   <th colspan="3">
     GST &mdash; <?=$basis==='cash'?'cash basis (payment dates)':'accrual basis (invoice dates)'?>
-    <span style="font-weight:normal;font-size:0.8em;margin-left:1rem;">
-      <?=$sales_cnt?> customer <?=$basis==='cash'?'payment':'invoice'?><?=$sales_cnt!==1?'s':''?>,
-      <?=$purch_cnt?> supplier <?=$basis==='cash'?'payment':'invoice'?><?=$purch_cnt!==1?'s':''?>
-    </span>
+    <?php if ($gst_source === 'journal'): ?>
+      <span style="font-weight:normal;font-size:0.8em;margin-left:0.5rem;color:#2a7;"
+            title="1A from account <?=htmlspecialchars($acct_gst_collected)?>, 1B from <?=htmlspecialchars($acct_gst_itc)?>">
+        &#9432; from journal
+      </span>
+    <?php else: ?>
+      <span style="font-weight:normal;font-size:0.8em;margin-left:1rem;">
+        <?=$sales_cnt?> customer <?=$basis==='cash'?'payment':'invoice'?><?=$sales_cnt!==1?'s':''?>,
+        <?=$purch_cnt?> supplier <?=$basis==='cash'?'payment':'invoice'?><?=$purch_cnt!==1?'s':''?>
+      </span>
+    <?php endif; ?>
   </th>
 </tr></thead>
 <tbody>
