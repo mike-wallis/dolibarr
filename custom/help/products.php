@@ -12,14 +12,14 @@ does what is the key to fast searching and clean invoices.</p>
 
 <hr>
 
-<h2>The four fields — what each one is for</h2>
+<h2>The five fields — what each one is for</h2>
 
 <table class="noborder" style="width:100%;max-width:900px;margin-bottom:1.5rem;">
   <thead>
     <tr style="background:#f5f5f5;">
       <th style="padding:0.5rem 1rem;text-align:left;">Field</th>
       <th style="padding:0.5rem 1rem;text-align:left;">Purpose</th>
-      <th style="padding:0.5rem 1rem;text-align:left;">Appears on invoice?</th>
+      <th style="padding:0.5rem 1rem;text-align:left;">Appears on documents?</th>
       <th style="padding:0.5rem 1rem;text-align:left;">Example</th>
     </tr>
   </thead>
@@ -27,22 +27,28 @@ does what is the key to fast searching and clean invoices.</p>
     <tr>
       <td style="padding:0.5rem 1rem;"><strong>Reference</strong></td>
       <td style="padding:0.5rem 1rem;">The SKU — unique identifier, matches the website variant SKU</td>
-      <td style="padding:0.5rem 1rem;color:green;">Yes — shown next to the line</td>
+      <td style="padding:0.5rem 1rem;color:green;">Yes — shown next to every line</td>
       <td style="padding:0.5rem 1rem;"><code>BLAZ5</code></td>
     </tr>
     <tr style="background:#fafafa;">
       <td style="padding:0.5rem 1rem;"><strong>Label</strong></td>
-      <td style="padding:0.5rem 1rem;">Internal search string — used when adding products to invoices and orders. Never seen by customers.</td>
+      <td style="padding:0.5rem 1rem;">Internal search string — used when adding products to invoices and orders. Never seen by customers or suppliers.</td>
       <td style="padding:0.5rem 1rem;color:#c00;">No — suppressed in our templates</td>
       <td style="padding:0.5rem 1rem;"><code>Hard Floor/Surface | Degreaser | ECOLAB | Blue Lazer 5L</code></td>
     </tr>
     <tr>
       <td style="padding:0.5rem 1rem;"><strong>Description</strong></td>
-      <td style="padding:0.5rem 1rem;">Customer-facing text. Copied to the invoice line when you add the product.</td>
-      <td style="padding:0.5rem 1rem;color:green;">Yes — the main line text</td>
+      <td style="padding:0.5rem 1rem;">Customer-facing text. Copied to the invoice or quote line when you add the product.</td>
+      <td style="padding:0.5rem 1rem;color:green;">Yes — sales invoices &amp; quotes</td>
       <td style="padding:0.5rem 1rem;"><code>Blue Lazer Kitchen &amp; Bathroom Degreaser 5L</code></td>
     </tr>
     <tr style="background:#fafafa;">
+      <td style="padding:0.5rem 1rem;"><strong>Purchase Description</strong></td>
+      <td style="padding:0.5rem 1rem;">Supplier-facing text. Overrides the Description on BCS purchase orders when filled in. Leave blank if the standard Description is fine for the supplier.</td>
+      <td style="padding:0.5rem 1rem;color:green;">Yes — BCS purchase orders only</td>
+      <td style="padding:0.5rem 1rem;"><code>72 L bin liner</code></td>
+    </tr>
+    <tr>
       <td style="padding:0.5rem 1rem;"><strong>Category</strong></td>
       <td style="padding:0.5rem 1rem;">Hierarchy used for product list filtering, reports, and website sync.</td>
       <td style="padding:0.5rem 1rem;color:#888;">No</td>
@@ -180,6 +186,61 @@ nothing from the internal Label hierarchy.</p>
         <td style="padding:0.4rem 1rem;text-align:right;">2</td>
         <td style="padding:0.4rem 1rem;text-align:right;">$42.00</td>
         <td style="padding:0.4rem 1rem;text-align:right;">$84.00</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<hr>
+
+<h2>Purchase Description — supplier-facing text</h2>
+
+<p>The <strong>Purchase Description</strong> field lets you store a different product description for use
+on purchase orders sent to suppliers. This mirrors the split that Reckon had between the sales description
+and the purchase description.</p>
+
+<h3>When to fill it in</h3>
+<p>Use it when what you want the supplier to see on the PO differs from what you show customers on invoices.
+Common cases:</p>
+<ul>
+  <li>Your customer description is long and marketing-flavoured; the supplier just needs the short product name they recognise.</li>
+  <li>The supplier uses their own product name rather than the brand name you sell under.</li>
+  <li>You want to omit quantity details (e.g. "250 sheets") that the supplier already knows from context.</li>
+</ul>
+<p>If the standard Description is also appropriate for the supplier, leave Purchase Description blank — the PO will fall back to Description automatically.</p>
+
+<h3>Where to find it on the product card</h3>
+<p>The field appears on the <strong>Product</strong> tab, right-hand column, below Origin. It is always editable
+inline — click the <strong>pencil icon</strong> next to "Purchase Description" to edit without entering full MODIFY mode,
+or use the MODIFY button to edit all fields at once.</p>
+
+<h3>How it appears on purchase orders</h3>
+<p>The BCS purchase order template reads this field for every line. If a line's product has a Purchase Description set,
+that text replaces the standard Description on the printed PO. Lines without a Purchase Description use the standard Description as normal.</p>
+
+<div style="border:1px solid #ccc;border-radius:6px;overflow:hidden;max-width:700px;margin:1rem 0 1.5rem;font-size:0.9rem;">
+  <div style="background:#f4f4f4;padding:0.5rem 1rem;font-weight:bold;border-bottom:1px solid #ddd;">BCS Purchase Order line — what the supplier sees</div>
+  <table style="width:100%;border-collapse:collapse;">
+    <thead>
+      <tr style="background:#fafafa;border-bottom:1px solid #eee;">
+        <th style="padding:0.4rem 1rem;text-align:left;">SKU</th>
+        <th style="padding:0.4rem 1rem;text-align:left;">Description on PO</th>
+        <th style="padding:0.4rem 1rem;text-align:left;">Source</th>
+        <th style="padding:0.4rem 1rem;text-align:right;">Qty</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding:0.4rem 1rem;">1301</td>
+        <td style="padding:0.4rem 1rem;">72 L bin liner</td>
+        <td style="padding:0.4rem 1rem;color:green;">← Purchase Description</td>
+        <td style="padding:0.4rem 1rem;text-align:right;">10</td>
+      </tr>
+      <tr style="background:#fafafa;">
+        <td style="padding:0.4rem 1rem;">BLAZ5</td>
+        <td style="padding:0.4rem 1rem;">Blue Lazer Kitchen &amp; Bathroom Degreaser 5L</td>
+        <td style="padding:0.4rem 1rem;color:#888;">← Description (no purchase override)</td>
+        <td style="padding:0.4rem 1rem;text-align:right;">4</td>
       </tr>
     </tbody>
   </table>
