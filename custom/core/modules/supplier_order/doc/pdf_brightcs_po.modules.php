@@ -74,6 +74,22 @@ class pdf_brightcs_po extends pdf_muscadet
 	public function write_file($object, $outputlangs, $srctemplatepath = '', $hidedetails = 0, $hidedesc = 0, $hideref = 0)
 	{
 		// phpcs:enable
+
+		// Swap in purchase_description extra field for any line that has one set.
+		if (!empty($object->lines)) {
+			require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
+			foreach ($object->lines as $line) {
+				if (empty($line->fk_product)) continue;
+				$prod = new Product($this->db);
+				if ($prod->fetch($line->fk_product) <= 0) continue;
+				$prod->fetch_optionals();
+				$purchDesc = trim((string) ($prod->array_options['options_purchase_description'] ?? ''));
+				if ($purchDesc !== '') {
+					$line->desc = $purchDesc;
+				}
+			}
+		}
+
 		$t = &$outputlangs->tab_translate;
 
 		$t['VAT']                              = 'GST';
