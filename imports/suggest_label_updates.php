@@ -79,7 +79,22 @@ while (($row = fgetcsv($handle)) !== false) {
 }
 fclose($handle);
 
-// ── 2. Query DB — products with their first category assignment ────────────────
+// ── 2. Load SSS website category map (SKU → parent, child) ───────────────────
+// Used as a fallback when the product has no Dolibarr category assignment yet.
+$sssCats = []; // ref → ['parent' => str, 'child' => str]
+$catsCsvFile = __DIR__ . '/raw_samples/categories.csv';
+if (file_exists($catsCsvFile)) {
+    $ch = fopen($catsCsvFile, 'r');
+    fgetcsv($ch); // header: SKU,Category,Subcategory
+    while (($cr = fgetcsv($ch)) !== false) {
+        if (count($cr) < 3 || trim($cr[0]) === '') continue;
+        $sssCats[trim($cr[0])] = ['parent' => trim($cr[1]), 'child' => trim($cr[2])];
+    }
+    fclose($ch);
+    echo "Loaded " . count($sssCats) . " SSS website category mappings.\n";
+}
+
+// ── 3. Query DB — products with their first category assignment ────────────────
 $dbRows = $pdo->query("
     SELECT
         p.ref,
@@ -97,7 +112,7 @@ $dbRows = $pdo->query("
     ORDER BY p.ref
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-// ── 3. Generate suggestions ────────────────────────────────────────────────────
+// ── 4. Generate suggestions ────────────────────────────────────────────────────
 $out = [['REF', 'CURRENT LABEL', 'SUGGESTED LABEL', 'STATUS', 'CATEGORY ASSIGNED', 'MANUFACTURER FROM CSV']];
 
 $counts = ['COMPLETE' => 0, 'NEEDS_MANUF' => 0, 'NEEDS_CAT' => 0, 'NEEDS_BOTH' => 0];
@@ -110,8 +125,16 @@ foreach ($dbRows as $row) {
     // Clean up description: collapse whitespace, trim
     $descPart = preg_replace('/\s+/', ' ', $descPart);
 
+    // Category: prefer Dolibarr DB assignment, fall back to SSS website CSV
     $parentCat = trim($row['parent_cat'] ?? '');
     $childCat  = trim($row['child_cat'] ?? '');
+    $catSource = 'DB';
+    if ($parentCat === '' && isset($sssCats[$ref])) {
+        $parentCat = $sssCats[$ref]['parent'];
+        $childCat  = $sssCats[$ref]['child'];
+        $catSource = 'SSS_CSV';
+    }
+
     $csvInfo   = $csvByRef[$ref] ?? null;
     $manuf     = $csvInfo ? strtoupper(trim($csvInfo['manuf'])) : '';
 
@@ -151,7 +174,7 @@ foreach ($dbRows as $row) {
     ];
 }
 
-// ── 4. Write CSV ──────────────────────────────────────────────────────────────
+// ── 5. Write CSV ──────────────────────────────────────────────────────────────
 $outFile = __DIR__ . '/label_suggestions.csv';
 $fh = fopen($outFile, 'w');
 fprintf($fh, "\xEF\xBB\xBF"); // UTF-8 BOM so Excel opens without encoding issues
@@ -160,7 +183,7 @@ foreach ($out as $r) {
 }
 fclose($fh);
 
-// ── 5. Print summary ──────────────────────────────────────────────────────────
+// ── 6. Print summary ──────────────────────────────────────────────────────────
 $total = count($out) - 1;
 echo "Products needing label update: $total\n";
 echo "  COMPLETE  (cat + manuf found): {$counts['COMPLETE']}\n";
