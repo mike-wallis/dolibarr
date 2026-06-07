@@ -113,7 +113,7 @@ $dbRows = $pdo->query("
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 // ── 4. Generate suggestions ────────────────────────────────────────────────────
-$out = [['REF', 'CURRENT LABEL', 'SUGGESTED LABEL', 'STATUS', 'CATEGORY ASSIGNED', 'MANUFACTURER FROM CSV']];
+$out = [['REF', 'CURRENT LABEL', 'SUGGESTED LABEL', 'APPROVED LABEL', 'STATUS', 'CATEGORY ASSIGNED', 'MANUFACTURER FROM CSV']];
 
 $counts = ['COMPLETE' => 0, 'NEEDS_MANUF' => 0, 'NEEDS_CAT' => 0, 'NEEDS_BOTH' => 0];
 
@@ -168,6 +168,7 @@ foreach ($dbRows as $row) {
         $ref,
         $curLabel,
         $suggested,
+        '',          // APPROVED LABEL — fill in to override SUGGESTED; leave blank to accept as-is
         $status,
         $hasCat ? "$parentCat | $childCat" : '',
         $hasManuf ? $manuf : '',
@@ -175,7 +176,7 @@ foreach ($dbRows as $row) {
 }
 
 // ── 5. Write CSV ──────────────────────────────────────────────────────────────
-$outFile = __DIR__ . '/label_suggestions.csv';
+$outFile = __DIR__ . '/label_suggestions_v2.csv';
 $fh = fopen($outFile, 'w');
 fprintf($fh, "\xEF\xBB\xBF"); // UTF-8 BOM so Excel opens without encoding issues
 foreach ($out as $r) {
@@ -192,9 +193,10 @@ echo "  NEEDS_CAT  (manuf found, no category):    {$counts['NEEDS_CAT']}\n";
 echo "  NEEDS_BOTH (neither found):               {$counts['NEEDS_BOTH']}\n";
 echo "\nWritten to: $outFile\n";
 echo "\nColumns in CSV:\n";
-echo "  REF              — the product SKU\n";
-echo "  CURRENT LABEL    — what is in Dolibarr now\n";
-echo "  SUGGESTED LABEL  — proposed replacement (edit cells before applying)\n";
-echo "  STATUS           — COMPLETE / NEEDS_MANUF / NEEDS_CAT / NEEDS_BOTH\n";
-echo "  CATEGORY ASSIGNED — parent | child from Dolibarr categories\n";
+echo "  REF                  — the product SKU\n";
+echo "  CURRENT LABEL        — what is in Dolibarr now\n";
+echo "  SUGGESTED LABEL      — proposed replacement based on naming convention\n";
+echo "  APPROVED LABEL       — YOUR COLUMN: leave blank to accept SUGGESTED, or type your own\n";
+echo "  STATUS               — COMPLETE / NEEDS_MANUF / NEEDS_CAT / NEEDS_BOTH\n";
+echo "  CATEGORY ASSIGNED    — parent | child from Dolibarr categories\n";
 echo "  MANUFACTURER FROM CSV — extracted from Reckon item name hierarchy\n";

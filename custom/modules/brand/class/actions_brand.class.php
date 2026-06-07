@@ -32,11 +32,13 @@ class ActionsBrand
         if (strpos($parameters['context'], 'invoicecard') === false) {
             return 0;
         }
-        if (empty($object->socid) || empty($this->brand_map)) {
+        // For new invoices $object->socid is 0 — fall back to parameters or GET/POST
+        $socid = (int) ($object->socid ?: ($parameters['socid'] ?? 0) ?: GETPOSTINT('socid'));
+        if (empty($socid) || empty($this->brand_map)) {
             return 0;
         }
 
-        $brand = $this->getBrandForThirdparty((int) $object->socid);
+        $brand = $this->getBrandForThirdparty($socid);
         if (!$brand || !isset($this->brand_map[$brand])) {
             return 0;
         }
@@ -91,7 +93,7 @@ class ActionsBrand
         $sql = "SELECT c.label"
              . " FROM " . MAIN_DB_PREFIX . "categorie c"
              . " JOIN " . MAIN_DB_PREFIX . "categorie_societe cs ON cs.fk_categorie = c.rowid"
-             . " WHERE cs.fk_societe = " . $socid
+             . " WHERE cs.fk_soc = " . $socid
              . " AND c.label IN (" . implode(',', $labels) . ")"
              . " LIMIT 1";
 
@@ -108,26 +110,46 @@ class ActionsBrand
         return <<<SCRIPT
 <script>
 (function ($) {
-    function setBrandDefaults() {
-        var \$model = \$('#model');
-        if (\$model.length && \$model.val() !== '{$template}') {
-            \$model.val('{$template}');
-            if (\$model.data('select2')) \$model.trigger('change');
+    function setSelect(\$el, val) {
+        // Set selected attribute directly so Select2 picks it up after its own init
+        \$el.find('option').prop('selected', false);
+        \$el.find('option[value="' + val + '"]').prop('selected', true);
+        \$el.val(val);
+        \$el.trigger('change');           // native + jQuery listeners
+        \$el.trigger('change.select2');   // Select2 internal event
+        \$el.trigger('chosen:updated');   // Chosen fallback
+        if (\$el[0]) \$el[0].dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function applyBrandDefaults() {
+        var \$model = \$('select[name="model"], #model').first();
+        if (\$model.length && \$model.find('option[value="{$template}"]').length) {
+            setSelect(\$model, '{$template}');
         }
-        var \$from = \$('#frommail');
+
+        // From-email selector on the presend / send-by-email dialog.
+        // Dolibarr renders this as select[name="fromtype"] with option values like
+        // "senderprofile_1_1" — so match by option text, not value.
+        var \$from = \$('select[name="fromtype"], .fromforsendingprofile').first();
         if (\$from.length) {
             \$from.find('option').each(function () {
-                if ($(this).val().indexOf('{$fromEmail}') !== -1) {
-                    \$from.val($(this).val());
-                    if (\$from.data('select2')) \$from.trigger('change');
+                if ($(this).text().indexOf('{$fromEmail}') !== -1) {
+                    setSelect(\$from, $(this).val());
                     return false;
                 }
             });
         }
     }
-    $(document).ready(function () {
-        setBrandDefaults();
-        setTimeout(setBrandDefaults, 300);
+
+    // Run after $(window).load so Select2 is fully initialised before we override.
+    // Poll a few times to cover any late-loading widgets.
+    $(window).on('load', function () {
+        applyBrandDefaults();
+        var tries = 0;
+        var poll = setInterval(function () {
+            applyBrandDefaults();
+            if (++tries >= 5) clearInterval(poll);
+        }, 300);
     });
 }(jQuery));
 </script>
