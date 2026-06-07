@@ -130,6 +130,109 @@ if ($action === 'recalc') {
     exit;
 }
 
+// ── Handle: GST working CSV download ─────────────────────────────────────────
+
+if ($action === 'working_csv') {
+    $fname = 'BAS-working-FY'.$fy.'-Q'.$q.'-'.ucfirst($basis).'-'.$qstart.'-to-'.$qend.'.csv';
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="'.$fname.'"');
+    $out = fopen('php://output', 'w');
+    fputs($out, "\xEF\xBB\xBF"); // UTF-8 BOM for Excel
+
+    // Metadata header
+    fputcsv($out, ['BAS GST Working', 'FY'.$fy.' Q'.$q, $qstart.' to '.$qend, ucfirst($basis).' basis', 'Generated: '.date('d/m/Y H:i')]);
+    fputcsv($out, []);
+
+    if ($basis === 'cash') {
+        // 1A — customer payments
+        fputcsv($out, ['1A — GST on customer payments received', '', '', '', 'payment × (invoice GST ÷ invoice total)']);
+        fputcsv($out, ['Date', 'Customer', 'Invoice', 'Payment (inc. GST)', 'GST Portion']);
+        $total = 0.0;
+        $r = $db->query(
+            "SELECT DATE(p.datep) AS dt, s.nom AS party, f.ref AS ref,"
+            ." pf.amount AS paid, ROUND(pf.amount * f.total_tva / NULLIF(f.total_ttc,0), 2) AS gst"
+            ." FROM ".MAIN_DB_PREFIX."paiement p"
+            ." INNER JOIN ".MAIN_DB_PREFIX."paiement_facture pf ON pf.fk_paiement=p.rowid"
+            ." INNER JOIN ".MAIN_DB_PREFIX."facture f ON f.rowid=pf.fk_facture"
+            ." LEFT JOIN ".MAIN_DB_PREFIX."societe s ON s.rowid=f.fk_soc"
+            ." WHERE DATE(p.datep) BETWEEN '$qs' AND '$qe' AND f.entity=$entity ORDER BY p.datep"
+        );
+        while ($r && ($row = $db->fetch_object($r)) instanceof stdClass) {
+            $gst = round((float)$row->gst, 2);
+            $total += $gst;
+            fputcsv($out, [date('d/m/Y', strtotime($row->dt)), $row->party ?? '', $row->ref ?? '', number_format((float)$row->paid, 2), number_format($gst, 2)]);
+        }
+        fputcsv($out, ['', '', '', 'Total 1A', number_format(round($total, 2), 2)]);
+        fputcsv($out, []);
+
+        // 1B — supplier payments
+        fputcsv($out, ['1B — GST on supplier payments made', '', '', '', 'payment × (invoice GST ÷ invoice total)']);
+        fputcsv($out, ['Date', 'Supplier', 'Invoice', 'Payment (inc. GST)', 'GST Portion']);
+        $total = 0.0;
+        $r = $db->query(
+            "SELECT DATE(p.datep) AS dt, s.nom AS party, f.ref AS ref,"
+            ." pf.amount AS paid, ROUND(pf.amount * f.total_tva / NULLIF(f.total_ttc,0), 2) AS gst"
+            ." FROM ".MAIN_DB_PREFIX."paiementfourn p"
+            ." INNER JOIN ".MAIN_DB_PREFIX."paiementfourn_facture pf ON pf.fk_paiementfourn=p.rowid"
+            ." INNER JOIN ".MAIN_DB_PREFIX."facture_fourn f ON f.rowid=pf.fk_facturefourn"
+            ." LEFT JOIN ".MAIN_DB_PREFIX."societe s ON s.rowid=f.fk_soc"
+            ." WHERE DATE(p.datep) BETWEEN '$qs' AND '$qe' AND f.entity=$entity ORDER BY p.datep"
+        );
+        while ($r && ($row = $db->fetch_object($r)) instanceof stdClass) {
+            $gst = round((float)$row->gst, 2);
+            $total += $gst;
+            fputcsv($out, [date('d/m/Y', strtotime($row->dt)), $row->party ?? '', $row->ref ?? '', number_format((float)$row->paid, 2), number_format($gst, 2)]);
+        }
+        fputcsv($out, ['', '', '', 'Total 1B', number_format(round($total, 2), 2)]);
+    } else {
+        // 1A — journal credits
+        $acc_a = $acct['gst_collected'];
+        fputcsv($out, ['1A — GST on sales', '', 'Journal CREDIT entries to account: '.$acc_a]);
+        fputcsv($out, ['Date', 'Reference', 'Description', 'Amount']);
+        $total = 0.0;
+        if (!empty($acc_a)) {
+            $acc_esc = "'".$db->escape($acc_a)."'";
+            $r = $db->query(
+                "SELECT DATE(doc_date) AS dt, doc_ref AS ref, label_operation AS descr, credit AS gst"
+                ." FROM ".MAIN_DB_PREFIX."accounting_bookkeeping"
+                ." WHERE numero_compte=$acc_esc AND credit>0"
+                ." AND DATE(doc_date) BETWEEN '$qs' AND '$qe' AND entity=$entity ORDER BY doc_date"
+            );
+            while ($r && ($row = $db->fetch_object($r)) instanceof stdClass) {
+                $gst = round((float)$row->gst, 2);
+                $total += $gst;
+                fputcsv($out, [date('d/m/Y', strtotime($row->dt)), $row->ref ?? '', $row->descr ?? '', number_format($gst, 2)]);
+            }
+        }
+        fputcsv($out, ['', '', 'Total 1A', number_format(round($total, 2), 2)]);
+        fputcsv($out, []);
+
+        // 1B — journal debits
+        $acc_b = $acct['gst_itc'];
+        fputcsv($out, ['1B — GST credits on purchases', '', 'Journal DEBIT entries to account: '.$acc_b]);
+        fputcsv($out, ['Date', 'Reference', 'Description', 'Amount']);
+        $total = 0.0;
+        if (!empty($acc_b)) {
+            $acc_esc = "'".$db->escape($acc_b)."'";
+            $r = $db->query(
+                "SELECT DATE(doc_date) AS dt, doc_ref AS ref, label_operation AS descr, debit AS gst"
+                ." FROM ".MAIN_DB_PREFIX."accounting_bookkeeping"
+                ." WHERE numero_compte=$acc_esc AND debit>0"
+                ." AND DATE(doc_date) BETWEEN '$qs' AND '$qe' AND entity=$entity ORDER BY doc_date"
+            );
+            while ($r && ($row = $db->fetch_object($r)) instanceof stdClass) {
+                $gst = round((float)$row->gst, 2);
+                $total += $gst;
+                fputcsv($out, [date('d/m/Y', strtotime($row->dt)), $row->ref ?? '', $row->descr ?? '', number_format($gst, 2)]);
+            }
+        }
+        fputcsv($out, ['', '', 'Total 1B', number_format(round($total, 2), 2)]);
+    }
+
+    fclose($out);
+    exit;
+}
+
 // ── Journal helper ────────────────────────────────────────────────────────────
 
 $journal_sum = function(array $accounts, string $col) use ($db, $qs, $qe, $entity): float {
@@ -528,6 +631,21 @@ $vol_note = $basis === 'cash'
   <?php endif; ?>
 </div>
 <?php endif; ?>
+
+<?php
+$csv_url = DOL_URL_ROOT.'/custom/bas/report.php?action=working_csv'
+    .'&fy='.$fy.'&q='.$q.'&from='.urlencode($qstart).'&to='.urlencode($qend)
+    .'&basis='.$basis.'&mainmenu=accountancy&leftmenu=bas_report';
+?>
+<div style="margin-top:0.6rem;max-width:620px;display:flex;align-items:center;justify-content:flex-end;gap:0.75rem;">
+  <span style="font-size:0.82em;color:#888;">
+    Every transaction making up 1A &amp; 1B — open in Excel to verify the working.
+  </span>
+  <a href="<?= htmlspecialchars($csv_url) ?>"
+     style="white-space:nowrap;font-size:0.82em;border:1px solid #aaa;border-radius:3px;padding:3px 10px;color:#555;text-decoration:none;display:inline-block;">
+    &#8659; Download working (CSV)
+  </a>
+</div>
 </div>
 
 <?php
@@ -658,7 +776,7 @@ if ($full) {
   </a>
   <span style="margin-left:1rem;font-size:0.85em;color:#888;">
     Opens a clean print-ready page &mdash; <?=htmlspecialchars(ucfirst($bas_type))?> BAS &mdash;
-    <a href="<?=DOL_URL_ROOT?>/custom/bas/admin/setup.php">Setup</a>
+    <a href="<?=DOL_URL_ROOT?>/custom/bas/admin/setup.php" style="font-size:1.1em;font-weight:bold;"><i class="fas fa-cog" style="margin-right:0.3rem;"></i>Setup</a>
   </span>
 </div>
 

@@ -123,6 +123,20 @@ function bas_text_single(string $name, string $value, string $placeholder): stri
          . ' placeholder="' . htmlspecialchars($placeholder, ENT_QUOTES) . '">';
 }
 
+function bas_select_disabled(array $accounts, string $selected): string
+{
+    $h  = '<select class="flat" style="min-width:320px;opacity:0.8;cursor:default;" disabled>';
+    $h .= '<option value="">— not configured —</option>';
+    foreach ($accounts as $acc) {
+        if (!isset($acc->account_number)) continue;
+        $sel = ($acc->account_number === $selected) ? ' selected' : '';
+        $h  .= '<option value="' . htmlspecialchars($acc->account_number, ENT_QUOTES) . '"' . $sel . '>'
+             . htmlspecialchars($acc->account_number . ' — ' . $acc->label, ENT_QUOTES)
+             . '</option>';
+    }
+    return $h . '</select>';
+}
+
 function bas_text_multi(string $name, array $values, string $placeholder): string
 {
     return '<input type="text" name="' . $name . '" class="flat minwidth250"'
@@ -193,22 +207,120 @@ $wm = fn($k,$v,$p) => $has_accounts ? bas_select_multi($k,$accounts,$v)  : bas_t
   </td>
 </tr>
 
-<!-- GST -->
-<tr class="liste_titre">
+<!-- GST — Accrual basis box -->
+<tr>
+  <td colspan="3" style="padding:1rem 0 0.5rem;">
+    <div id="bas-accrual-box" style="border:2px solid #5b7fd4;border-radius:6px;padding:1rem 1.25rem;background:#f8faff;transition:box-shadow 0.3s;">
+      <div style="font-weight:bold;font-size:1rem;color:#3a5dbf;margin-bottom:0.35rem;">GST calculation — Accrual basis</div>
+      <div style="font-size:0.875em;color:#555;margin-bottom:0.85rem;">
+        All fields are read at <strong>invoice date</strong> — income and expenses are recognised
+        when the invoice is raised, regardless of whether it has been paid.
+        Requires journals to be transferred to the ledger
+        (<em>Accounting &rarr; Journals &rarr; Transfer to ledger</em>).
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr style="font-size:0.8em;color:#888;">
+            <th style="font-weight:normal;text-align:left;padding:0.3rem 0.5rem 0.3rem 0;width:11rem;">Field</th>
+            <th style="font-weight:normal;text-align:left;padding:0.3rem 0.5rem;">Source</th>
+            <th style="font-weight:normal;text-align:left;padding:0.3rem 0;">How it's calculated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="font-size:0.875em;border-top:1px solid #d0d8f0;">
+            <td style="padding:0.35rem 0.5rem 0.35rem 0;vertical-align:top;color:#444;"><strong>G1 &amp; 1A</strong><br><span style="font-weight:normal;color:#666;">Sales</span></td>
+            <td style="padding:0.35rem 0.5rem;vertical-align:top;">
+              Validated <strong>customer invoices</strong>, by invoice date<br>
+              <span style="color:#777;">(Billing &rarr; Customer Invoices)</span>
+            </td>
+            <td style="padding:0.35rem 0;vertical-align:top;color:#555;">
+              G1 = sum of invoice totals (inc. GST)<br>
+              <table style="margin-top:0.3rem;border-collapse:collapse;width:auto;">
+                <tr>
+                  <td style="white-space:nowrap;vertical-align:middle;padding-right:0.5rem;">1A = sum of <strong>CREDIT</strong> entries to:</td>
+                  <td style="vertical-align:middle;"><?= $w('bas_account_gst_collected', $cfg['gst_collected'], 'e.g. 2-1100') ?></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr style="font-size:0.875em;border-top:1px solid #d0d8f0;">
+            <td style="padding:0.35rem 0.5rem 0.35rem 0;vertical-align:top;color:#444;"><strong>G11 &amp; 1B</strong><br><span style="font-weight:normal;color:#666;">Purchases</span></td>
+            <td style="padding:0.35rem 0.5rem;vertical-align:top;">
+              Validated <strong>supplier invoices</strong>, by invoice date<br>
+              <span style="color:#777;">(Billing &rarr; Supplier Invoices)</span>
+            </td>
+            <td style="padding:0.35rem 0;vertical-align:top;color:#555;">
+              G11 = sum of invoice totals (inc. GST)<br>
+              <table style="margin-top:0.3rem;border-collapse:collapse;width:auto;">
+                <tr>
+                  <td style="white-space:nowrap;vertical-align:middle;padding-right:0.5rem;">1B = sum of <strong>DEBIT</strong> entries to:</td>
+                  <td style="vertical-align:middle;"><?= $w('bas_account_gst_itc', $cfg['gst_itc'], 'e.g. 1-3300') ?></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </td>
+</tr>
+
+<!-- GST — Cash basis box -->
+<tr>
+  <td colspan="3" style="padding:0.5rem 0 0.75rem;">
+    <div style="border:2px solid #5da85b;border-radius:6px;padding:1rem 1.25rem;background:#f6fff6;">
+      <div style="font-weight:bold;font-size:1rem;color:#2e7d32;margin-bottom:0.35rem;">GST calculation — Cash basis</div>
+      <div style="font-size:0.875em;color:#555;margin-bottom:0.85rem;">
+        G1 (total sales) and G11 (total purchases) are drawn from payment records — income and expenses
+        are recognised when money changes hands. 1A and 1B are still read from the accounting journal
+        using the same accounts configured above, so the journal must be kept up to date.
+        Select <strong>Cash</strong> on the report page to use this mode.
+      </div>
+      <table style="width:100%;border-collapse:collapse;margin-top:0.75rem;border-top:1px solid #b8ddb8;">
+        <thead>
+          <tr style="font-size:0.8em;color:#888;">
+            <th style="font-weight:normal;text-align:left;padding:0.3rem 0.5rem 0.3rem 0;width:11rem;">Field</th>
+            <th style="font-weight:normal;text-align:left;padding:0.3rem 0.5rem;">Source</th>
+            <th style="font-weight:normal;text-align:left;padding:0.3rem 0;">How GST is calculated</th>
+          </tr>
+        </thead>
+        <tbody style="font-size:0.875em;">
+          <tr>
+            <td style="padding:0.35rem 0.5rem 0.35rem 0;vertical-align:top;color:#444;"><strong>G1 &amp; 1A</strong><br><span style="font-weight:normal;color:#666;">Sales</span></td>
+            <td style="padding:0.35rem 0.5rem;vertical-align:top;">
+              Customer invoice <strong>payments received</strong><br>
+              <span style="color:#777;">(Billing &rarr; Customer Invoices &rarr; Record Payment)</span>
+            </td>
+            <td style="padding:0.35rem 0;vertical-align:top;color:#555;">
+              1A = payment amount &times; (invoice GST &divide; invoice total)
+            </td>
+          </tr>
+          <tr style="border-top:1px solid #d8ecd8;">
+            <td style="padding:0.35rem 0.5rem 0.35rem 0;vertical-align:top;color:#444;"><strong>G11 &amp; 1B</strong><br><span style="font-weight:normal;color:#666;">Purchases</span></td>
+            <td style="padding:0.35rem 0.5rem;vertical-align:top;">
+              Supplier invoice <strong>payments made</strong><br>
+              <span style="color:#777;">(Billing &rarr; Supplier Invoices &rarr; Record Payment)</span>
+            </td>
+            <td style="padding:0.35rem 0;vertical-align:top;color:#555;">
+              1B = payment amount &times; (invoice GST &divide; invoice total)
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </td>
+</tr>
+
+<!-- Full GST additional fields (hidden unless Full GST mode selected) -->
+<tr class="bas-full-row liste_titre">
   <th style="width:11rem;">BAS field</th><th>Account</th><th>How it's calculated</th>
 </tr>
-<tr class="liste_titre_sel">
+<tr class="bas-full-row liste_titre_sel">
   <th colspan="3" style="font-weight:normal;font-style:italic;">
-    GST &mdash; leave blank to calculate from invoice/payment totals
+    Full GST reporting &mdash; additional fields (accrual, from ledger)
   </th>
 </tr>
 <?php
-echo bas_row('1A', 'GST collected (sales)',
-    $w('bas_account_gst_collected', $cfg['gst_collected'], 'e.g. 2-1100'),
-    'Sum of <strong>CREDIT</strong> entries in the quarter');
-echo bas_row('1B', 'GST Paid (purchases)',
-    $w('bas_account_gst_itc', $cfg['gst_itc'], 'e.g. 1-3300'),
-    'Sum of <strong>DEBIT</strong> entries in the quarter');
 echo bas_row('G2', 'Export sales',
     $w('bas_account_g2', $cfg['g2'], 'e.g. 4-9000'),
     'Sum of <strong>CREDIT</strong> entries &mdash; subset of G1 (Full only)', true);
@@ -277,6 +389,14 @@ echo bas_row('Super', 'Superannuation expense',
 </form>
 
 <script>
+function bas_focus_accrual(fieldName) {
+    var $box = $('#bas-accrual-box');
+    $('html, body').animate({ scrollTop: $box.offset().top - 80 }, 300);
+    $box.css('box-shadow', '0 0 0 4px rgba(91,127,212,0.5)');
+    setTimeout(function () { $box.css('box-shadow', ''); }, 1800);
+    var $sel = $('select[name="' + fieldName + '"]');
+    if ($sel.length) setTimeout(function () { $sel.focus(); }, 350);
+}
 function bas_update_visibility() {
     var full = $('input[name="bas_type"]:checked').val() === 'full';
     $('.bas-full-row').toggle(full);
