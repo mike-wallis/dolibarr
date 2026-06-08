@@ -187,10 +187,17 @@ class ActionsSearchbox
         var r = items[idx];
         if (!r) return;
         closeDropdown();
-        // Navigate directly — constructs a clean filter URL
-        window.location.href = window.location.pathname
-            + '?' + encodeURIComponent(SB_FILL_PARAM) + '=' + encodeURIComponent(r.fill)
-            + '&button_search=1';
+        // Set the value in the filter input, then submit the form so all
+        // existing hidden fields (sortfield, formfilteraction, etc.) are preserved
+        input.value = r.fill;
+        var form = input.closest('form');
+        if (!form) return;
+        var h = document.createElement('input');
+        h.type = 'hidden';
+        h.name = 'button_search';
+        h.value = '1';
+        form.appendChild(h);
+        form.submit();
     }
 
     input.addEventListener('input', function () {
