@@ -187,17 +187,13 @@ class ActionsSearchbox
         var r = items[idx];
         if (!r) return;
         closeDropdown();
-        // Set the value in the filter input, then submit the form so all
-        // existing hidden fields (sortfield, formfilteraction, etc.) are preserved
-        input.value = r.fill;
-        var form = input.closest('form');
-        if (!form) return;
-        var h = document.createElement('input');
-        h.type = 'hidden';
-        h.name = 'button_search';
-        h.value = '1';
-        form.appendChild(h);
-        form.submit();
+        // Preserve all existing URL params (sortfield, type, contextpage, etc.)
+        // and just replace the filter field + reset pagination
+        var params = new URLSearchParams(window.location.search);
+        params.set(SB_FILL_PARAM, r.fill);
+        params.set('button_search', '1');
+        params.delete('page');
+        window.location.href = window.location.pathname + '?' + params.toString();
     }
 
     input.addEventListener('input', function () {
