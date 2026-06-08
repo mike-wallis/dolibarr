@@ -129,6 +129,9 @@ class ActionsSearchbox
     var input = document.querySelector(SB_SEL);
     if (!input) return;
 
+    // Suppress the browser's own autocomplete popup
+    input.setAttribute('autocomplete', 'off');
+
     var dropdown = null;
     var items    = [];
     var active   = -1;
