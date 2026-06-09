@@ -64,19 +64,23 @@ function sb_ref_row(string $ref, string $name): array
 }
 
 /**
- * Build "AND (f1 LIKE '%t%' OR f2 LIKE '%t%') AND ..." for each term.
+ * Build WHERE for multi-term search: all terms must match within the same field.
+ * Result: ((f1 LIKE '%t1%' AND f1 LIKE '%t2%') OR (f2 LIKE '%t1%' AND f2 LIKE '%t2%'))
  * $fields — array of SQL column expressions e.g. ['ref','label'] or ['p.ref','s.nom']
  */
 function sb_terms_where(array $terms, array $fields): string
 {
     global $db;
-    $and_parts = [];
-    foreach ($terms as $term) {
-        $st = $db->escape($term);
-        $or_parts = array_map(function ($f) use ($st) { return "$f LIKE '%$st%'"; }, $fields);
-        $and_parts[] = '(' . implode(' OR ', $or_parts) . ')';
+    $field_parts = [];
+    foreach ($fields as $f) {
+        $and_parts = array_map(function ($term) use ($f) {
+            global $db;
+            $st = $db->escape($term);
+            return "$f LIKE '%$st%'";
+        }, $terms);
+        $field_parts[] = '(' . implode(' AND ', $and_parts) . ')';
     }
-    return implode(' AND ', $and_parts);
+    return '(' . implode(' OR ', $field_parts) . ')';
 }
 
 /** COUNT for a single-table WHERE (no JOIN). */
