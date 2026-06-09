@@ -49,10 +49,14 @@ print dol_get_fiche_head(
 );
 ?>
 
-<p style="margin-bottom:1.5rem;max-width:600px;">
+<p style="margin-bottom:0.5rem;max-width:600px;">
   Tick the list pages where you want Google-style autocomplete suggestions.
   Typing 2 or more characters in the <em>Ref</em> or <em>Label</em> search box will show matching results
   in a dropdown — click one to go directly to that record.
+</p>
+<p style="margin-bottom:1.5rem;max-width:600px;color:#555;">
+  Use <strong>+</strong> to search for multiple terms within the same field —
+  e.g. <code>hard+floor+deg</code> returns records where the ref or label contains all three words.
 </p>
 
 <form method="post" action="setup.php">
