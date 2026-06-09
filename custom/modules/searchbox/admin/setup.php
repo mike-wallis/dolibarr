@@ -49,14 +49,10 @@ print dol_get_fiche_head(
 );
 ?>
 
-<p style="margin-bottom:0.5rem;max-width:600px;">
+<p style="margin-bottom:1.5rem;max-width:600px;">
   Tick the list pages where you want Google-style autocomplete suggestions.
-  Typing 2 or more characters in the search box will show matching results
+  Typing 2 or more characters in the <em>Ref</em> or <em>Label</em> search box will show matching results
   in a dropdown — click one to go directly to that record.
-</p>
-<p style="margin-bottom:1.5rem;max-width:600px;color:#555;">
-  <strong>Products:</strong> autocomplete is active on both the <em>Ref</em> and <em>Label</em> search fields.
-  Clicking a suggestion opens the product card directly.
 </p>
 
 <form method="post" action="setup.php">
