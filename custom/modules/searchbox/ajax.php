@@ -1,7 +1,9 @@
 <?php
 /**
  * Searchbox — AJAX autocomplete endpoint.
- * GET ?type=products&q=agar  → JSON {results:[{fill,html},...], total:N}
+ * GET ?type=products&q=agar         → single-term search
+ * GET ?type=products&q=agr+deg      → AND search: both terms must match
+ * Returns JSON {results:[{fill,html},...], total:N}
  * total is only present when there are more matches than the display limit.
  */
 
@@ -32,9 +34,19 @@ if (strlen($q) < 2 || empty($type)) {
     exit;
 }
 
-$sq  = $db->escape($q);
-$ent = (int)$conf->entity;
-$out = [];
+// Split on '+' and drop any term shorter than 2 chars (still being typed)
+$terms = array_values(array_filter(
+    array_map('trim', explode('+', $q)),
+    function ($t) { return strlen($t) >= 2; }
+));
+
+if (empty($terms)) {
+    echo '{"results":[]}';
+    exit;
+}
+
+$ent   = (int)$conf->entity;
+$out   = [];
 $total = null;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -45,11 +57,29 @@ function sb_ref_row(string $ref, string $name): array
     $name_h = htmlspecialchars($name, ENT_QUOTES);
     return [
         'fill' => $ref,
-        'html' => '<span class="sb-ref">' . $ref_h . '</span><span class="sb-sep">—</span><span class="sb-label">' . $name_h . '</span>',
+        'html' => '<span class="sb-ref">' . $ref_h . '</span>'
+                . '<span class="sb-sep">—</span>'
+                . '<span class="sb-label">' . $name_h . '</span>',
     ];
 }
 
-// Fetch count for a simple single-table WHERE (no JOIN needed).
+/**
+ * Build "AND (f1 LIKE '%t%' OR f2 LIKE '%t%') AND ..." for each term.
+ * $fields — array of SQL column expressions e.g. ['ref','label'] or ['p.ref','s.nom']
+ */
+function sb_terms_where(array $terms, array $fields): string
+{
+    global $db;
+    $and_parts = [];
+    foreach ($terms as $term) {
+        $st = $db->escape($term);
+        $or_parts = array_map(function ($f) use ($st) { return "$f LIKE '%$st%'"; }, $fields);
+        $and_parts[] = '(' . implode(' OR ', $or_parts) . ')';
+    }
+    return implode(' AND ', $and_parts);
+}
+
+/** COUNT for a single-table WHERE (no JOIN). */
 function sb_count(string $table, string $where): int
 {
     global $db;
@@ -61,7 +91,8 @@ function sb_count(string $table, string $where): int
 // ── Queries ───────────────────────────────────────────────────────────────────
 
 if ($type === 'products') {
-    $where = "entity=$ent AND (ref LIKE '%$sq%' OR label LIKE '%$sq%')";
+    $tw    = sb_terms_where($terms, ['ref', 'label']);
+    $where = "entity=$ent AND $tw";
     $res = $db->query(
         "SELECT rowid, ref, label FROM " . MAIN_DB_PREFIX . "product"
       . " WHERE $where ORDER BY label LIMIT " . ($limit + 1)
@@ -77,7 +108,8 @@ if ($type === 'products') {
     }
 
 } elseif ($type === 'societe') {
-    $where = "entity=$ent AND (nom LIKE '%$sq%' OR code_client LIKE '%$sq%')";
+    $tw    = sb_terms_where($terms, ['nom', 'code_client']);
+    $where = "entity=$ent AND $tw";
     $res = $db->query(
         "SELECT nom, code_client FROM " . MAIN_DB_PREFIX . "societe"
       . " WHERE $where ORDER BY nom LIMIT " . ($limit + 1)
@@ -96,7 +128,8 @@ if ($type === 'products') {
     }
 
 } elseif ($type === 'contact') {
-    $where = "entity=$ent AND (lastname LIKE '%$sq%' OR firstname LIKE '%$sq%' OR email LIKE '%$sq%')";
+    $tw    = sb_terms_where($terms, ['lastname', 'firstname', 'email']);
+    $where = "entity=$ent AND $tw";
     $res = $db->query(
         "SELECT firstname, lastname, email FROM " . MAIN_DB_PREFIX . "socpeople"
       . " WHERE $where ORDER BY lastname LIMIT " . ($limit + 1)
@@ -116,7 +149,8 @@ if ($type === 'products') {
 
 } elseif ($type === 'propal') {
     $join  = "LEFT JOIN " . MAIN_DB_PREFIX . "societe s ON s.rowid = p.fk_soc";
-    $where = "p.entity=$ent AND (p.ref LIKE '%$sq%' OR s.nom LIKE '%$sq%')";
+    $tw    = sb_terms_where($terms, ['p.ref', 's.nom']);
+    $where = "p.entity=$ent AND $tw";
     $res = $db->query(
         "SELECT p.ref, s.nom FROM " . MAIN_DB_PREFIX . "propal p $join"
       . " WHERE $where ORDER BY p.ref DESC LIMIT " . ($limit + 1)
@@ -130,7 +164,8 @@ if ($type === 'products') {
 
 } elseif ($type === 'commande') {
     $join  = "LEFT JOIN " . MAIN_DB_PREFIX . "societe s ON s.rowid = c.fk_soc";
-    $where = "c.entity=$ent AND (c.ref LIKE '%$sq%' OR s.nom LIKE '%$sq%')";
+    $tw    = sb_terms_where($terms, ['c.ref', 's.nom']);
+    $where = "c.entity=$ent AND $tw";
     $res = $db->query(
         "SELECT c.ref, s.nom FROM " . MAIN_DB_PREFIX . "commande c $join"
       . " WHERE $where ORDER BY c.ref DESC LIMIT " . ($limit + 1)
@@ -144,7 +179,8 @@ if ($type === 'products') {
 
 } elseif ($type === 'facture') {
     $join  = "LEFT JOIN " . MAIN_DB_PREFIX . "societe s ON s.rowid = f.fk_soc";
-    $where = "f.entity=$ent AND (f.ref LIKE '%$sq%' OR s.nom LIKE '%$sq%')";
+    $tw    = sb_terms_where($terms, ['f.ref', 's.nom']);
+    $where = "f.entity=$ent AND $tw";
     $res = $db->query(
         "SELECT f.ref, s.nom FROM " . MAIN_DB_PREFIX . "facture f $join"
       . " WHERE $where ORDER BY f.ref DESC LIMIT " . ($limit + 1)
@@ -158,7 +194,8 @@ if ($type === 'products') {
 
 } elseif ($type === 'fourn_commande') {
     $join  = "LEFT JOIN " . MAIN_DB_PREFIX . "societe s ON s.rowid = c.fk_soc";
-    $where = "c.entity=$ent AND (c.ref LIKE '%$sq%' OR s.nom LIKE '%$sq%')";
+    $tw    = sb_terms_where($terms, ['c.ref', 's.nom']);
+    $where = "c.entity=$ent AND $tw";
     $res = $db->query(
         "SELECT c.ref, s.nom FROM " . MAIN_DB_PREFIX . "commande_fournisseur c $join"
       . " WHERE $where ORDER BY c.ref DESC LIMIT " . ($limit + 1)
@@ -172,7 +209,8 @@ if ($type === 'products') {
 
 } elseif ($type === 'fourn_facture') {
     $join  = "LEFT JOIN " . MAIN_DB_PREFIX . "societe s ON s.rowid = f.fk_soc";
-    $where = "f.entity=$ent AND (f.ref LIKE '%$sq%' OR s.nom LIKE '%$sq%')";
+    $tw    = sb_terms_where($terms, ['f.ref', 's.nom']);
+    $where = "f.entity=$ent AND $tw";
     $res = $db->query(
         "SELECT f.ref, s.nom FROM " . MAIN_DB_PREFIX . "facture_fourn f $join"
       . " WHERE $where ORDER BY f.ref DESC LIMIT " . ($limit + 1)
@@ -185,7 +223,8 @@ if ($type === 'products') {
     }
 
 } elseif ($type === 'projet') {
-    $where = "entity=$ent AND (ref LIKE '%$sq%' OR title LIKE '%$sq%')";
+    $tw    = sb_terms_where($terms, ['ref', 'title']);
+    $where = "entity=$ent AND $tw";
     $res = $db->query(
         "SELECT ref, title FROM " . MAIN_DB_PREFIX . "projet"
       . " WHERE $where ORDER BY ref DESC LIMIT " . ($limit + 1)
