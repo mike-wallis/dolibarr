@@ -148,7 +148,7 @@ class ActionsSearchbox
             };
         }
 
-        function showDropdown(results) {
+        function showDropdown(results, total) {
             closeDropdown();
             if (!results.length) return;
             var pos = getRect();
@@ -166,6 +166,12 @@ class ActionsSearchbox
                 li.addEventListener('click', function () { selectItem(i); });
                 dropdown.appendChild(li);
             });
+            if (total && total > results.length) {
+                var footer = document.createElement('li');
+                footer.className = 'sb-footer';
+                footer.textContent = 'Showing ' + results.length + ' of ' + total;
+                dropdown.appendChild(footer);
+            }
             document.body.appendChild(dropdown);
         }
 
@@ -179,7 +185,7 @@ class ActionsSearchbox
             if (!dropdown) return;
             var lis = dropdown.querySelectorAll('li');
             lis.forEach(function (li) { li.classList.remove('sb-active'); });
-            active = Math.max(-1, Math.min(idx, lis.length - 1));
+            active = Math.max(-1, Math.min(idx, items.length - 1));
             if (active >= 0) lis[active].classList.add('sb-active');
         }
 
@@ -205,7 +211,7 @@ class ActionsSearchbox
             timer = setTimeout(function () {
                 fetch(SB_AJAX + '?type=' + SB_TYPE + '&q=' + encodeURIComponent(q), {credentials: 'same-origin'})
                     .then(function (r) { return r.json(); })
-                    .then(function (d) { d.results ? showDropdown(d.results) : closeDropdown(); })
+                    .then(function (d) { d.results ? showDropdown(d.results, d.total) : closeDropdown(); })
                     .catch(closeDropdown);
             }, 300);
         });

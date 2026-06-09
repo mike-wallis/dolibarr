@@ -31,3 +31,15 @@
 .sb-ref   { font-weight: 600; color: #222; }
 .sb-sep   { color: #bbb; margin: 0 5px; }
 .sb-label { color: #555; }
+.sb-dropdown li.sb-footer {
+    text-align: center;
+    color: #999;
+    font-size: 11px;
+    font-style: italic;
+    cursor: default;
+    border-top: 1px solid #e8e8e8;
+    padding: 5px 12px;
+}
+.sb-dropdown li.sb-footer:hover {
+    background: transparent;
+}
