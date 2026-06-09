@@ -66,7 +66,7 @@ if ($type === 'products') {
       . " ORDER BY label LIMIT $limit"
     );
     while ($res && $row = $db->fetch_object($res)) {
-        $out[] = sb_row($row->ref, $row->label);
+        $out[] = sb_ref_row($row->ref, (string)$row->label);
     }
 
 } elseif ($type === 'societe') {

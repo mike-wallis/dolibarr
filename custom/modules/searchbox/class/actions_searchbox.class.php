@@ -19,7 +19,7 @@ class ActionsSearchbox
             'const'      => 'SEARCHBOX_ENABLE_PRODUCTS',
             'path'       => '/product/list.php',
             'input_sel'  => 'input[name="search_label"]',
-            'fill_param' => 'search_label',
+            'fill_param' => 'search_ref',   // filter by ref so natural_search doesn't mangle the label
         ],
         'societe' => [
             'const'      => 'SEARCHBOX_ENABLE_SOCIETE',
@@ -160,10 +160,8 @@ class ActionsSearchbox
         results.forEach(function (r, i) {
             var li = document.createElement('li');
             li.innerHTML = r.html;
-            li.addEventListener('mousedown', function (e) {
-                e.preventDefault();
-                selectItem(i);
-            });
+            li.addEventListener('mousedown', function (e) { e.preventDefault(); });
+            li.addEventListener('click', function () { selectItem(i); });
             dropdown.appendChild(li);
         });
         document.body.appendChild(dropdown);
