@@ -185,8 +185,10 @@ class ActionsSearchbox
         var r = items[idx];
         if (!r) return;
         closeDropdown();
-        // Preserve all existing URL params (sortfield, type, contextpage, etc.)
-        // and just replace the filter field + reset pagination
+        if (r.url) {
+            window.location.href = r.url;
+            return;
+        }
         var params = new URLSearchParams(window.location.search);
         params.set(SB_FILL_PARAM, r.fill);
         params.set('button_search', '1');

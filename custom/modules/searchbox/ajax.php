@@ -61,12 +61,14 @@ function sb_ref_row(string $ref, string $name): array
 
 if ($type === 'products') {
     $res = $db->query(
-        "SELECT ref, label FROM " . MAIN_DB_PREFIX . "product"
+        "SELECT rowid, ref, label FROM " . MAIN_DB_PREFIX . "product"
       . " WHERE entity=$ent AND (ref LIKE '%$sq%' OR label LIKE '%$sq%')"
       . " ORDER BY label LIMIT $limit"
     );
     while ($res && $row = $db->fetch_object($res)) {
-        $out[] = sb_ref_row($row->ref, (string)$row->label);
+        $r = sb_ref_row($row->ref, (string)$row->label);
+        $r['url'] = DOL_URL_ROOT . '/product/card.php?id=' . (int)$row->rowid;
+        $out[] = $r;
     }
 
 } elseif ($type === 'societe') {
