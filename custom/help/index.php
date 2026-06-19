@@ -55,6 +55,11 @@ llxHeader('', 'Help — South Side Supplies');
   </div>
 
   <div class="div-table-responsive" style="border:1px solid #ddd;border-radius:6px;padding:1.5rem;">
+    <h3 style="margin-top:0;">🧾 <a href="expense-invoices.php">Expense Invoices</a></h3>
+    <p>Recording phone bills, utilities, fuel, office supplies — predefined service records, GST split, correct expense accounts, transferring to the ledger, cloning for next month.</p>
+  </div>
+
+  <div class="div-table-responsive" style="border:1px solid #ddd;border-radius:6px;padding:1.5rem;">
     <h3 style="margin-top:0;">🏷️ <a href="branding.php">BCS vs SSS Invoices</a></h3>
     <p>Tagging customers with the right brand, selecting the correct invoice template (brightcs or southside), and what each template prints.</p>
   </div>

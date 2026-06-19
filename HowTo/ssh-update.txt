@@ -1,0 +1,15 @@
+It's already there — HowTo/server-updates.md. The key bit is:
+
+SSH in:
+
+
+SSH SouthSideSupplies
+(That's an SSH config alias — it handles the host, user, and port automatically.)
+
+Then on the server:
+
+
+cd ~/erp_dolibarr/repo
+git pull
+HTDOCS_DIR=~/erp_dolibarr/public_html bash scripts/deploy.sh
+

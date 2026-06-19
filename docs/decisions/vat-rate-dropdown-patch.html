@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Core Patch — Supplier Price VAT Rate Dropdown &amp; Code Handling</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Arial, sans-serif; max-width: 880px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #222; }
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.2rem; margin-top: 2rem; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem; }
+  h3 { font-size: 1.05rem; margin-top: 1.5rem; }
+  code, pre { font-family: Consolas, "Courier New", monospace; font-size: 0.85rem; }
+  pre { background: #f6f8fa; border: 1px solid #ddd; border-radius: 6px; padding: 0.75rem 1rem; overflow-x: auto; }
+  .meta { color: #666; font-size: 0.9rem; }
+  .removed { background: #ffeef0; color: #82071e; display: block; }
+  .added { background: #e6ffed; color: #035309; display: block; }
+  .warning { background: #fff3cd; border-left: 4px solid #f0ad4e; padding: 0.75rem 1rem; border-radius: 4px; margin: 1rem 0; }
+  .note { background: #eef6ff; border-left: 4px solid #5b9bd5; padding: 0.75rem 1rem; border-radius: 4px; margin: 1rem 0; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; vertical-align: top; }
+  th { background: #f6f8fa; }
+
+  /* "Add new line" mockup, recreating the Purchase Order line entry row */
+  .po-mockup { border: 1px solid #ddd; border-radius: 6px; overflow: hidden; margin: 1rem 0; font-size: 0.85rem; }
+  .po-mockup-header { background: #eef0f3; display: flex; align-items: center; padding: 0.6rem 1rem; color: #555; }
+  .po-mockup-header .col-label { flex: 1; font-weight: 600; }
+  .po-mockup-header .col-narrow { width: 80px; text-align: center; }
+  .po-mockup-row { display: flex; align-items: center; padding: 0.75rem 1rem; gap: 0.5rem; flex-wrap: wrap; background: #fff; }
+  .po-mockup-row .product-select { flex: 2; min-width: 220px; padding: 0.4rem; border: 1px solid #ccc; border-radius: 4px; background: #fff; color: #333; }
+  .po-mockup input, .po-mockup select.vat { border: 1px solid #ccc; border-radius: 3px; padding: 0.35rem; font-size: 0.85rem; }
+  .po-mockup .sku { width: 90px; }
+  .po-mockup .vat { width: 80px; }
+  .po-mockup .vat.empty { background: #fff3f3; border: 1px dashed #e0a0a0; color: #aaa; }
+  .po-mockup .vat.filled { background: #f3fff3; border-color: #9bd49b; }
+  .po-mockup .price { width: 60px; }
+  .po-mockup .qty { width: 45px; }
+  .po-mockup .disc { width: 45px; }
+  .po-mockup .add-btn { background: #6c5ce7; color: #fff; border: none; border-radius: 4px; padding: 0.5rem 1.25rem; font-weight: bold; font-size: 0.85rem; }
+  .po-mockup-caption { padding: 0.6rem 1rem; border-top: 1px solid #eee; background: #fafafa; }
+  .po-mockup-caption.bad { color: #82071e; }
+  .po-mockup-caption.good { color: #035309; }
+</style>
+</head>
+<body>
+
+<h1>Core Patch — Supplier Price VAT Rate Dropdown &amp; Code Handling</h1>
+<p class="meta">Decision/patch record for the South Side Supplies / Bright Cleaning Solutions Dolibarr evaluation.
+Dolibarr version: <strong>23.0.3</strong>. File: <code>htdocs/product/price_suppliers.php</code> (core, not tracked in git — see <a href="#upgrade-risk">Upgrade risk</a>).</p>
+
+<div class="note">
+<p>This is the same underlying patch covered day-to-day in the Dolibarr <strong>Knowledge Base</strong> entry
+<strong>KM2607 — "GST not auto-populating on purchase order lines"</strong> (Setup → Knowledge Management).
+KM2607 explains the symptom/fix from a user's point of view and includes a one-off SQL fix for supplier prices
+imported before this patch existed. This page is the upgrade-risk record for the <em>code</em> side — keep both
+in sync if either changes.</p>
+</div>
+
+<h2 id="the-problem">The problem</h2>
+<p>
+On a product's <strong>"For purchase"</strong> tab, the <strong>"Tax Rate (for this vendor/product)"</strong> field
+(<code>VATRateForSupplierProduct</code>) has two related problems in stock Dolibarr 23.0.3:
+</p>
+<ol>
+  <li><strong>No dropdown.</strong> The proper VAT-rate dropdown helper (<code>$form-&gt;load_tva(...)</code>) is
+      present in core but <strong>commented out</strong>. The field is always a plain text box you type a number into
+      (e.g. <code>10</code>), with no GST/tax-code information.</li>
+  <li><strong>Even if a code-bearing value is submitted, it's discarded.</strong> Stock's save handler
+      (<code>action == 'save_price'</code>) parses <code>tva_tx</code> assuming it's a plain number, and both calls to
+      <code>$object-&gt;update_buyprice(...)</code> hard-code an empty string for the VAT-code argument. So
+      <code>llx_product_fournisseur_price.default_vat_code</code> is never set by this form.</li>
+</ol>
+<p>
+Problem 2 is why <strong>KM2607</strong> exists: products whose supplier price has <code>tva_tx = 10</code> but
+<code>default_vat_code IS NULL</code> show <em>no GST</em> in the VAT dropdown on purchase order lines, because
+Dolibarr can't match a NULL code to a tax rule.
+</p>
+
+<h2>The fix we applied — three hunks, all interdependent</h2>
+<p>
+All three hunks work together. Hunk 3 (the dropdown) submits values like <code>"10 (GST)"</code>; hunk 1 must be
+able to parse that; hunk 2 must pass the parsed code through to be saved. Applying only one or two of these would
+either do nothing (hunk 2/3 without hunk 1 → "must be numeric" validation error on save) or silently drop the code
+again (hunk 3 without hunk 1+2).
+</p>
+
+<h3>Hunk 1 — parse the VAT code out of the submitted value (~line 217)</h3>
+<table>
+  <tr><th>Stock 23.0.3</th><th>Patched (current)</th></tr>
+  <tr>
+<td><pre>$npr = preg_match('/\*/', GETPOST('tva_tx', 'alpha')) ? 1 : 0;
+$tva_tx = str_replace('*', '', GETPOST('tva_tx', 'alpha'));
+if (!preg_match('/\((.*)\)/', $tva_tx)) {
+    $tva_tx = price2num($tva_tx);
+}</pre></td>
+<td><pre>$npr = preg_match('/\*/', GETPOST('tva_tx', 'alpha')) ? 1 : 0;
+$tva_tx = str_replace('*', '', GETPOST('tva_tx', 'alpha'));
+<span class="added">$newdefaultvatcode = '';
+if (preg_match('/\((.*)\)/', $tva_tx, $reg)) {
+    $newdefaultvatcode = $reg[1];
+    $tva_tx = price2num(preg_replace('/\s*\(.*\)/', '', $tva_tx));
+} else {
+    $tva_tx = price2num($tva_tx);
+}</span></pre></td>
+  </tr>
+</table>
+<p>
+Stock's version only calls <code>price2num()</code> when there's <strong>no</strong> parenthesis — if a value like
+<code>"10 (GST)"</code> were ever submitted, <code>$tva_tx</code> would stay as that literal string, fail the later
+<code>is_numeric($tva_tx)</code> check, and the form would reject the save with "VAT rate must be numeric". This branch
+is effectively dead in stock because stock never produces a value with a code attached (no dropdown — see hunk 3).
+The patched version always extracts the code into <code>$newdefaultvatcode</code> and numeric-cleans
+<code>$tva_tx</code> either way.
+</p>
+
+<h3>Hunk 2 — pass the parsed code into <code>update_buyprice()</code> (~lines 333, 335)</h3>
+<table>
+  <tr><th>Stock 23.0.3</th><th>Patched (current)</th></tr>
+  <tr>
+<td><pre>// multicurrency
+... array(), <span class="removed">''</span>, $multicurrency_price, ...
+
+// non-multicurrency
+... array(), <span class="removed">''</span>, 0, 'HT', 1, '', ...</pre></td>
+<td><pre>// multicurrency
+... array(), <span class="added">$newdefaultvatcode</span>, $multicurrency_price, ...
+
+// non-multicurrency
+... array(), <span class="added">$newdefaultvatcode</span>, 0, 'HT', 1, '', ...</pre></td>
+  </tr>
+</table>
+<p>
+Both calls to <code>$object-&gt;update_buyprice(...)</code> (multicurrency-enabled and disabled variants) take a VAT
+code as one of their later positional arguments. Stock hard-codes <code>''</code> here, so
+<code>default_vat_code</code> is always cleared/blank regardless of what was selected. The patch passes
+<code>$newdefaultvatcode</code> from hunk 1 instead.
+</p>
+
+<h3>Hunk 3 — show the <code>load_tva()</code> dropdown when editing an existing price (~lines 647–669)</h3>
+<table>
+  <tr><th>Stock 23.0.3</th><th>Patched (current)</th></tr>
+  <tr>
+<td><pre><span class="removed">//print $form->load_tva('tva_tx',$object->tva_tx,$supplier,$mysoc);</span>
+if (!empty($rowid)) {	// update
+    $tmpproductsupplier = new ProductFournisseur($db);
+    $tmpproductsupplier->fetch_product_fournisseur_price($rowid, 1);
+    $default_vat = $tmpproductsupplier->fourn_tva_tx;
+    $default_npr = $tmpproductsupplier->fourn_tva_npr;
+} else {
+    if (empty($default_vat)) {
+        $default_vat = $object->tva_tx;
+    }
+}
+$vattosuggest = (GETPOSTISSET("tva_tx") ? vatrate(GETPOST("tva_tx")) :
+    ($default_vat != '' ? vatrate($default_vat) : ''));
+$vattosuggest = preg_replace('/\s*\(.*\)$/', '', $vattosuggest);
+print '&lt;input type="text" class="flat" size="5" name="tva_tx" value="'.$vattosuggest.'"&gt;';</pre></td>
+<td><pre>if (!empty($rowid)) {	// update — show dropdown
+    $tmpproductsupplier = new ProductFournisseur($db);
+    $tmpproductsupplier->fetch_product_fournisseur_price($rowid, 1);
+    $default_vat = $tmpproductsupplier->fourn_tva_tx;
+    <span class="added">$default_vat_code = $tmpproductsupplier->default_vat_code;</span>
+    $default_npr = $tmpproductsupplier->fourn_tva_npr;
+    <span class="added">if (GETPOSTISSET("tva_tx")) {
+        $vatforselect = GETPOST("tva_tx");
+    } else {
+        $vatforselect = price2num($default_vat).(!empty($default_vat_code) ? ' ('.$default_vat_code.')' : '');
+    }
+    print $form->load_tva('tva_tx', $vatforselect, $mysoc, $mysoc, 0, 0, '', false, 1, 0);</span>
+} else {
+    if (empty($default_vat)) {
+        $default_vat = $object->tva_tx;
+    }
+    $vattosuggest = (GETPOSTISSET("tva_tx") ? vatrate(GETPOST("tva_tx")) : ($default_vat != '' ? vatrate($default_vat) : ''));
+    $vattosuggest = preg_replace('/\s*\(.*\)$/', '', $vattosuggest);
+    print '&lt;input type="text" class="flat" size="5" name="tva_tx" value="'.$vattosuggest.'"&gt;';
+}</pre></td>
+  </tr>
+</table>
+
+<h2>What changed in practice</h2>
+<table>
+  <tr><th>Screen / action</th><th>Stock 23.0.3</th><th>Patched</th></tr>
+  <tr>
+    <td><strong>Edit existing supplier price</strong> — field display<br><span class="meta">(<code>action=edit_price&amp;rowid=...</code>)</span></td>
+    <td>Plain text box, numeric rate only (e.g. <code>10</code>)</td>
+    <td>Dropdown of configured VAT/GST rates &amp; codes (e.g. <code>10% (GST)</code>, <code>0% (GST Free)</code>), current value pre-selected</td>
+  </tr>
+  <tr>
+    <td><strong>Save</strong> — <code>default_vat_code</code> column</td>
+    <td>Always set to <code>''</code> (cleared), even if the submitted value somehow had a code</td>
+    <td>Set from the dropdown's selected code (e.g. <code>GST</code>)</td>
+  </tr>
+  <tr>
+    <td><strong>Add new supplier price</strong><br><span class="meta">(no <code>rowid</code>)</span></td>
+    <td>Plain text box</td>
+    <td><strong>Unchanged</strong> — still a plain text box (a brand-new price might need a rate not in our local list, e.g. an overseas supplier)</td>
+  </tr>
+</table>
+
+<h2>Visual example — effect on Purchase Order lines</h2>
+<p>
+This is the symptom KM2607 was written for: adding a product to a Purchase Order's <strong>"Add new line"</strong> row.
+The VAT column reads <code>default_vat_code</code> from the supplier price to pre-fill the VAT dropdown.
+</p>
+
+<div class="po-mockup">
+  <div class="po-mockup-header">
+    <div class="col-label">Add new line</div>
+    <div class="col-narrow">VAT</div>
+    <div class="col-narrow">U.P. (net)</div>
+    <div class="col-narrow">U.P. (inc. tax)</div>
+    <div class="col-narrow">Qty</div>
+    <div class="col-narrow">Disc.</div>
+  </div>
+  <div class="po-mockup-row">
+    <select class="product-select"><option>AUPR240LT - Bin Liner | Mobile Bin | AUSTAR | 240LT Premium...</option></select>
+    <input class="sku" value="AUPR240LT" readonly>
+    <input class="vat empty" value="" placeholder="">
+    <input class="price" value="36.38" readonly>
+    <input class="price" value="">
+    <input class="qty" value="1" readonly>
+    <input class="disc" value="">
+    <button class="add-btn" disabled>ADD</button>
+  </div>
+  <div class="po-mockup-caption bad">
+    <strong>Before the patch:</strong> <code>llx_product_fournisseur_price.default_vat_code</code> is <code>NULL</code> for this
+    supplier price (every save via the stock form clears it — hunk 2). Dolibarr can't match <code>tva_tx = 10</code> to a tax
+    rule on its own, so the VAT field is left <strong>empty</strong>. If you don't notice and click ADD anyway, the line is
+    added with no GST — understating GST paid on this purchase.
+  </div>
+</div>
+
+<div class="po-mockup">
+  <div class="po-mockup-header">
+    <div class="col-label">Add new line</div>
+    <div class="col-narrow">VAT</div>
+    <div class="col-narrow">U.P. (net)</div>
+    <div class="col-narrow">U.P. (inc. tax)</div>
+    <div class="col-narrow">Qty</div>
+    <div class="col-narrow">Disc.</div>
+  </div>
+  <div class="po-mockup-row">
+    <select class="product-select"><option>AUPR240LT - Bin Liner | Mobile Bin | AUSTAR | 240LT Premium...</option></select>
+    <input class="sku" value="AUPR240LT" readonly>
+    <select class="vat filled"><option>10% (G...</option></select>
+    <input class="price" value="36.38" readonly>
+    <input class="price" value="">
+    <input class="qty" value="1" readonly>
+    <input class="disc" value="">
+    <button class="add-btn">ADD</button>
+  </div>
+  <div class="po-mockup-caption good">
+    <strong>After the patch:</strong> editing the supplier price once via the new <code>load_tva()</code> dropdown (hunk 3) and
+    saving correctly writes <code>default_vat_code = 'GST'</code> (hunks 1–2). The PO line now pre-fills VAT as
+    <strong>10% (GST)</strong> automatically — this is the field circled in the original screenshot.
+  </div>
+</div>
+
+<h2>Why <code>load_tva()</code> was commented out in the first place</h2>
+<p>
+Per Dolibarr history, the dropdown was disabled by Laurent Destailleur (Dolibarr's original author), with the
+rationale that a supplier's VAT rate "<em>may be any vat rates for any country</em>" — i.e. for multi-country
+deployments, restricting the field to a dropdown of the local company's configured rates could be too limiting.
+The plain-text fallback avoided that restriction but, as a side effect, never wrote <code>default_vat_code</code>
+(hunks 1 &amp; 2 above) — a bug that persisted unnoticed through Dolibarr v14–v23.
+</p>
+<p>
+For our single-country (Australia-only) deployment, restricting the edit-price dropdown to locally configured GST
+rates is correct and desirable, so we've re-enabled it for the "edit existing price" case only — new prices for a
+potential overseas supplier still use free text.
+</p>
+
+<h2>Why this is safe</h2>
+<ul>
+  <li>Scope is limited to the supplier-price edit form and its save handler — no other screens are touched.</li>
+  <li>Hunk 3 uses Dolibarr's own <code>$form-&gt;load_tva()</code> helper — the same function used for VAT dropdowns elsewhere in core.</li>
+  <li>Hunks 1–2 only change <em>which value</em> is written to the existing <code>default_vat_code</code> column — no schema changes.</li>
+  <li>The "add new price" path is untouched, so creating a brand-new supplier price still behaves exactly as stock.</li>
+</ul>
+
+<h2 id="upgrade-risk">⚠ Upgrade risk — this is a CORE file edit</h2>
+<div class="warning">
+  <p><strong><code>htdocs/</code> is excluded from this repo's git tracking</strong> (see CLAUDE.md). All three hunks
+  live only in the live <code>htdocs/product/price_suppliers.php</code> file on this machine and on the live
+  server — they are <strong>not</strong> backed up by git.</p>
+  <ul>
+    <li>Any future Dolibarr core upgrade (re-extracting/replacing <code>htdocs/</code>) will <strong>silently remove all three hunks</strong>
+        and revert to stock behaviour (no dropdown, <code>default_vat_code</code> cleared on every save).</li>
+    <li>This page is the record of what to re-apply after an upgrade. Re-apply <strong>all three hunks together</strong> —
+        applying a subset can produce a worse state than stock (e.g. hunk 3 alone causes a "must be numeric" save error).</li>
+  </ul>
+  <p><strong>Checked (2026-06-15): a <code>formObjectOptions</code> hook-based alternative is not viable</strong> for hunk 3.
+  That hook (<code>htdocs/product/price_suppliers.php</code> around line 914) fires <em>after</em> the field table is
+  printed and can only append rows, not replace the VAT field rendered earlier in the same table. Hunks 1–2 are in the
+  save-handler, well before any hook point. A hook-based approach would still require core changes to call hooks at
+  these new points, so it offers no upgrade-safety benefit over this patch.</p>
+</div>
+
+<h2>How to test</h2>
+<ol>
+  <li>Go to <strong>Products</strong> &gt; open a product with an existing supplier price &gt; <strong>"For purchase"</strong> tab.</li>
+  <li>Click the pencil/edit icon on an existing supplier price row (<code>action=edit_price&amp;rowid=NN</code>).</li>
+  <li>Confirm <strong>"Tax Rate (for this vendor/product)"</strong> is a <strong>dropdown</strong>, pre-selected to the
+      product's current rate/code (e.g. <code>10% (GST)</code>).</li>
+  <li>Change it (or just re-save with the same value), click <strong>Save</strong>.</li>
+  <li>Check the database row was written correctly:
+<pre>SELECT rowid, fk_product, fk_soc, tva_tx, default_vat_code
+FROM llx_product_fournisseur_price
+WHERE rowid = NN;</pre>
+      <code>default_vat_code</code> should be <code>GST</code> (or <code>GST_FREE</code> etc.), not <code>NULL</code> or empty.</li>
+  <li>Click <strong>"Add price"</strong> (new supplier price, no <code>rowid</code>) and confirm the VAT field is
+      still the original plain text box (unchanged).</li>
+  <li>Add the new product/supplier combo to a purchase order line and confirm the VAT dropdown on the PO line shows
+      <em>GST 10%</em> (not blank) — this is the symptom KM2607 was written for.</li>
+</ol>
+
+<h2>How to undo</h2>
+<p>In <code>htdocs/product/price_suppliers.php</code>, revert all three hunks back to the stock 23.0.3 versions shown
+in the left-hand columns above:</p>
+<ul>
+  <li>Hunk 1 (~line 217): restore the simple <code>if (!preg_match(...)) { $tva_tx = price2num($tva_tx); }</code> form, remove <code>$newdefaultvatcode</code>.</li>
+  <li>Hunk 2 (~lines 333, 335): change both <code>$newdefaultvatcode</code> arguments back to <code>''</code>.</li>
+  <li>Hunk 3 (~line 647): remove the <code>load_tva()</code> call and <code>$vatforselect</code>/<code>$default_vat_code</code> logic, restore the commented-out line and the plain <code>&lt;input type="text"&gt;</code> for both branches.</li>
+</ul>
+
+</body>
+</html>
