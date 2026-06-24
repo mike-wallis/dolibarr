@@ -1578,6 +1578,15 @@ function payroll_test_data_table($rows_by_fy, $base_url, $del_action, $headers, 
   </table>
 </div>
 
+<div style="background:#f5f5f5;border:1px solid #ddd;border-radius:4px;padding:0.75rem 1rem;margin-bottom:1.5rem;max-width:900px;">
+  <strong>ATO Tax Tables — Quick Links</strong>
+  &nbsp;&nbsp;
+  <a href="https://www.ato.gov.au/tax-rates-and-codes/tax-tables-overview" target="_blank">
+    tax-tables-overview ↗
+  </a>
+  <span style="color:#888;font-size:0.85em;margin-left:0.5rem;">— start here to find formula pages and sample data download pages for each schedule</span>
+</div>
+
 <?php
 // ── 1. Withholding amounts ────────────────────────────────────────────────────
 $wth_by_fy = group_by_fy($test_wth_rows);
