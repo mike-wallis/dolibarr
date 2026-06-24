@@ -906,10 +906,23 @@ $delete_test_tables = [
     'delete_test_mla6'        => 'payroll_test_mla6',
     'delete_test_stsl'        => 'payroll_test_stsl',
 ];
+// Per-row delete (legacy — kept for any manually-entered rows)
 foreach ($delete_test_tables as $act => $tbl) {
     if ($action === $act && $rowid) {
         $db->query("DELETE FROM " . MAIN_DB_PREFIX . $tbl
             . " WHERE rowid=$rowid AND entity=" . (int)$conf->entity);
+        header('Location: config.php?tab=tests&mainmenu=admintools');
+        exit;
+    }
+}
+// Bulk delete by FY (e.g. delete_test_withholding_fy)
+foreach ($delete_test_tables as $act => $tbl) {
+    if ($action === $act . '_fy') {
+        $del_fy = trim(GETPOST('fy', 'alpha'));
+        if (preg_match('/^\d{4}-\d{2}$/', $del_fy)) {
+            $db->query("DELETE FROM " . MAIN_DB_PREFIX . $tbl
+                . " WHERE fy='" . $db->escape($del_fy) . "' AND entity=" . (int)$conf->entity);
+        }
         header('Location: config.php?tab=tests&mainmenu=admintools');
         exit;
     }
@@ -1961,33 +1974,30 @@ function payroll_test_import_card($base_url, $fy_options, $action_name, $dl_acti
     echo '</div></form></div>';
 }
 
-// Helper: imported rows summary table (generic columns passed as header/value closures)
+// Helper: compact imported-data summary — FY chip with row count and a Clear button
 function payroll_test_data_table($rows_by_fy, $base_url, $del_action, $headers, $row_cells, $period_labels)
 {
     if (empty($rows_by_fy)) {
-        echo '<p style="color:#888;font-style:italic;">No data imported yet.</p>';
+        echo '<p style="color:#888;font-size:0.88em;margin:0.25rem 0 0.5rem;">No data imported yet.</p>';
         return;
     }
+    echo '<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin:0.5rem 0 1rem;">';
     foreach ($rows_by_fy as $fy_key => $rows) {
-        echo '<h4 style="margin:1rem 0 0.4rem;">' . htmlspecialchars($fy_key)
-            . ' <small style="font-weight:normal;color:#777;">(' . count($rows) . ' rows)</small></h4>';
-        echo '<div style="overflow-x:auto;">';
-        echo '<table class="noborder" style="font-size:0.85em;margin-bottom:0.5rem;">';
-        echo '<thead><tr style="background:#f4f4f4;">';
-        foreach ($headers as $h) {
-            echo '<th style="padding:0.3rem 0.6rem;text-align:' . ($h[1] ?? 'left') . ';">' . $h[0] . '</th>';
-        }
-        echo '<th style="padding:0.3rem 0.4rem;"></th></tr></thead><tbody>';
-        foreach ($rows as $i => $r) {
-            echo '<tr style="' . ($i % 2 ? 'background:#fafafa;' : '') . 'border-top:1px solid #eee;">';
-            $row_cells($r, $period_labels);
-            echo '<td style="padding:0.25rem 0.4rem;white-space:nowrap;">';
-            echo '<a href="' . $base_url . '&amp;tab=tests&amp;action=' . $del_action . '&amp;rowid=' . $r->rowid . '&amp;token=' . newToken() . '"'
-                . ' onclick="return confirm(\'Delete this row?\')" style="color:#c0392b;font-size:0.85em;">Del</a>';
-            echo '</td></tr>';
-        }
-        echo '</tbody></table></div>';
+        $count   = count($rows);
+        $del_url = $base_url . '&amp;tab=tests&amp;action=' . $del_action . '_fy'
+            . '&amp;fy=' . urlencode($fy_key) . '&amp;token=' . newToken();
+        echo '<div style="display:flex;align-items:center;gap:0.6rem;background:#eaf4fb;'
+            . 'border:1px solid #b3d8ee;border-radius:4px;padding:0.3rem 0.75rem;font-size:0.88em;">';
+        echo '<span style="font-weight:600;">' . htmlspecialchars($fy_key) . '</span>';
+        echo '<span style="color:#555;">' . number_format($count) . ' rows</span>';
+        echo '<a href="' . $del_url . '"'
+            . ' onclick="return confirm(\'Clear all ' . $count . ' rows for '
+            . htmlspecialchars($fy_key, ENT_QUOTES) . '?\')"'
+            . ' style="color:#c0392b;font-size:0.85em;text-decoration:none;" title="Remove all imported rows for this FY">'
+            . '&#10005; Clear</a>';
+        echo '</div>';
     }
+    echo '</div>';
 }
 ?>
 
