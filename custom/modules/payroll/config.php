@@ -351,20 +351,33 @@ function payroll_seed_hecs($db, $conf, $fy)
 
 // FY config actions
 if ($action === 'save_fy') {
-    $tab     = 'fy';
-    $fy_val  = trim(GETPOST('fy', 'alpha'));
-    $sup_r   = (float)str_replace(',', '.', GETPOST('super_rate',  'alpha'));
-    $hecs_s  = GETPOST('hecs_system', 'alpha');
-    $min_w   = (float)str_replace(',', '.', GETPOST('min_wage',    'alpha'));
-    $notes   = trim(GETPOST('notes', 'alphanohtml'));
+    $tab        = 'fy';
+    $fy_val     = trim(GETPOST('fy', 'alpha'));
+    $sup_r      = (float)str_replace(',', '.', GETPOST('super_rate',  'alpha'));
+    $hecs_s     = GETPOST('hecs_system', 'alpha');
+    $min_w      = (float)str_replace(',', '.', GETPOST('min_wage',    'alpha'));
+    $notes      = trim(GETPOST('notes', 'alphanohtml'));
+    $start_date = trim(GETPOST('start_date', 'alpha'));
+    $end_date   = trim(GETPOST('end_date',   'alpha'));
 
     if (!preg_match('/^\d{4}-\d{2}$/', $fy_val)) {
         $error = 'FY must be in YYYY-YY format (e.g. 2025-26).';
     } else {
+        // Auto-derive ATO tax-year dates from FY string if not supplied or invalid.
+        $start_year = (int)substr($fy_val, 0, 4);
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
+            $start_date = $start_year . '-07-01';
+        }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $end_date)) {
+            $end_date = ($start_year + 1) . '-06-30';
+        }
+
         $notes_sql = $notes ? "'" . $db->escape($notes) . "'" : 'NULL';
         if ($rowid) {
             $db->query("UPDATE " . MAIN_DB_PREFIX . "payroll_fy_config SET"
                 . " fy='" . $db->escape($fy_val) . "'"
+                . ", start_date='" . $db->escape($start_date) . "'"
+                . ", end_date='" . $db->escape($end_date) . "'"
                 . ", super_rate=$sup_r"
                 . ", hecs_system='" . $db->escape($hecs_s) . "'"
                 . ", min_wage=$min_w"
@@ -372,9 +385,10 @@ if ($action === 'save_fy') {
                 . " WHERE rowid=$rowid AND entity=" . (int)$conf->entity);
         } else {
             $db->query("INSERT INTO " . MAIN_DB_PREFIX . "payroll_fy_config"
-                . " (fy, super_rate, hecs_system, min_wage, notes, entity)"
-                . " VALUES ('" . $db->escape($fy_val) . "', $sup_r"
-                . ", '" . $db->escape($hecs_s) . "', $min_w, $notes_sql"
+                . " (fy, start_date, end_date, super_rate, hecs_system, min_wage, notes, entity)"
+                . " VALUES ('" . $db->escape($fy_val) . "'"
+                . ", '" . $db->escape($start_date) . "', '" . $db->escape($end_date) . "'"
+                . ", $sup_r, '" . $db->escape($hecs_s) . "', $min_w, $notes_sql"
                 . ", " . (int)$conf->entity . ")");
         }
         header('Location: config.php?tab=fy&saved=1&mainmenu=admintools');
@@ -962,6 +976,7 @@ echo '</ul>';
   <thead>
     <tr style="background:#f4f4f4;">
       <th style="padding:0.5rem 1rem;text-align:left;">FY</th>
+      <th style="padding:0.5rem 1rem;text-align:left;">Period</th>
       <th style="padding:0.5rem 1rem;text-align:right;">Super rate</th>
       <th style="padding:0.5rem 1rem;text-align:left;">HECS system</th>
       <th style="padding:0.5rem 1rem;text-align:right;">Min wage ($/hr)</th>
@@ -973,6 +988,13 @@ echo '</ul>';
     <?php foreach ($fy_list as $fy_obj): ?>
     <tr style="border-top:1px solid #eee;">
       <td style="padding:0.4rem 1rem;font-weight:600;"><?= htmlspecialchars($fy_obj->fy) ?></td>
+      <td style="padding:0.4rem 1rem;font-size:0.85em;color:#555;">
+        <?php if ($fy_obj->start_date && $fy_obj->end_date): ?>
+          <?= date('d/m/Y', strtotime($fy_obj->start_date)) ?> – <?= date('d/m/Y', strtotime($fy_obj->end_date)) ?>
+        <?php else: ?>
+          <span style="color:#c00;">No dates set</span>
+        <?php endif; ?>
+      </td>
       <td style="padding:0.4rem 1rem;text-align:right;"><?= number_format($fy_obj->super_rate, 2) ?>%</td>
       <td style="padding:0.4rem 1rem;">
         <?= $fy_obj->hecs_system === 'marginal'
@@ -990,7 +1012,7 @@ echo '</ul>';
     </tr>
     <?php endforeach; ?>
     <?php if (empty($fy_list)): ?>
-    <tr><td colspan="6" style="padding:1rem;color:#888;">No financial years configured yet. Add one below.</td></tr>
+    <tr><td colspan="7" style="padding:1rem;color:#888;">No financial years configured yet. Add one below.</td></tr>
     <?php endif; ?>
   </tbody>
 </table>
@@ -1006,9 +1028,26 @@ echo '</ul>';
   <tr>
     <td style="padding:0.5rem 1rem;width:180px;"><strong>Financial year</strong></td>
     <td style="padding:0.5rem 1rem;">
-      <input type="text" name="fy" value="<?= htmlspecialchars($edit_fy->fy ?? '') ?>"
-             placeholder="2026-27" maxlength="10" style="width:100px;" class="flat" required>
+      <input type="text" name="fy" id="fy_input" value="<?= htmlspecialchars($edit_fy->fy ?? '') ?>"
+             placeholder="2026-27" maxlength="10" style="width:100px;" class="flat" required
+             oninput="payrollAutoFillDates(this.value)">
       <small style="color:#888;margin-left:0.5rem;">Format: YYYY-YY</small>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0.5rem 1rem;"><strong>Period start</strong></td>
+    <td style="padding:0.5rem 1rem;">
+      <input type="date" name="start_date" id="fy_start" value="<?= htmlspecialchars($edit_fy->start_date ?? '') ?>"
+             style="width:150px;" class="flat">
+      <small style="color:#888;margin-left:0.5rem;">Auto-filled from FY (1 July) — override if needed</small>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0.5rem 1rem;"><strong>Period end</strong></td>
+    <td style="padding:0.5rem 1rem;">
+      <input type="date" name="end_date" id="fy_end" value="<?= htmlspecialchars($edit_fy->end_date ?? '') ?>"
+             style="width:150px;" class="flat">
+      <small style="color:#888;margin-left:0.5rem;">Auto-filled from FY (30 June) — override if needed</small>
     </td>
   </tr>
   <tr>
@@ -1048,6 +1087,17 @@ echo '</ul>';
   <?php endif; ?>
 </div>
 </form>
+<script>
+function payrollAutoFillDates(fy) {
+    var m = fy.match(/^(\d{4})-\d{2}$/);
+    if (!m) return;
+    var y = parseInt(m[1], 10);
+    var s = document.getElementById('fy_start');
+    var e = document.getElementById('fy_end');
+    if (s && !s.value) s.value = y + '-07-01';
+    if (e && !e.value) e.value = (y + 1) + '-06-30';
+}
+</script>
 
 <?php // ===================================================================
       // TAB: Tax Coefficients
