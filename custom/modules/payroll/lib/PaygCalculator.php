@@ -61,8 +61,9 @@ class PaygCalculator
         $weekly = $gross_period / $divisor;
         $x      = floor($weekly) + 0.99;
 
-        // Step 2: PAYG withholding (weekly, then scale back to period)
-        $weekly_payg  = self::applyScale($x, $scale, $tables);
+        // Step 2: PAYG withholding — ATO formula: round to whole dollars at weekly step, then scale.
+        // round() before ×divisor matches the ATO spec; reversing order gives ±1 errors on fortnightly/monthly.
+        $weekly_payg  = (int) round(self::applyScale($x, $scale, $tables));
         $period_payg  = (int) round($weekly_payg * $divisor);
 
         // Step 3: Medicare levy adjustment (reduces withholding — Scale 2/6 only)
