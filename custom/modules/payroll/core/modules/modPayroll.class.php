@@ -111,6 +111,7 @@ class modPayroll extends DolibarrModules
             'llx_payroll_test_mla2',        // ATO MLA Scale 2 (dependants)
             'llx_payroll_test_mla6',        // ATO MLA Scale 6 (half Medicare, children)
             'llx_payroll_test_stsl',        // ATO Schedule 8 STSL/HECS total withholding
+            'llx_payroll_mla_params',       // MLA formula parameters (DB-driven, replaces hardcoded values)
             'llx_payroll_alter',
         ];
         foreach ($tables_to_create as $table) {

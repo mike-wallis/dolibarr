@@ -4,10 +4,9 @@
  * Accessed via the gear icon on Setup > Modules > Payroll card.
  *
  * Tabs:
- *   fy     — super rate, HECS system, minimum wage per financial year
- *   coeff  — ATO NAT 1004 Schedule 1 PAYG coefficients (view/seed/import/edit per FY+scale)
- *   hecs   — ATO NAT 3539 Schedule 8 HECS/HELP thresholds (view/seed/import/edit per FY)
- *   tests  — ATO sample data test cases for PAYG verification (import/view per FY)
+ *   fy         — super rate, HECS system, minimum wage per financial year
+ *   taxtables  — ATO tax tables: PAYG coefficients (NAT 1004), MLA params (NAT 1008/1009), STSL brackets (NAT 3539)
+ *   tests      — ATO sample data test cases for PAYG verification (import/view per FY)
  */
 
 require '../../main.inc.php';
@@ -20,6 +19,10 @@ $langs->loadLangs(['compta']);
 
 $action = GETPOST('action', 'aZ09');
 $tab    = GETPOST('tab', 'alpha') ?: 'fy';
+// Legacy tab names — redirect to unified taxtables tab
+if ($tab === 'coeff' || $tab === 'hecs') {
+    $tab = 'taxtables';
+}
 $rowid  = GETPOSTINT('rowid');
 
 $error   = '';
@@ -135,6 +138,36 @@ if (isset($ato_download_datasets[$action])) {
         exit;
     }
     $filename = 'ato-' . $dataset . '-' . $fy . '.csv';
+    $path     = dol_buildpath('/custom/payroll/data/' . $filename, 0);
+    if (!file_exists($path)) {
+        http_response_code(404);
+        echo 'File not found: ' . htmlspecialchars($filename);
+        exit;
+    }
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Content-Length: ' . filesize($path));
+    readfile($path);
+    exit;
+}
+
+// ── Bundled tax-table file downloads ─────────────────────────────────────────
+// Serves tax-coeff-*.csv, tax-mla-*.csv, tax-stsl-*.csv from data/.
+// fy parameter selects which year's file to serve (e.g. fy=2026-27).
+$taxtable_download_datasets = [
+    'download_taxtable_coeff' => 'tax-coeff',
+    'download_taxtable_mla'   => 'tax-mla',
+    'download_taxtable_stsl'  => 'tax-stsl',
+];
+if (isset($taxtable_download_datasets[$action])) {
+    $prefix = $taxtable_download_datasets[$action];
+    $fy     = preg_replace('/[^0-9-]/', '', GETPOST('fy', 'alpha'));
+    if (!preg_match('/^\d{4}-\d{2}$/', $fy)) {
+        http_response_code(400);
+        echo 'Invalid FY.';
+        exit;
+    }
+    $filename = $prefix . '-' . $fy . '.csv';
     $path     = dol_buildpath('/custom/payroll/data/' . $filename, 0);
     if (!file_exists($path)) {
         http_response_code(404);
@@ -405,7 +438,7 @@ if ($action === 'delete_fy' && $rowid) {
 
 // Coefficient actions
 if ($action === 'seed_coeff') {
-    $tab = 'coeff';
+    $tab = 'taxtables';
     $r   = payroll_seed_coefficients($db, $conf, GETPOST('fy_seed', 'alpha'));
     $message = $r['message'];
     $error   = $r['error'];
@@ -431,20 +464,20 @@ if ($action === 'save_coeff') {
             . " VALUES ('" . $db->escape($fy_v) . "', '" . $db->escape($sc_v) . "'"
             . ", $mw_v, $a_v, $b_v, $pos_v, " . (int)$conf->entity . ")");
     }
-    header('Location: config.php?tab=coeff&saved=1&mainmenu=admintools');
+    header('Location: config.php?tab=taxtables&saved=1&mainmenu=admintools');
     exit;
 }
 
 if ($action === 'delete_coeff' && $rowid) {
     $db->query("DELETE FROM " . MAIN_DB_PREFIX . "payroll_tax_coefficient"
         . " WHERE rowid=$rowid AND entity=" . (int)$conf->entity);
-    header('Location: config.php?tab=coeff&mainmenu=admintools');
+    header('Location: config.php?tab=taxtables&mainmenu=admintools');
     exit;
 }
 
 // HECS actions
 if ($action === 'seed_hecs') {
-    $tab = 'hecs';
+    $tab = 'taxtables';
     $r   = payroll_seed_hecs($db, $conf, GETPOST('fy_seed', 'alpha'));
     $message = $r['message'];
     $error   = $r['error'];
@@ -471,20 +504,98 @@ if ($action === 'save_hecs') {
             . " VALUES ('" . $db->escape($fy_v) . "', $fr_v, $to_v, $rt_v"
             . ", $ba_v, $fl_v, $pos_v, " . (int)$conf->entity . ")");
     }
-    header('Location: config.php?tab=hecs&saved=1&mainmenu=admintools');
+    header('Location: config.php?tab=taxtables&saved=1&mainmenu=admintools');
     exit;
 }
 
 if ($action === 'delete_hecs' && $rowid) {
     $db->query("DELETE FROM " . MAIN_DB_PREFIX . "payroll_hecs_bracket"
         . " WHERE rowid=$rowid AND entity=" . (int)$conf->entity);
-    header('Location: config.php?tab=hecs&mainmenu=admintools');
+    header('Location: config.php?tab=taxtables&mainmenu=admintools');
+    exit;
+}
+
+// ── MLA params CRUD ──────────────────────────────────────────────────────────
+// Seed default MLA param values (2026-27 hardcoded — same as 2025-26 per ATO).
+// Accepts ?fy=2026-27 — seeds that FY for both scale2 and scale6.
+if ($action === 'seed_mla') {
+    $tab    = 'taxtables';
+    $fy_s   = trim(GETPOST('fy_seed', 'alpha'));
+    if (!preg_match('/^\d{4}-\d{2}$/', $fy_s)) {
+        $error = 'Invalid FY format.';
+    } else {
+        $defaults = [
+            'scale2' => [
+                'weekly_threshold' => 538.67, 'mid_threshold' => 673.00,
+                'phase_in_rate' => 0.10,  'levy_rate' => 0.02, 'shade_out_rate' => 0.08,
+                'annual_base' => 47238,   'annual_per_child' => 4338,
+            ],
+            'scale6' => [
+                'weekly_threshold' => 908.42, 'mid_threshold' => 1135.00,
+                'phase_in_rate' => 0.05,  'levy_rate' => 0.01, 'shade_out_rate' => 0.04,
+                'annual_base' => 47238,   'annual_per_child' => 4338,
+            ],
+        ];
+        $seeded = 0;
+        foreach ($defaults as $sc => $params) {
+            foreach ($params as $key => $val) {
+                $db->query("INSERT INTO " . MAIN_DB_PREFIX . "payroll_mla_params"
+                    . " (fy, scale, param_key, param_value, entity)"
+                    . " VALUES ('" . $db->escape($fy_s) . "', '" . $db->escape($sc) . "'"
+                    . ", '" . $db->escape($key) . "', $val, " . (int)$conf->entity . ")"
+                    . " ON DUPLICATE KEY UPDATE param_value = VALUES(param_value)");
+                $seeded++;
+            }
+        }
+        $message = "Seeded $seeded MLA parameter rows for $fy_s (scale2 + scale6)."
+            . " These are 2026-27 ATO values — verify against the Medicare levy adjustment page each July.";
+    }
+}
+
+if ($action === 'save_mla') {
+    $tab   = 'taxtables';
+    $fy_v  = trim(GETPOST('fy',         'alpha'));
+    $sc_v  = trim(GETPOST('scale',      'alpha'));
+    $pk_v  = trim(GETPOST('param_key',  'alpha'));
+    $pv_v  = (float)str_replace(',', '.', GETPOST('param_value', 'alpha'));
+    $valid_scales = ['scale2', 'scale6'];
+    $valid_keys   = ['weekly_threshold','mid_threshold','phase_in_rate','levy_rate','shade_out_rate','annual_base','annual_per_child'];
+    if (!preg_match('/^\d{4}-\d{2}$/', $fy_v)) {
+        $error = 'Invalid FY format.';
+    } elseif (!in_array($sc_v, $valid_scales)) {
+        $error = 'Scale must be scale2 or scale6.';
+    } elseif (!in_array($pk_v, $valid_keys)) {
+        $error = 'Invalid param_key.';
+    } else {
+        if ($rowid) {
+            $db->query("UPDATE " . MAIN_DB_PREFIX . "payroll_mla_params SET"
+                . " fy='" . $db->escape($fy_v) . "'"
+                . ", scale='" . $db->escape($sc_v) . "'"
+                . ", param_key='" . $db->escape($pk_v) . "'"
+                . ", param_value=$pv_v"
+                . " WHERE rowid=$rowid AND entity=" . (int)$conf->entity);
+        } else {
+            $db->query("INSERT INTO " . MAIN_DB_PREFIX . "payroll_mla_params"
+                . " (fy, scale, param_key, param_value, entity)"
+                . " VALUES ('" . $db->escape($fy_v) . "', '" . $db->escape($sc_v) . "'"
+                . ", '" . $db->escape($pk_v) . "', $pv_v, " . (int)$conf->entity . ")"
+                . " ON DUPLICATE KEY UPDATE param_value = VALUES(param_value)");
+        }
+        header('Location: config.php?tab=taxtables&saved=1&mainmenu=admintools');
+        exit;
+    }
+}
+
+if ($action === 'delete_mla' && $rowid) {
+    $db->query("DELETE FROM " . MAIN_DB_PREFIX . "payroll_mla_params"
+        . " WHERE rowid=$rowid AND entity=" . (int)$conf->entity);
+    header('Location: config.php?tab=taxtables&mainmenu=admintools');
     exit;
 }
 
 // ── CSV import: PAYG coefficients ─────────────────────────────────────────────
 if ($action === 'import_coeff') {
-    $tab    = 'coeff';
+    $tab    = 'taxtables';
     $fy_imp = trim(GETPOST('fy_import', 'alpha'));
     if (!preg_match('/^\d{4}-\d{2}$/', $fy_imp)) {
         $error = 'Invalid FY format — expected YYYY-YY.';
@@ -565,7 +676,7 @@ if ($action === 'import_coeff') {
 
 // ── CSV import: HECS brackets ─────────────────────────────────────────────────
 if ($action === 'import_hecs') {
-    $tab    = 'hecs';
+    $tab    = 'taxtables';
     $fy_imp = trim(GETPOST('fy_import', 'alpha'));
     if (!preg_match('/^\d{4}-\d{2}$/', $fy_imp)) {
         $error = 'Invalid FY format — expected YYYY-YY.';
@@ -631,6 +742,70 @@ if ($action === 'import_hecs') {
                         . ", $pos, " . (int)$conf->entity . ")");
                 }
                 $message = 'Imported ' . count($import_rows) . ' HECS bracket rows for ' . $fy_imp . '.';
+            }
+        }
+    }
+}
+
+// ── CSV import: MLA parameters ────────────────────────────────────────────────
+// CSV columns: scale,param_key,param_value  (FY from UI selector)
+if ($action === 'import_mla') {
+    $tab    = 'taxtables';
+    $fy_imp = trim(GETPOST('fy_import', 'alpha'));
+    $valid_scales = ['scale2', 'scale6'];
+    $valid_keys   = ['weekly_threshold','mid_threshold','phase_in_rate','levy_rate','shade_out_rate','annual_base','annual_per_child'];
+    if (!preg_match('/^\d{4}-\d{2}$/', $fy_imp)) {
+        $error = 'Invalid FY format — expected YYYY-YY.';
+    } elseif (!isset($_FILES['csv_file']) || $_FILES['csv_file']['error'] !== UPLOAD_ERR_OK) {
+        $error = 'No file uploaded or upload error (code ' . ($_FILES['csv_file']['error'] ?? '?') . ').';
+    } else {
+        $fp      = fopen($_FILES['csv_file']['tmp_name'], 'r');
+        $headers = fgetcsv($fp);
+        if ($headers !== false) {
+            if (isset($headers[0]) && substr($headers[0], 0, 3) === "\xEF\xBB\xBF") {
+                $headers[0] = substr($headers[0], 3);
+            }
+            $headers = array_map('trim', $headers);
+        }
+        $expected = ['scale', 'param_key', 'param_value'];
+        if ($headers !== $expected) {
+            $error = 'CSV headers must be: ' . implode(',', $expected) . '<br>Got: ' . implode(',', (array)$headers);
+        } else {
+            $import_rows = [];
+            $row_errors  = [];
+            $rownum = 1;
+            while (($row = fgetcsv($fp)) !== false) {
+                $rownum++;
+                if (count($row) < 3) { $row_errors[] = "Row $rownum: not enough columns."; continue; }
+                [$sc, $pk, $pv] = array_map('trim', $row);
+                $sc = strtolower($sc);
+                $pk = strtolower($pk);
+                $pv = (float)str_replace(',', '.', $pv);
+                if (!in_array($sc, $valid_scales)) { $row_errors[] = "Row $rownum: scale must be scale2 or scale6."; continue; }
+                if (!in_array($pk, $valid_keys))   { $row_errors[] = "Row $rownum: unknown param_key '$pk'."; continue; }
+                $import_rows[] = [$sc, $pk, $pv];
+            }
+            fclose($fp);
+            if ($row_errors) {
+                $error = implode('<br>', array_map('htmlspecialchars', $row_errors));
+            } elseif (empty($import_rows)) {
+                $error = 'No data rows found in the CSV.';
+            } else {
+                $imported_scales = array_unique(array_column($import_rows, 0));
+                foreach ($imported_scales as $sc) {
+                    $db->query("DELETE FROM " . MAIN_DB_PREFIX . "payroll_mla_params"
+                        . " WHERE fy='" . $db->escape($fy_imp) . "'"
+                        . " AND scale='" . $db->escape($sc) . "'"
+                        . " AND entity=" . (int)$conf->entity);
+                }
+                foreach ($import_rows as [$sc, $pk, $pv]) {
+                    $db->query("INSERT INTO " . MAIN_DB_PREFIX . "payroll_mla_params"
+                        . " (fy, scale, param_key, param_value, entity)"
+                        . " VALUES ('" . $db->escape($fy_imp) . "', '" . $db->escape($sc) . "'"
+                        . ", '" . $db->escape($pk) . "', $pv, " . (int)$conf->entity . ")");
+                }
+                $message = 'Imported ' . count($import_rows) . ' MLA parameter rows for ' . $fy_imp
+                    . ' (' . implode(', ', $imported_scales) . ').';
             }
         }
     }
@@ -868,6 +1043,15 @@ while ($obj = $db->fetch_object($res)) {
     $hecs_rows[] = $obj;
 }
 
+$mla_rows = [];
+$res = $db->query("SELECT * FROM " . MAIN_DB_PREFIX . "payroll_mla_params"
+    . " WHERE entity=" . (int)$conf->entity . " ORDER BY fy DESC, scale, param_key");
+if ($res) {
+    while ($obj = $db->fetch_object($res)) {
+        $mla_rows[] = $obj;
+    }
+}
+
 // Load test data for all 4 ATO datasets
 $test_wth_rows = [];
 $res = $db->query("SELECT * FROM " . MAIN_DB_PREFIX . "payroll_test_withholding"
@@ -900,6 +1084,7 @@ if ($res) {
 $edit_fy    = null;
 $edit_coeff = null;
 $edit_hecs  = null;
+$edit_mla   = null;
 if ($action === 'edit_fy' && $rowid) {
     foreach ($fy_list as $r) {
         if ($r->rowid == $rowid) { $edit_fy = $r; $tab = 'fy'; break; }
@@ -907,12 +1092,17 @@ if ($action === 'edit_fy' && $rowid) {
 }
 if ($action === 'edit_coeff' && $rowid) {
     foreach ($coeff_rows as $r) {
-        if ($r->rowid == $rowid) { $edit_coeff = $r; $tab = 'coeff'; break; }
+        if ($r->rowid == $rowid) { $edit_coeff = $r; $tab = 'taxtables'; break; }
     }
 }
 if ($action === 'edit_hecs' && $rowid) {
     foreach ($hecs_rows as $r) {
-        if ($r->rowid == $rowid) { $edit_hecs = $r; $tab = 'hecs'; break; }
+        if ($r->rowid == $rowid) { $edit_hecs = $r; $tab = 'taxtables'; break; }
+    }
+}
+if ($action === 'edit_mla' && $rowid) {
+    foreach ($mla_rows as $r) {
+        if ($r->rowid == $rowid) { $edit_mla = $r; $tab = 'taxtables'; break; }
     }
 }
 
@@ -960,10 +1150,9 @@ $base_url = 'config.php?mainmenu=admintools';
 <?php
 // ── Tab navigation ────────────────────────────────────────────────────────────
 $tabs = [
-    'fy'    => 'Financial Years',
-    'coeff' => 'Tax Coefficients (NAT 1004)',
-    'hecs'  => 'HECS Thresholds (NAT 3539)',
-    'tests' => 'Verification Tests',
+    'fy'         => 'Financial Years',
+    'taxtables'  => 'Tax Tables',
+    'tests'      => 'Verification Tests',
 ];
 echo '<ul class="tabs" role="tablist" style="margin-bottom:1.5rem;">';
 foreach ($tabs as $t => $label) {
@@ -1109,374 +1298,525 @@ function payrollAutoFillDates(fy) {
 </script>
 
 <?php // ===================================================================
-      // TAB: Tax Coefficients
-      elseif ($tab === 'coeff'):
+      // TAB: Tax Tables
+      elseif ($tab === 'taxtables'):
 
 // Group coefficient rows by FY for display
 $coeff_by_fy = [];
 foreach ($coeff_rows as $cr) {
     $coeff_by_fy[$cr->fy][$cr->scale][] = $cr;
 }
-?>
-<h2>PAYG Coefficient Tables — ATO Schedule 1 (NAT 1004)</h2>
 
-<div style="background:#fffbe6;border:1px solid #f0d080;border-radius:4px;padding:0.75rem 1rem;margin-bottom:1.5rem;max-width:900px;">
-  <strong>Annual update (each July):</strong>
-  Download <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld" target="_blank">NAT 1004</a>
-  from the ATO. If coefficients changed, update <code>lib/tax-tables/YYYY-YY.php</code> then click
-  <strong>Seed from PHP file</strong> below. All values marked TODO in the PHP file must be verified
-  against the official NAT 1004 PDF before using in a live payroll run. The PAYG field on the pay
-  run form is editable — minor rounding differences can be corrected there.
-</div>
+// Group MLA rows by FY then scale
+$mla_by_fy_scale = [];
+foreach ($mla_rows as $mr) {
+    $mla_by_fy_scale[$mr->fy][$mr->scale][$mr->param_key] = $mr;
+}
 
-<?php if (empty($coeff_rows)): ?>
-<div style="background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:1rem;max-width:900px;margin-bottom:1.5rem;">
-  <strong>No coefficient rows in database yet.</strong>
-  Use the Seed button below to populate from the PHP tax-table file.
-</div>
-<?php else: ?>
-<?php foreach ($coeff_by_fy as $fy_key => $by_scale): ?>
-<h3 style="margin-top:1.5rem;"><?= htmlspecialchars($fy_key) ?></h3>
-<table class="noborder" style="width:100%;max-width:900px;margin-bottom:1rem;font-size:0.9em;">
-  <thead>
-    <tr style="background:#f4f4f4;">
-      <th style="padding:0.4rem 0.75rem;text-align:left;">Scale</th>
-      <th style="padding:0.4rem 0.75rem;text-align:right;">Max weekly ($)</th>
-      <th style="padding:0.4rem 0.75rem;text-align:right;">a coeff</th>
-      <th style="padding:0.4rem 0.75rem;text-align:right;">b coeff</th>
-      <th style="padding:0.4rem 0.75rem;text-align:right;">Sort</th>
-      <th style="padding:0.4rem 0.75rem;"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php foreach ($by_scale as $scale_key => $rows):
-        $scale_lbl = $scale_options[$scale_key] ?? $scale_key;
-    ?>
-    <tr style="background:#f9f9f9;">
-      <td colspan="6" style="padding:0.3rem 0.75rem;font-style:italic;color:#555;font-size:0.85em;">
-        <?= htmlspecialchars($scale_lbl) ?>
-      </td>
-    </tr>
-    <?php foreach ($rows as $cr): ?>
-    <tr style="border-top:1px solid #eee;">
-      <td style="padding:0.3rem 0.75rem;"></td>
-      <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;">
-        <?= $cr->max_weekly >= 9999999 ? '∞' : number_format($cr->max_weekly, 2) ?>
-      </td>
-      <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;"><?= number_format($cr->a_coeff, 5) ?></td>
-      <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;"><?= number_format($cr->b_coeff, 4) ?></td>
-      <td style="padding:0.3rem 0.75rem;text-align:right;"><?= (int)$cr->position ?></td>
-      <td style="padding:0.3rem 0.75rem;white-space:nowrap;">
-        <a href="<?= $base_url ?>&tab=coeff&action=edit_coeff&rowid=<?= $cr->rowid ?>">Edit</a>
-        &nbsp;
-        <a href="<?= $base_url ?>&tab=coeff&action=delete_coeff&rowid=<?= $cr->rowid ?>&token=<?= newToken() ?>"
-           onclick="return confirm('Delete this row?')">Del</a>
-      </td>
-    </tr>
-    <?php endforeach; ?>
-    <?php endforeach; ?>
-  </tbody>
-</table>
-<?php endforeach; ?>
-<?php endif; ?>
-
-<div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start;margin-top:1.5rem;max-width:900px;">
-
-  <!-- Seed form -->
-  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:280px;">
-    <strong>Seed from PHP file</strong>
-    <p style="font-size:0.87em;color:#444;margin:0.4rem 0 0.7rem;">
-      Reads <code>lib/tax-tables/YYYY-YY.php</code> and replaces coefficient rows
-      for the selected FY. Run once after creating or updating the PHP file each July.
-    </p>
-    <form method="post" action="<?= $base_url ?>&tab=coeff" style="display:flex;gap:0.5rem;align-items:center;">
-      <input type="hidden" name="token"  value="<?= newToken() ?>">
-      <input type="hidden" name="action" value="seed_coeff">
-      <?php payroll_fy_select('fy_seed', $fy_options, '2025-26') ?>
-      <button type="submit" class="button buttonaction">Seed</button>
-    </form>
-  </div>
-
-  <!-- CSV import form -->
-  <div style="background:#f0fff4;border:1px solid #90c090;border-radius:4px;padding:1rem;min-width:300px;">
-    <strong>Import from CSV</strong>
-    <p style="font-size:0.87em;color:#444;margin:0.4rem 0 0.75rem;">
-      Columns: <code>scale,position,max_weekly,a_coeff,b_coeff</code><br>
-      Replaces rows for any scale present in the file.<br>
-      <a href="<?= $base_url ?>&action=download_template_coeff">Download template (2026-27 values)</a>
-    </p>
-    <form method="post" action="<?= $base_url ?>&tab=coeff" enctype="multipart/form-data">
-      <input type="hidden" name="token"  value="<?= newToken() ?>">
-      <input type="hidden" name="action" value="import_coeff">
-      <div style="display:flex;flex-direction:column;gap:0.5rem;">
-        <div style="display:flex;gap:0.5rem;align-items:center;">
-          <span style="font-size:0.87em;">FY:</span>
-          <?php payroll_fy_select('fy_import', $fy_options, '2026-27') ?>
-        </div>
-        <input type="file" name="csv_file" accept=".csv" required style="font-size:0.85em;">
-        <div>
-          <button type="submit" class="button buttonaction"
-                  onclick="return confirm('Replace ALL coefficient rows for the selected FY with this file?')">
-            Import CSV
-          </button>
-        </div>
-      </div>
-    </form>
-  </div>
-
-  <!-- Add single row form -->
-  <div style="background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:1rem;min-width:400px;">
-    <strong><?= $edit_coeff ? 'Edit row' : 'Add coefficient row' ?></strong>
-    <form method="post" action="<?= $base_url ?>&tab=coeff" style="margin-top:0.6rem;">
-      <input type="hidden" name="token"  value="<?= newToken() ?>">
-      <input type="hidden" name="action" value="save_coeff">
-      <?php if ($edit_coeff): ?>
-      <input type="hidden" name="rowid" value="<?= (int)$edit_coeff->rowid ?>">
-      <?php endif; ?>
-      <table>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">FY</td>
-          <td style="padding:0.3rem 0.5rem;"><?php payroll_fy_select('fy', $fy_options, $edit_coeff->fy ?? '2025-26') ?></td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">Scale</td>
-          <td style="padding:0.3rem 0.5rem;"><?php payroll_select('scale', $scale_options, $edit_coeff->scale ?? 'scale2') ?></td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">Max weekly $</td>
-          <td style="padding:0.3rem 0.5rem;">
-            <input type="number" name="max_weekly" value="<?= htmlspecialchars($edit_coeff->max_weekly ?? '') ?>"
-                   step="0.01" style="width:100px;" class="flat" placeholder="9999999 for last row" required>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">a coeff</td>
-          <td style="padding:0.3rem 0.5rem;">
-            <input type="number" name="a_coeff" value="<?= htmlspecialchars($edit_coeff->a_coeff ?? '') ?>"
-                   step="0.00001" style="width:100px;" class="flat" required>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">b coeff</td>
-          <td style="padding:0.3rem 0.5rem;">
-            <input type="number" name="b_coeff" value="<?= htmlspecialchars($edit_coeff->b_coeff ?? '') ?>"
-                   step="0.0001" style="width:100px;" class="flat" required>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">Sort order</td>
-          <td style="padding:0.3rem 0.5rem;">
-            <input type="number" name="position" value="<?= (int)($edit_coeff->position ?? 10) ?>"
-                   min="1" style="width:60px;" class="flat">
-          </td>
-        </tr>
-      </table>
-      <div style="margin-top:0.5rem;">
-        <button type="submit" class="button buttonaction"><?= $edit_coeff ? 'Save' : 'Add row' ?></button>
-        <?php if ($edit_coeff): ?>
-        &nbsp;<a href="<?= $base_url ?>&tab=coeff" class="button">Cancel</a>
-        <?php endif; ?>
-      </div>
-    </form>
-  </div>
-
-</div>
-
-<?php // ===================================================================
-      // TAB: HECS Thresholds
-      elseif ($tab === 'hecs'):
-
+// Group HECS/STSL rows by FY
 $hecs_by_fy = [];
 foreach ($hecs_rows as $hr) {
     $hecs_by_fy[$hr->fy][] = $hr;
 }
-?>
-<h2>HECS/HELP Repayment Thresholds — ATO Schedule 8 (NAT 3539)</h2>
 
-<div style="background:#fffbe6;border:1px solid #f0d080;border-radius:4px;padding:0.75rem 1rem;margin-bottom:1.5rem;max-width:900px;">
-  <strong>Annual update (each July):</strong>
-  Check <a href="https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components" target="_blank">NAT 3539</a>
-  for any threshold changes. Update <code>lib/tax-tables/YYYY-YY.php</code> then use
-  <strong>Seed from PHP file</strong> to refresh these rows, or edit rows directly below.
-  <br><strong>Flat-rate system (up to 2024-25):</strong> rate applies to TOTAL annual income.
-  <strong>Marginal system (2025-26+):</strong> rate applies to income ABOVE the lower threshold;
-  final bracket (is_flat=1) applies 10% to total income.
-</div>
-
-<?php foreach ($hecs_by_fy as $fy_key => $rows):
-    // Look up hecs_system for this FY
-    $hecs_sys_label = 'flat';
-    foreach ($fy_list as $fyc) {
-        if ($fyc->fy === $fy_key) { $hecs_sys_label = $fyc->hecs_system; break; }
+// Helper: get a tax-table bundled download card
+function payroll_taxtable_download_card($base_url, $prefix, $label, $note = '')
+{
+    $dir   = dol_buildpath('/custom/payroll/data', 0);
+    $years = [];
+    foreach (glob($dir . '/' . $prefix . '-*.csv') ?: [] as $f) {
+        if (preg_match('/' . preg_quote($prefix, '/') . '-(\d{4}-\d{2})\.csv$/', basename($f), $m)) {
+            $years[] = $m[1];
+        }
     }
+    sort($years);
+    $action = 'download_taxtable_' . str_replace('tax-', '', $prefix);
+    $uid    = 'tt_' . str_replace('-', '_', $prefix);
+
+    echo '<div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:200px;max-width:260px;">';
+    echo '<strong>Bundled ATO data</strong>';
+    echo '<p style="font-size:0.85em;color:#555;margin:0.4rem 0 0.75rem;">' . htmlspecialchars($label);
+    if ($note) echo '<br><em style="color:#999;">' . htmlspecialchars($note) . '</em>';
+    echo '</p>';
+    if (empty($years)) {
+        echo '<span style="font-size:0.85em;color:#999;">No bundled files in data/.</span>';
+    } elseif (count($years) === 1) {
+        echo '<a href="' . $base_url . '&amp;action=' . $action . '&amp;fy=' . rawurlencode($years[0]) . '" class="button">'
+           . 'Download ' . htmlspecialchars($years[0]) . '</a>';
+    } else {
+        $latest = end($years);
+        $js_pfx = addslashes($base_url . '&action=' . $action . '&fy=');
+        echo '<div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;">';
+        echo '<select id="sel_' . $uid . '" style="font-size:0.9em;padding:0.2rem 0.4rem;"'
+           . ' onchange="document.getElementById(\'btn_' . $uid . '\').href=\'' . $js_pfx . '\'+encodeURIComponent(this.value);">';
+        foreach (array_reverse($years) as $y) {
+            echo '<option value="' . htmlspecialchars($y) . '">' . htmlspecialchars($y) . '</option>';
+        }
+        echo '</select>';
+        echo '<a id="btn_' . $uid . '" href="' . $base_url . '&amp;action=' . $action . '&amp;fy=' . rawurlencode($latest) . '" class="button">Download</a>';
+        echo '</div>';
+    }
+    echo '</div>';
+}
+
+$mla_param_labels = [
+    'weekly_threshold' => 'Weekly threshold ($)',
+    'mid_threshold'    => 'Mid threshold ($)',
+    'phase_in_rate'    => 'Phase-in rate',
+    'levy_rate'        => 'Levy rate',
+    'shade_out_rate'   => 'Shade-out rate',
+    'annual_base'      => 'Annual base ($)',
+    'annual_per_child' => 'Annual per child ($)',
+];
+$mla_valid_scales = ['scale2', 'scale6'];
+$mla_valid_keys   = array_keys($mla_param_labels);
 ?>
-<h3 style="margin-top:1.5rem;"><?= htmlspecialchars($fy_key) ?>
-  <small style="font-size:0.75em;color:#777;margin-left:0.5rem;">
-    <?= $hecs_sys_label === 'marginal' ? 'Marginal system' : 'Flat-rate system' ?>
-  </small>
+
+<h2>Tax Tables</h2>
+<p style="max-width:900px;color:#555;">
+  ATO-published tables used to calculate PAYG withholding. Update each July from the ATO website.
+  All four datasets must be verified against the ATO PDFs before using in a live pay run.
+  &nbsp;<a href="https://www.ato.gov.au/tax-rates-and-codes/tax-tables-overview" target="_blank">Tax tables overview ↗</a>
+</p>
+
+<?php
+// ── SECTION 1: PAYG Coefficients ─────────────────────────────────────────────
+?>
+<h3 style="border-bottom:2px solid #1a7cb8;padding-bottom:0.3rem;margin-top:2rem;color:#1a7cb8;">
+  1. PAYG Withholding Coefficients — Schedule 1
+  <span style="font-size:0.7em;font-weight:400;">
+    <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld" target="_blank" style="color:#1a7cb8;">(NAT 1004) ↗</a>
+  </span>
 </h3>
+<p style="font-size:0.88em;max-width:900px;">
+  Coefficients for the ATO formula: <code>withholding = round(a × (floor(weekly_gross) + 0.99) − b)</code>.
+  If coefficients change each July, update <code>lib/tax-tables/YYYY-YY.php</code> then use Seed, or import a CSV.
+</p>
+
+<?php if (empty($coeff_rows)): ?>
+<div style="background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:1rem;max-width:900px;margin-bottom:1rem;">
+  No coefficient rows yet. Use <strong>Seed from PHP file</strong> or <strong>Import CSV</strong> below.
+</div>
+<?php else: ?>
+<?php foreach ($coeff_by_fy as $fy_key => $by_scale): ?>
+<h4 style="margin-top:1rem;"><?= htmlspecialchars($fy_key) ?></h4>
 <table class="noborder" style="width:100%;max-width:900px;margin-bottom:1rem;font-size:0.9em;">
-  <thead>
-    <tr style="background:#f4f4f4;">
-      <th style="padding:0.4rem 0.75rem;text-align:right;">Income from ($)</th>
-      <th style="padding:0.4rem 0.75rem;text-align:right;">Income to ($)</th>
-      <th style="padding:0.4rem 0.75rem;text-align:right;">Rate</th>
-      <th style="padding:0.4rem 0.75rem;text-align:right;">Base HECS ($)</th>
-      <th style="padding:0.4rem 0.75rem;text-align:center;">Flat total?</th>
-      <th style="padding:0.4rem 0.75rem;text-align:right;">Sort</th>
-      <th style="padding:0.4rem 0.75rem;"></th>
-    </tr>
-  </thead>
+  <thead><tr style="background:#f4f4f4;">
+    <th style="padding:0.4rem 0.75rem;text-align:left;">Scale</th>
+    <th style="padding:0.4rem 0.75rem;text-align:right;">Max weekly ($)</th>
+    <th style="padding:0.4rem 0.75rem;text-align:right;">a coeff</th>
+    <th style="padding:0.4rem 0.75rem;text-align:right;">b coeff</th>
+    <th style="padding:0.4rem 0.75rem;text-align:right;">Sort</th>
+    <th style="padding:0.4rem 0.75rem;"></th>
+  </tr></thead>
   <tbody>
-    <?php foreach ($rows as $hr): ?>
-    <tr style="border-top:1px solid #eee;">
-      <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;">
-        <?= number_format($hr->income_from, 0) ?>
-      </td>
-      <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;">
-        <?= $hr->income_to >= 9999999 ? '∞' : number_format($hr->income_to, 0) ?>
-      </td>
-      <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;">
-        <?= number_format($hr->rate * 100, 1) ?>%
-      </td>
-      <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;">
-        <?= $hr->base_amount > 0 ? '$' . number_format($hr->base_amount, 2) : '—' ?>
-      </td>
-      <td style="padding:0.3rem 0.75rem;text-align:center;">
-        <?= $hr->is_flat_total ? '✓' : '' ?>
-      </td>
-      <td style="padding:0.3rem 0.75rem;text-align:right;"><?= (int)$hr->position ?></td>
-      <td style="padding:0.3rem 0.75rem;white-space:nowrap;">
-        <a href="<?= $base_url ?>&tab=hecs&action=edit_hecs&rowid=<?= $hr->rowid ?>">Edit</a>
-        &nbsp;
-        <a href="<?= $base_url ?>&tab=hecs&action=delete_hecs&rowid=<?= $hr->rowid ?>&token=<?= newToken() ?>"
-           onclick="return confirm('Delete this bracket?')">Del</a>
-      </td>
-    </tr>
-    <?php endforeach; ?>
+  <?php foreach ($by_scale as $scale_key => $rows):
+      $scale_lbl = $scale_options[$scale_key] ?? $scale_key;
+  ?>
+  <tr style="background:#f9f9f9;">
+    <td colspan="6" style="padding:0.3rem 0.75rem;font-style:italic;color:#555;font-size:0.85em;">
+      <?= htmlspecialchars($scale_lbl) ?>
+    </td>
+  </tr>
+  <?php foreach ($rows as $cr): ?>
+  <tr style="border-top:1px solid #eee;">
+    <td style="padding:0.3rem 0.75rem;"></td>
+    <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;">
+      <?= $cr->max_weekly >= 9999999 ? '∞' : number_format($cr->max_weekly, 2) ?>
+    </td>
+    <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;"><?= number_format($cr->a_coeff, 5) ?></td>
+    <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;"><?= number_format($cr->b_coeff, 4) ?></td>
+    <td style="padding:0.3rem 0.75rem;text-align:right;"><?= (int)$cr->position ?></td>
+    <td style="padding:0.3rem 0.75rem;white-space:nowrap;">
+      <a href="<?= $base_url ?>&tab=taxtables&action=edit_coeff&rowid=<?= $cr->rowid ?>">Edit</a>
+      &nbsp;
+      <a href="<?= $base_url ?>&tab=taxtables&action=delete_coeff&rowid=<?= $cr->rowid ?>&token=<?= newToken() ?>"
+         onclick="return confirm('Delete this row?')">Del</a>
+    </td>
+  </tr>
+  <?php endforeach; ?>
+  <?php endforeach; ?>
   </tbody>
 </table>
 <?php endforeach; ?>
-
-<?php if (empty($hecs_rows)): ?>
-<div style="background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:1rem;max-width:900px;margin-bottom:1.5rem;">
-  No HECS bracket rows yet. Use <strong>Seed from PHP file</strong> below, or add rows manually.
-</div>
 <?php endif; ?>
 
-<div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start;margin-top:1.5rem;max-width:900px;">
-
-  <!-- Seed form -->
-  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:280px;">
+<div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start;margin-top:1rem;max-width:960px;">
+  <!-- Seed -->
+  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:260px;">
     <strong>Seed from PHP file</strong>
     <p style="font-size:0.87em;color:#444;margin:0.4rem 0 0.7rem;">
-      Replaces ALL HECS brackets for the selected FY from the PHP tax-table file.
+      Reads <code>lib/tax-tables/YYYY-YY.php</code> and replaces coefficient rows for the selected FY.
     </p>
-    <form method="post" action="<?= $base_url ?>&tab=hecs" style="display:flex;gap:0.5rem;align-items:center;">
+    <form method="post" action="<?= $base_url ?>&tab=taxtables" style="display:flex;gap:0.5rem;align-items:center;">
       <input type="hidden" name="token"  value="<?= newToken() ?>">
-      <input type="hidden" name="action" value="seed_hecs">
-      <?php payroll_fy_select('fy_seed', $fy_options, '2025-26') ?>
+      <input type="hidden" name="action" value="seed_coeff">
+      <?php payroll_fy_select('fy_seed', $fy_options, '2026-27') ?>
       <button type="submit" class="button buttonaction">Seed</button>
     </form>
   </div>
-
-  <!-- CSV import form -->
-  <div style="background:#f0fff4;border:1px solid #90c090;border-radius:4px;padding:1rem;min-width:300px;">
+  <!-- Import CSV -->
+  <div style="background:#f0fff4;border:1px solid #90c090;border-radius:4px;padding:1rem;min-width:280px;">
     <strong>Import from CSV</strong>
     <p style="font-size:0.87em;color:#444;margin:0.4rem 0 0.75rem;">
-      Columns: <code>position,income_from,income_to,rate,base_amount,is_flat_total</code><br>
-      Rate as decimal (e.g. <code>0.15</code> = 15%). Replaces ALL brackets for the FY.<br>
-      <a href="<?= $base_url ?>&action=download_template_hecs">Download template (marginal, 2025-26+ format)</a>
+      Columns: <code>scale,position,max_weekly,a_coeff,b_coeff</code><br>
+      <a href="<?= $base_url ?>&action=download_template_coeff">Download template</a>
     </p>
-    <form method="post" action="<?= $base_url ?>&tab=hecs" enctype="multipart/form-data">
+    <form method="post" action="<?= $base_url ?>&tab=taxtables" enctype="multipart/form-data">
       <input type="hidden" name="token"  value="<?= newToken() ?>">
-      <input type="hidden" name="action" value="import_hecs">
+      <input type="hidden" name="action" value="import_coeff">
       <div style="display:flex;flex-direction:column;gap:0.5rem;">
-        <div style="display:flex;gap:0.5rem;align-items:center;">
-          <span style="font-size:0.87em;">FY:</span>
+        <div style="display:flex;gap:0.5rem;align-items:center;"><span style="font-size:0.87em;">FY:</span>
           <?php payroll_fy_select('fy_import', $fy_options, '2026-27') ?>
         </div>
         <input type="file" name="csv_file" accept=".csv" required style="font-size:0.85em;">
-        <div>
-          <button type="submit" class="button buttonaction"
-                  onclick="return confirm('Replace ALL HECS bracket rows for the selected FY with this file?')">
-            Import CSV
-          </button>
-        </div>
+        <button type="submit" class="button buttonaction"
+                onclick="return confirm('Replace coefficient rows for the selected FY?')">Import CSV</button>
       </div>
     </form>
   </div>
+  <!-- Bundled -->
+  <?php payroll_taxtable_download_card($base_url, 'tax-coeff', 'Pre-built from lib/tax-tables/ (Scales 1–6, all brackets)') ?>
+  <!-- Add/edit row -->
+  <div style="background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:1rem;min-width:360px;">
+    <strong><?= $edit_coeff ? 'Edit coefficient row' : 'Add coefficient row' ?></strong>
+    <form method="post" action="<?= $base_url ?>&tab=taxtables" style="margin-top:0.5rem;">
+      <input type="hidden" name="token"  value="<?= newToken() ?>">
+      <input type="hidden" name="action" value="save_coeff">
+      <?php if ($edit_coeff): ?><input type="hidden" name="rowid" value="<?= (int)$edit_coeff->rowid ?>"><?php endif; ?>
+      <table><tr>
+        <td style="padding:0.3rem 0.5rem;">FY</td>
+        <td style="padding:0.3rem 0.5rem;"><?php payroll_fy_select('fy', $fy_options, $edit_coeff->fy ?? '2026-27') ?></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Scale</td>
+        <td style="padding:0.3rem 0.5rem;"><?php payroll_select('scale', $scale_options, $edit_coeff->scale ?? 'scale2') ?></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Max weekly $</td>
+        <td style="padding:0.3rem 0.5rem;"><input type="number" name="max_weekly" value="<?= htmlspecialchars($edit_coeff->max_weekly ?? '') ?>"
+               step="0.01" style="width:100px;" class="flat" placeholder="9999999 for last" required></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">a coeff</td>
+        <td style="padding:0.3rem 0.5rem;"><input type="number" name="a_coeff" value="<?= htmlspecialchars($edit_coeff->a_coeff ?? '') ?>"
+               step="0.00001" style="width:100px;" class="flat" required></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">b coeff</td>
+        <td style="padding:0.3rem 0.5rem;"><input type="number" name="b_coeff" value="<?= htmlspecialchars($edit_coeff->b_coeff ?? '') ?>"
+               step="0.0001" style="width:100px;" class="flat" required></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Sort</td>
+        <td style="padding:0.3rem 0.5rem;"><input type="number" name="position" value="<?= (int)($edit_coeff->position ?? 10) ?>"
+               min="1" style="width:60px;" class="flat"></td>
+      </tr></table>
+      <div style="margin-top:0.5rem;">
+        <button type="submit" class="button buttonaction"><?= $edit_coeff ? 'Save' : 'Add row' ?></button>
+        <?php if ($edit_coeff): ?>&nbsp;<a href="<?= $base_url ?>&tab=taxtables" class="button">Cancel</a><?php endif; ?>
+      </div>
+    </form>
+  </div>
+</div>
 
-  <!-- Add/Edit bracket row -->
-  <div style="background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:1rem;min-width:400px;">
-    <strong><?= $edit_hecs ? 'Edit bracket' : 'Add bracket row' ?></strong>
-    <form method="post" action="<?= $base_url ?>&tab=hecs" style="margin-top:0.6rem;">
+<?php
+// ── SECTION 2: MLA Scale 2 ────────────────────────────────────────────────────
+?>
+<h3 style="border-bottom:2px solid #27ae60;padding-bottom:0.3rem;margin-top:2.5rem;color:#27ae60;">
+  2. Medicare Levy Adjustment — Scale 2
+  <span style="font-size:0.7em;font-weight:400;">
+    <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld#ato-Medicarelevyadjustment" target="_blank" style="color:#27ae60;">(NAT 1008) ↗</a>
+  </span>
+</h3>
+<p style="font-size:0.88em;max-width:900px;">
+  Parameters for the weekly levy adjustment (WLA) formula for Scale 2 employees who have lodged a
+  Medicare levy variation declaration. These values are loaded from the DB at pay-run time;
+  hardcoded fallback is used if no DB rows exist.
+</p>
+
+<?php foreach (['scale2', 'scale6'] as $mla_scale):
+    $mla_section_num   = ($mla_scale === 'scale2') ? 2 : 3;
+    $mla_section_color = ($mla_scale === 'scale2') ? '#27ae60' : '#8e44ad';
+    $mla_nat           = ($mla_scale === 'scale2') ? 'NAT 1008' : 'NAT 1009';
+    $mla_section_label = ($mla_scale === 'scale2') ? 'Scale 2' : 'Scale 6 (half Medicare)';
+
+    if ($mla_scale === 'scale6'):
+?>
+<h3 style="border-bottom:2px solid #8e44ad;padding-bottom:0.3rem;margin-top:2.5rem;color:#8e44ad;">
+  3. Medicare Half-Levy Adjustment — Scale 6
+  <span style="font-size:0.7em;font-weight:400;">
+    <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld#ato-Medicarelevyadjustment" target="_blank" style="color:#8e44ad;">(NAT 1009) ↗</a>
+  </span>
+</h3>
+<p style="font-size:0.88em;max-width:900px;">
+  Same WLA formula as Scale 2 but with different threshold values. For employees with a half
+  Medicare levy exemption (e.g. temporary residents from countries with a health agreement).
+</p>
+<?php endif; ?>
+
+<?php
+// Display MLA rows for this scale, grouped by FY
+$has_mla_rows = false;
+foreach ($mla_by_fy_scale as $fy_key => $by_scale) {
+    if (isset($by_scale[$mla_scale])) { $has_mla_rows = true; break; }
+}
+if (!$has_mla_rows): ?>
+<div style="background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:1rem;max-width:900px;margin-bottom:1rem;">
+  No <?= htmlspecialchars($mla_scale) ?> rows yet. Use <strong>Seed defaults</strong> or <strong>Import CSV</strong> below.
+</div>
+<?php else:
+    foreach ($mla_by_fy_scale as $fy_key => $by_scale):
+        if (!isset($by_scale[$mla_scale])) continue;
+        $params = $by_scale[$mla_scale];
+?>
+<h4 style="margin-top:1rem;"><?= htmlspecialchars($fy_key) ?></h4>
+<table class="noborder" style="max-width:600px;margin-bottom:1rem;font-size:0.9em;">
+  <thead><tr style="background:#f4f4f4;">
+    <th style="padding:0.4rem 0.75rem;text-align:left;">Parameter</th>
+    <th style="padding:0.4rem 0.75rem;text-align:right;">Value</th>
+    <th style="padding:0.4rem 0.75rem;"></th>
+  </tr></thead>
+  <tbody>
+  <?php foreach ($mla_param_labels as $pk => $plabel):
+      $mrow = $params[$pk] ?? null;
+  ?>
+  <tr style="border-top:1px solid #eee;">
+    <td style="padding:0.3rem 0.75rem;"><?= htmlspecialchars($plabel) ?> <small style="color:#aaa;">(<?= $pk ?>)</small></td>
+    <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;">
+      <?= $mrow ? htmlspecialchars(number_format((float)$mrow->param_value, in_array($pk, ['annual_base','annual_per_child']) ? 0 : 5)) : '<em style="color:#c00;">missing</em>' ?>
+    </td>
+    <td style="padding:0.3rem 0.75rem;white-space:nowrap;">
+      <?php if ($mrow): ?>
+      <a href="<?= $base_url ?>&tab=taxtables&action=edit_mla&rowid=<?= $mrow->rowid ?>">Edit</a>
+      &nbsp;
+      <a href="<?= $base_url ?>&tab=taxtables&action=delete_mla&rowid=<?= $mrow->rowid ?>&token=<?= newToken() ?>"
+         onclick="return confirm('Delete this row?')">Del</a>
+      <?php endif; ?>
+    </td>
+  </tr>
+  <?php endforeach; ?>
+  </tbody>
+</table>
+<?php endforeach; // fy loop
+endif; // has_mla_rows ?>
+
+<div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start;margin-top:1rem;max-width:960px;">
+  <!-- Seed defaults -->
+  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:260px;">
+    <strong>Seed 2026-27 defaults</strong>
+    <p style="font-size:0.87em;color:#444;margin:0.4rem 0 0.7rem;">
+      Inserts or updates the <?= htmlspecialchars($mla_scale) ?> ATO MLA parameter values for the selected FY.
+      Source: ATO Medicare levy adjustment page.
+    </p>
+    <form method="post" action="<?= $base_url ?>&tab=taxtables" style="display:flex;gap:0.5rem;align-items:center;">
+      <input type="hidden" name="token"  value="<?= newToken() ?>">
+      <input type="hidden" name="action" value="seed_mla">
+      <?php payroll_fy_select('fy_seed', $fy_options, '2026-27') ?>
+      <button type="submit" class="button buttonaction">Seed</button>
+    </form>
+  </div>
+  <!-- Import CSV -->
+  <div style="background:#f0fff4;border:1px solid #90c090;border-radius:4px;padding:1rem;min-width:280px;">
+    <strong>Import from CSV</strong>
+    <p style="font-size:0.87em;color:#444;margin:0.4rem 0 0.75rem;">
+      Columns: <code>scale,param_key,param_value</code><br>
+      File may include both scale2 and scale6 rows.<br>
+      <a href="<?= $base_url ?>&action=download_taxtable_mla&fy=2026-27">Download bundled 2026-27 file</a>
+    </p>
+    <form method="post" action="<?= $base_url ?>&tab=taxtables" enctype="multipart/form-data">
+      <input type="hidden" name="token"  value="<?= newToken() ?>">
+      <input type="hidden" name="action" value="import_mla">
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <div style="display:flex;gap:0.5rem;align-items:center;"><span style="font-size:0.87em;">FY:</span>
+          <?php payroll_fy_select('fy_import', $fy_options, '2026-27') ?>
+        </div>
+        <input type="file" name="csv_file" accept=".csv" required style="font-size:0.85em;">
+        <button type="submit" class="button buttonaction"
+                onclick="return confirm('Replace MLA rows for scales in this file?')">Import CSV</button>
+      </div>
+    </form>
+  </div>
+  <!-- Bundled -->
+  <?php payroll_taxtable_download_card($base_url, 'tax-mla', 'ATO MLA parameters (scale2 + scale6)') ?>
+  <!-- Add/edit single param row -->
+  <div style="background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:1rem;min-width:320px;">
+    <strong><?= $edit_mla ? 'Edit MLA parameter' : 'Add MLA parameter' ?></strong>
+    <form method="post" action="<?= $base_url ?>&tab=taxtables" style="margin-top:0.5rem;">
+      <input type="hidden" name="token"  value="<?= newToken() ?>">
+      <input type="hidden" name="action" value="save_mla">
+      <?php if ($edit_mla): ?><input type="hidden" name="rowid" value="<?= (int)$edit_mla->rowid ?>"><?php endif; ?>
+      <table><tr>
+        <td style="padding:0.3rem 0.5rem;">FY</td>
+        <td style="padding:0.3rem 0.5rem;"><?php payroll_fy_select('fy', $fy_options, $edit_mla->fy ?? '2026-27') ?></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Scale</td>
+        <td style="padding:0.3rem 0.5rem;">
+          <?php payroll_select('scale', ['scale2' => 'Scale 2', 'scale6' => 'Scale 6'], $edit_mla->scale ?? $mla_scale) ?>
+        </td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Parameter</td>
+        <td style="padding:0.3rem 0.5rem;">
+          <?php payroll_select('param_key', $mla_param_labels, $edit_mla->param_key ?? '') ?>
+        </td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Value</td>
+        <td style="padding:0.3rem 0.5rem;"><input type="number" name="param_value"
+               value="<?= htmlspecialchars($edit_mla->param_value ?? '') ?>"
+               step="0.00001" style="width:120px;" class="flat" required></td>
+      </tr></table>
+      <div style="margin-top:0.5rem;">
+        <button type="submit" class="button buttonaction"><?= $edit_mla ? 'Save' : 'Add' ?></button>
+        <?php if ($edit_mla): ?>&nbsp;<a href="<?= $base_url ?>&tab=taxtables" class="button">Cancel</a><?php endif; ?>
+      </div>
+    </form>
+  </div>
+</div><!-- close action cards flex container -->
+<?php endforeach; // scale loop ?>
+
+<?php
+// ── SECTION 4: STSL Brackets ──────────────────────────────────────────────────
+?>
+<h3 style="border-bottom:2px solid #e67e22;padding-bottom:0.3rem;margin-top:2.5rem;color:#e67e22;">
+  4. STSL Brackets — Schedule 8
+  <span style="font-size:0.7em;font-weight:400;">
+    <a href="https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components" target="_blank" style="color:#e67e22;">(NAT 3539) ↗</a>
+  </span>
+</h3>
+<p style="font-size:0.88em;max-width:900px;">
+  STSL (HELP/VSL/SSL/TSL/SFSS) income brackets and repayment rates.
+  <strong>Flat-rate system (up to 2024-25):</strong> rate on TOTAL income.
+  <strong>Marginal system (2025-26+):</strong> rate on income above threshold; final bracket (is_flat=1) is 10% flat.
+</p>
+
+<?php if (empty($hecs_rows)): ?>
+<div style="background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:1rem;max-width:900px;margin-bottom:1rem;">
+  No STSL bracket rows yet. Use <strong>Seed from PHP file</strong> or <strong>Import CSV</strong> below.
+</div>
+<?php else:
+    foreach ($hecs_by_fy as $fy_key => $rows):
+        $hecs_sys_label = 'flat';
+        foreach ($fy_list as $fyc) {
+            if ($fyc->fy === $fy_key) { $hecs_sys_label = $fyc->hecs_system; break; }
+        }
+?>
+<h4 style="margin-top:1rem;"><?= htmlspecialchars($fy_key) ?>
+  <small style="font-size:0.8em;color:#777;margin-left:0.5rem;">
+    <?= $hecs_sys_label === 'marginal' ? 'Marginal system' : 'Flat-rate system' ?>
+  </small>
+</h4>
+<table class="noborder" style="width:100%;max-width:900px;margin-bottom:1rem;font-size:0.9em;">
+  <thead><tr style="background:#f4f4f4;">
+    <th style="padding:0.4rem 0.75rem;text-align:right;">Income from ($)</th>
+    <th style="padding:0.4rem 0.75rem;text-align:right;">Income to ($)</th>
+    <th style="padding:0.4rem 0.75rem;text-align:right;">Rate</th>
+    <th style="padding:0.4rem 0.75rem;text-align:right;">Base STSL ($)</th>
+    <th style="padding:0.4rem 0.75rem;text-align:center;">Flat total?</th>
+    <th style="padding:0.4rem 0.75rem;text-align:right;">Sort</th>
+    <th style="padding:0.4rem 0.75rem;"></th>
+  </tr></thead>
+  <tbody>
+  <?php foreach ($rows as $hr): ?>
+  <tr style="border-top:1px solid #eee;">
+    <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;"><?= number_format($hr->income_from, 0) ?></td>
+    <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;">
+      <?= $hr->income_to >= 9999999 ? '∞' : number_format($hr->income_to, 0) ?>
+    </td>
+    <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;"><?= number_format($hr->rate * 100, 1) ?>%</td>
+    <td style="padding:0.3rem 0.75rem;text-align:right;font-family:monospace;">
+      <?= $hr->base_amount > 0 ? '$' . number_format($hr->base_amount, 2) : '—' ?>
+    </td>
+    <td style="padding:0.3rem 0.75rem;text-align:center;"><?= $hr->is_flat_total ? '✓' : '' ?></td>
+    <td style="padding:0.3rem 0.75rem;text-align:right;"><?= (int)$hr->position ?></td>
+    <td style="padding:0.3rem 0.75rem;white-space:nowrap;">
+      <a href="<?= $base_url ?>&tab=taxtables&action=edit_hecs&rowid=<?= $hr->rowid ?>">Edit</a>
+      &nbsp;
+      <a href="<?= $base_url ?>&tab=taxtables&action=delete_hecs&rowid=<?= $hr->rowid ?>&token=<?= newToken() ?>"
+         onclick="return confirm('Delete this bracket?')">Del</a>
+    </td>
+  </tr>
+  <?php endforeach; ?>
+  </tbody>
+</table>
+<?php endforeach; ?>
+<?php endif; ?>
+
+<div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start;margin-top:1rem;max-width:960px;">
+  <!-- Seed -->
+  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:260px;">
+    <strong>Seed from PHP file</strong>
+    <p style="font-size:0.87em;color:#444;margin:0.4rem 0 0.7rem;">
+      Replaces ALL STSL brackets for the selected FY from <code>lib/tax-tables/YYYY-YY.php</code>.
+    </p>
+    <form method="post" action="<?= $base_url ?>&tab=taxtables" style="display:flex;gap:0.5rem;align-items:center;">
+      <input type="hidden" name="token"  value="<?= newToken() ?>">
+      <input type="hidden" name="action" value="seed_hecs">
+      <?php payroll_fy_select('fy_seed', $fy_options, '2026-27') ?>
+      <button type="submit" class="button buttonaction">Seed</button>
+    </form>
+  </div>
+  <!-- Import CSV -->
+  <div style="background:#f0fff4;border:1px solid #90c090;border-radius:4px;padding:1rem;min-width:280px;">
+    <strong>Import from CSV</strong>
+    <p style="font-size:0.87em;color:#444;margin:0.4rem 0 0.75rem;">
+      Columns: <code>position,income_from,income_to,rate,base_amount,is_flat_total</code><br>
+      Rate as decimal. Replaces ALL brackets for the FY.<br>
+      <a href="<?= $base_url ?>&action=download_template_hecs">Download template</a>
+    </p>
+    <form method="post" action="<?= $base_url ?>&tab=taxtables" enctype="multipart/form-data">
+      <input type="hidden" name="token"  value="<?= newToken() ?>">
+      <input type="hidden" name="action" value="import_hecs">
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <div style="display:flex;gap:0.5rem;align-items:center;"><span style="font-size:0.87em;">FY:</span>
+          <?php payroll_fy_select('fy_import', $fy_options, '2026-27') ?>
+        </div>
+        <input type="file" name="csv_file" accept=".csv" required style="font-size:0.85em;">
+        <button type="submit" class="button buttonaction"
+                onclick="return confirm('Replace ALL STSL brackets for the selected FY?')">Import CSV</button>
+      </div>
+    </form>
+  </div>
+  <!-- Bundled -->
+  <?php payroll_taxtable_download_card($base_url, 'tax-stsl', 'Pre-built STSL brackets from lib/tax-tables/') ?>
+  <!-- Add/edit bracket row -->
+  <div style="background:#f8f8f8;border:1px solid #ddd;border-radius:4px;padding:1rem;min-width:360px;">
+    <strong><?= $edit_hecs ? 'Edit STSL bracket' : 'Add STSL bracket' ?></strong>
+    <form method="post" action="<?= $base_url ?>&tab=taxtables" style="margin-top:0.5rem;">
       <input type="hidden" name="token"  value="<?= newToken() ?>">
       <input type="hidden" name="action" value="save_hecs">
-      <?php if ($edit_hecs): ?>
-      <input type="hidden" name="rowid" value="<?= (int)$edit_hecs->rowid ?>">
-      <?php endif; ?>
-      <table>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">FY</td>
-          <td style="padding:0.3rem 0.5rem;"><?php payroll_fy_select('fy', $fy_options, $edit_hecs->fy ?? '2025-26') ?></td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">Income from $</td>
-          <td style="padding:0.3rem 0.5rem;">
-            <input type="number" name="income_from" value="<?= htmlspecialchars($edit_hecs->income_from ?? '0') ?>"
-                   step="1" style="width:100px;" class="flat" required>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">Income to $ <small>(9999999=∞)</small></td>
-          <td style="padding:0.3rem 0.5rem;">
-            <input type="number" name="income_to" value="<?= htmlspecialchars($edit_hecs->income_to ?? '') ?>"
-                   step="1" style="width:100px;" class="flat" required>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">Rate (decimal)</td>
-          <td style="padding:0.3rem 0.5rem;">
-            <input type="number" name="rate" value="<?= htmlspecialchars($edit_hecs->rate ?? '0') ?>"
-                   step="0.00001" min="0" max="1" style="width:90px;" class="flat" required>
-            <small style="color:#888;">&nbsp;e.g. 0.10 = 10%</small>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">Base HECS $ <small>(marginal only)</small></td>
-          <td style="padding:0.3rem 0.5rem;">
-            <input type="number" name="base_amount" value="<?= htmlspecialchars($edit_hecs->base_amount ?? '0') ?>"
-                   step="0.01" min="0" style="width:90px;" class="flat">
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">Flat on total?</td>
-          <td style="padding:0.3rem 0.5rem;">
-            <label>
-              <input type="checkbox" name="is_flat_total" value="1"
-                     <?= ($edit_hecs->is_flat_total ?? 0) ? 'checked' : '' ?>>
-              Rate applies to TOTAL income (flat only, last bracket)
-            </label>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding:0.3rem 0.5rem;">Sort order</td>
-          <td style="padding:0.3rem 0.5rem;">
-            <input type="number" name="position" value="<?= (int)($edit_hecs->position ?? 10) ?>"
-                   min="1" style="width:60px;" class="flat">
-          </td>
-        </tr>
-      </table>
+      <?php if ($edit_hecs): ?><input type="hidden" name="rowid" value="<?= (int)$edit_hecs->rowid ?>"><?php endif; ?>
+      <table><tr>
+        <td style="padding:0.3rem 0.5rem;">FY</td>
+        <td style="padding:0.3rem 0.5rem;"><?php payroll_fy_select('fy', $fy_options, $edit_hecs->fy ?? '2026-27') ?></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Income from $</td>
+        <td style="padding:0.3rem 0.5rem;"><input type="number" name="income_from" value="<?= htmlspecialchars($edit_hecs->income_from ?? '0') ?>"
+               step="1" style="width:100px;" class="flat" required></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Income to $ <small>(9999999=∞)</small></td>
+        <td style="padding:0.3rem 0.5rem;"><input type="number" name="income_to" value="<?= htmlspecialchars($edit_hecs->income_to ?? '') ?>"
+               step="1" style="width:100px;" class="flat" required></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Rate (decimal)</td>
+        <td style="padding:0.3rem 0.5rem;"><input type="number" name="rate" value="<?= htmlspecialchars($edit_hecs->rate ?? '0') ?>"
+               step="0.00001" min="0" max="1" style="width:90px;" class="flat" required>
+          <small style="color:#888;">&nbsp;e.g. 0.10 = 10%</small></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Base STSL $</td>
+        <td style="padding:0.3rem 0.5rem;"><input type="number" name="base_amount" value="<?= htmlspecialchars($edit_hecs->base_amount ?? '0') ?>"
+               step="0.01" min="0" style="width:90px;" class="flat"></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Flat on total?</td>
+        <td style="padding:0.3rem 0.5rem;"><label>
+          <input type="checkbox" name="is_flat_total" value="1" <?= ($edit_hecs->is_flat_total ?? 0) ? 'checked' : '' ?>>
+          Rate applies to TOTAL income
+        </label></td>
+      </tr><tr>
+        <td style="padding:0.3rem 0.5rem;">Sort</td>
+        <td style="padding:0.3rem 0.5rem;"><input type="number" name="position" value="<?= (int)($edit_hecs->position ?? 10) ?>"
+               min="1" style="width:60px;" class="flat"></td>
+      </tr></table>
       <div style="margin-top:0.5rem;">
         <button type="submit" class="button buttonaction"><?= $edit_hecs ? 'Save' : 'Add row' ?></button>
-        <?php if ($edit_hecs): ?>
-        &nbsp;<a href="<?= $base_url ?>&tab=hecs" class="button">Cancel</a>
-        <?php endif; ?>
+        <?php if ($edit_hecs): ?>&nbsp;<a href="<?= $base_url ?>&tab=taxtables" class="button">Cancel</a><?php endif; ?>
       </div>
     </form>
   </div>
-
 </div>
 
 <?php // ===================================================================

@@ -1,0 +1,15 @@
+﻿scale,param_key,param_value
+scale2,weekly_threshold,538.67
+scale2,mid_threshold,673.00
+scale2,phase_in_rate,0.10
+scale2,levy_rate,0.02
+scale2,shade_out_rate,0.08
+scale2,annual_base,47238.00
+scale2,annual_per_child,4338.00
+scale6,weekly_threshold,908.42
+scale6,mid_threshold,1135.00
+scale6,phase_in_rate,0.05
+scale6,levy_rate,0.01
+scale6,shade_out_rate,0.04
+scale6,annual_base,47238.00
+scale6,annual_per_child,4338.00

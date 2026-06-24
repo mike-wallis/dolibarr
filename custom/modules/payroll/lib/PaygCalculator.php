@@ -68,7 +68,7 @@ class PaygCalculator
         // Step 3: Medicare levy adjustment (reduces withholding — Scale 2/6 only)
         // Source: ato.gov.au/tax-rates-and-codes/tax-tables/medicare-levy-adjustment (17 June 2026)
         if ($has_medicare_adj && in_array($scale, ['scale2', 'scale6'])) {
-            $weekly_wla = self::medicareAdjustment($x, $scale, $medicare_dependants);
+            $weekly_wla = self::medicareAdjustment($x, $scale, $medicare_dependants, $fy);
             // ATO: monthly = WLA × 13 ÷ 3; all other periods = WLA × divisor
             $period_wla = ($period === 'monthly')
                 ? (int) round($weekly_wla * 13 / 3)
@@ -93,50 +93,88 @@ class PaygCalculator
 
     /**
      * Medicare levy weekly adjustment (WLA).
-     * ATO source: medicare-levy-adjustment page, published 17 June 2026.
+     * ATO source: medicare-levy-adjustment page (NAT 1008/1009), published 17 June 2026.
      *
-     * Applies to Scale 2 employees earning ≥$538/wk and Scale 6 ≥$908/wk
+     * Applies to Scale 2 employees earning ≥ weekly_threshold and Scale 6 ≥ weekly_threshold
      * who have lodged a Medicare levy variation declaration (NAT 0929).
+     * Parameters are loaded from llx_payroll_mla_params (DB) with hardcoded fallback.
      *
      * @param float  $x           floor(weekly_gross) + 0.99
      * @param string $scale       'scale2' or 'scale6'
      * @param int    $dependants  0 = spouse/partner only; N = N dependent children
+     * @param string $fy          Financial year e.g. '2026-27'
      * @return float Weekly levy adjustment in whole dollars (0.5 rounds up)
      */
-    private static function medicareAdjustment(float $x, string $scale, int $dependants): float
+    private static function medicareAdjustment(float $x, string $scale, int $dependants, string $fy = '2026-27'): float
     {
-        // Weekly Family Threshold: $908.42 (no children) + $83.42 per child
-        $wft = round((4338 * $dependants + 47238) / 52, 2);
+        $p = self::loadMlaParams($fy, $scale);
 
-        // Shading Out Point: ignore cents
-        $sop = (int)(($wft * 0.1) / 0.08);
+        // Weekly Family Threshold from annual thresholds
+        $wft = round(($p['annual_per_child'] * $dependants + $p['annual_base']) / 52, 2);
 
-        if ($scale === 'scale2') {
-            if ($x < 538.67 || $x >= $sop) {
-                return 0.0;
-            }
-            if ($x < min(673.0, $wft)) {
-                $wla = ($x - 538.67) * 0.1;
-            } elseif ($x < $wft) {
-                $wla = $x * 0.02;
-            } else {
-                $wla = ($wft * 0.02) - (($x - $wft) * 0.08);
-            }
-        } else { // scale6
-            if ($x < 908.42 || $x >= $sop) {
-                return 0.0;
-            }
-            if ($x < min(1135.0, $wft)) {
-                $wla = ($x - 908.42) * 0.05;
-            } elseif ($x < $wft) {
-                $wla = $x * 0.01;
-            } else {
-                $wla = ($wft * 0.01) - (($x - $wft) * 0.04);
-            }
+        // Shading Out Point: income where WLA shades back to zero
+        // Derived: wft × (levy_rate + shade_out_rate) / shade_out_rate
+        $sop = (int)($wft * ($p['levy_rate'] + $p['shade_out_rate']) / $p['shade_out_rate']);
+
+        if ($x < $p['weekly_threshold'] || $x >= $sop) {
+            return 0.0;
+        }
+        if ($x < min($p['mid_threshold'], $wft)) {
+            $wla = ($x - $p['weekly_threshold']) * $p['phase_in_rate'];
+        } elseif ($x < $wft) {
+            $wla = $x * $p['levy_rate'];
+        } else {
+            $wla = ($wft * $p['levy_rate']) - (($x - $wft) * $p['shade_out_rate']);
         }
 
         // Round to nearest dollar; 0.50 cents rounds up
         return (float)(int)(max(0.0, $wla) + 0.5);
+    }
+
+    /**
+     * Load MLA parameters for a given FY and scale from DB, with hardcoded fallback.
+     * Returns assoc array of param_key => param_value.
+     */
+    private static function loadMlaParams(string $fy, string $scale): array
+    {
+        global $db, $conf;
+        if (!empty($db)) {
+            $sql = "SELECT param_key, param_value FROM " . MAIN_DB_PREFIX . "payroll_mla_params"
+                . " WHERE fy = '" . $db->escape($fy) . "'"
+                . " AND scale = '" . $db->escape($scale) . "'"
+                . " AND entity = " . (int)$conf->entity;
+            $res = $db->query($sql);
+            if ($res && $db->num_rows($res) >= 5) {
+                $params = [];
+                while ($obj = $db->fetch_object($res)) {
+                    $params[$obj->param_key] = (float)$obj->param_value;
+                }
+                if (isset($params['weekly_threshold'], $params['levy_rate'], $params['annual_base'])) {
+                    return $params;
+                }
+            }
+        }
+        // Hardcoded fallback — 2026-27 values (same as 2025-26, ATO confirmed no change)
+        if ($scale === 'scale6') {
+            return [
+                'weekly_threshold' => 908.42,
+                'mid_threshold'    => 1135.00,
+                'phase_in_rate'    => 0.05,
+                'levy_rate'        => 0.01,
+                'shade_out_rate'   => 0.04,
+                'annual_base'      => 47238,
+                'annual_per_child' => 4338,
+            ];
+        }
+        return [
+            'weekly_threshold' => 538.67,
+            'mid_threshold'    => 673.00,
+            'phase_in_rate'    => 0.10,
+            'levy_rate'        => 0.02,
+            'shade_out_rate'   => 0.08,
+            'annual_base'      => 47238,
+            'annual_per_child' => 4338,
+        ];
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
