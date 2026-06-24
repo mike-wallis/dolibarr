@@ -131,6 +131,8 @@ class modPayroll extends DolibarrModules
             ['llx_payroll_deduction_type', 'is_super_applicable',  'TINYINT NOT NULL DEFAULT 0'],
             ['llx_payroll_employee',       'has_medicare_adj',      'TINYINT NOT NULL DEFAULT 0'],
             ['llx_payroll_employee',       'medicare_dependants',   'TINYINT NOT NULL DEFAULT 0'],
+            ['llx_payroll_fy_config',      'start_date',            'DATE NULL AFTER fy'],
+            ['llx_payroll_fy_config',      'end_date',              'DATE NULL AFTER start_date'],
         ];
         foreach ($migrations as [$table, $col, $def]) {
             $res = $this->db->query(
@@ -144,6 +146,20 @@ class modPayroll extends DolibarrModules
                     $sql[] = "ALTER TABLE $table ADD COLUMN $col $def";
                 }
             }
+        }
+
+        // Seed 2026-27 FY config if not yet present (dates known; min_wage TBC each July).
+        $sql[] = "INSERT IGNORE INTO llx_payroll_fy_config"
+               . " (fy, start_date, end_date, super_rate, hecs_system, min_wage, entity)"
+               . " VALUES ('2026-27', '2026-07-01', '2027-06-30', 12.00, 'marginal', 0.00, 1)";
+
+        // Backfill start/end dates for rows that predate this migration.
+        foreach (['2024-25' => ['2024-07-01', '2025-06-30'],
+                  '2025-26' => ['2025-07-01', '2026-06-30'],
+                  '2026-27' => ['2026-07-01', '2027-06-30']] as $fy => [$sd, $ed]) {
+            $sql[] = "UPDATE llx_payroll_fy_config"
+                   . " SET start_date = '$sd', end_date = '$ed'"
+                   . " WHERE fy = '$fy' AND (start_date IS NULL OR start_date = '0000-00-00')";
         }
 
         return $this->_init($sql, $options);

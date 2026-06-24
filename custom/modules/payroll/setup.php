@@ -137,6 +137,25 @@ function calcTypeLabel($ct)
 }
 
 /**
+ * Return the ATO tax-year FY string (e.g. '2026-27') that covers $pay_date.
+ * $pay_date: 'YYYY-MM-DD' string.
+ * Returns null if no active fy_config row covers that date — caller must warn
+ * the user to load tax tables for that period before running pays.
+ */
+function payroll_get_fy_for_date($db, $conf, $pay_date)
+{
+    $res = $db->query(
+        "SELECT fy FROM " . MAIN_DB_PREFIX . "payroll_fy_config"
+        . " WHERE start_date <= '" . $db->escape($pay_date) . "'"
+        . "   AND end_date   >= '" . $db->escape($pay_date) . "'"
+        . "   AND active = 1 AND entity = " . (int)$conf->entity
+        . " LIMIT 1"
+    );
+    if ($res && $obj = $db->fetch_object($res)) return $obj->fy;
+    return null;
+}
+
+/**
  * Load withholding test cases for a given FY from the DB.
  * Tries llx_payroll_test_withholding first (new format, no has_hecs/has_mla columns).
  * Falls back to legacy llx_payroll_test_case if the new table is empty for that FY.
