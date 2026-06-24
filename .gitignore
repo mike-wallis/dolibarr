@@ -25,6 +25,8 @@ imports/raw_samples/
 
 # Database dumps
 *.sql
+# Exception: custom module install/schema SQL files are source code
+!custom/modules/*/sql/*.sql
 
 # Logs
 *.log

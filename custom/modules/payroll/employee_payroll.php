@@ -89,8 +89,9 @@ if ($action === 'save') {
     $pay_period    = GETPOST('pay_period',    'alpha');
     $pay_rate      = (float)str_replace(',', '.', GETPOST('pay_rate',  'alpha'));
     $pay_rate_type = GETPOST('pay_rate_type', 'alpha');
-    $std_hours     = (float)str_replace(',', '.', GETPOST('std_hours', 'alpha'));
-    $ot_rate1      = (float)str_replace(',', '.', GETPOST('ot_rate1',  'alpha'));
+    $std_hours         = (float)str_replace(',', '.', GETPOST('std_hours',         'alpha'));
+    $std_weekly_hours  = (float)str_replace(',', '.', GETPOST('std_weekly_hours',  'alpha'));
+    $ot_rate1          = (float)str_replace(',', '.', GETPOST('ot_rate1',           'alpha'));
     $ot_rate2      = (float)str_replace(',', '.', GETPOST('ot_rate2',  'alpha'));
     $tax_scale           = GETPOST('tax_scale',     'alpha');
     $has_hecs            = GETPOSTINT('has_hecs');
@@ -105,26 +106,28 @@ if ($action === 'save') {
             . ", pay_period = '"      . $db->escape($pay_period)    . "'"
             . ", pay_rate = "         . (float)$pay_rate
             . ", pay_rate_type = '"   . $db->escape($pay_rate_type) . "'"
-            . ", std_hours = "        . (float)$std_hours
-            . ", ot_rate1 = "         . (float)$ot_rate1
-            . ", ot_rate2 = "         . (float)$ot_rate2
-            . ", tax_scale = '"       . $db->escape($tax_scale)     . "'"
-            . ", has_hecs = "         . (int)$has_hecs
-            . ", has_medicare_adj = " . (int)$has_medicare_adj
+            . ", std_hours = "           . (float)$std_hours
+            . ", std_weekly_hours = "   . (float)$std_weekly_hours
+            . ", ot_rate1 = "           . (float)$ot_rate1
+            . ", ot_rate2 = "           . (float)$ot_rate2
+            . ", tax_scale = '"         . $db->escape($tax_scale)     . "'"
+            . ", has_hecs = "           . (int)$has_hecs
+            . ", has_medicare_adj = "   . (int)$has_medicare_adj
             . ", medicare_dependants = " . (int)$medicare_dependants
-            . " WHERE fk_user = "     . (int)$userid . " AND entity = " . (int)$conf->entity;
+            . " WHERE fk_user = "       . (int)$userid . " AND entity = " . (int)$conf->entity;
     } else {
         $sql = "INSERT INTO " . MAIN_DB_PREFIX . "payroll_employee"
-            . " (fk_user, position_type, pay_period, pay_rate, pay_rate_type, std_hours, ot_rate1, ot_rate2, tax_scale, has_hecs, has_medicare_adj, medicare_dependants, entity)"
+            . " (fk_user, position_type, pay_period, pay_rate, pay_rate_type, std_hours, std_weekly_hours, ot_rate1, ot_rate2, tax_scale, has_hecs, has_medicare_adj, medicare_dependants, entity)"
             . " VALUES (" . (int)$userid
-            . ", '" . $db->escape($position_type) . "'"
-            . ", '" . $db->escape($pay_period)    . "'"
+            . ", '" . $db->escape($position_type)  . "'"
+            . ", '" . $db->escape($pay_period)      . "'"
             . ", "  . (float)$pay_rate
-            . ", '" . $db->escape($pay_rate_type) . "'"
+            . ", '" . $db->escape($pay_rate_type)   . "'"
             . ", "  . (float)$std_hours
+            . ", "  . (float)$std_weekly_hours
             . ", "  . (float)$ot_rate1
             . ", "  . (float)$ot_rate2
-            . ", '" . $db->escape($tax_scale)     . "'"
+            . ", '" . $db->escape($tax_scale)       . "'"
             . ", "  . (int)$has_hecs
             . ", "  . (int)$has_medicare_adj
             . ", "  . (int)$medicare_dependants
@@ -160,6 +163,37 @@ if ($action === 'save') {
         }
     }
 
+    // Opening balance save (FT/PT only — casuals have no accruing leave)
+    $casual_types = ['CA', 'CAPT'];
+    if (!in_array($position_type, $casual_types)) {
+        foreach (['annual', 'sick'] as $lt) {
+            $ob_val = GETPOST('opening_' . $lt, 'alpha');
+            if ($ob_val !== '' && $ob_val !== null) {
+                $ob_hours = round((float)str_replace(',', '.', $ob_val), 2);
+                if ($ob_hours >= 0) {
+                    // Upsert balance
+                    $db->query("INSERT INTO " . MAIN_DB_PREFIX . "payroll_leave_balance"
+                        . " (fk_user, entity, leave_type, balance_hours, date_updated)"
+                        . " VALUES (" . (int)$userid . ", " . (int)$conf->entity
+                        . ", '" . $db->escape($lt) . "', " . $ob_hours . ", NOW())"
+                        . " ON DUPLICATE KEY UPDATE balance_hours=" . $ob_hours . ", date_updated=NOW()");
+                    // Record opening transaction (replace any previous opening row)
+                    $db->query("DELETE FROM " . MAIN_DB_PREFIX . "payroll_leave_transaction"
+                        . " WHERE fk_user=" . (int)$userid . " AND entity=" . (int)$conf->entity
+                        . " AND leave_type='" . $db->escape($lt) . "'"
+                        . " AND transaction_type='opening'");
+                    if ($ob_hours > 0) {
+                        $db->query("INSERT INTO " . MAIN_DB_PREFIX . "payroll_leave_transaction"
+                            . " (fk_user, entity, leave_type, transaction_type, hours, date_transaction, note)"
+                            . " VALUES (" . (int)$userid . ", " . (int)$conf->entity
+                            . ", '" . $db->escape($lt) . "', 'opening', " . $ob_hours
+                            . ", CURDATE(), 'Opening balance set via employee profile')");
+                    }
+                }
+            }
+        }
+    }
+
     $db->commit();
 
     // Reload after save
@@ -174,6 +208,17 @@ if ($action === 'save') {
     setEventMessages('Payroll profile saved.', null, 'mesgs');
     $action = '';
 }
+
+// ── Load leave balances ────────────────────────────────────────────────────
+
+$leave_balances = ['annual' => 0.00, 'sick' => 0.00];
+$res_lb = $db->query("SELECT leave_type, balance_hours FROM " . MAIN_DB_PREFIX . "payroll_leave_balance"
+    . " WHERE fk_user = " . (int)$userid . " AND entity = " . (int)$conf->entity);
+while ($obj = $db->fetch_object($res_lb)) {
+    $leave_balances[$obj->leave_type] = (float)$obj->balance_hours;
+}
+
+$is_casual = in_array($pe->position_type ?? 'CA', ['CA', 'CAPT']);
 
 // ── Output ─────────────────────────────────────────────────────────────────
 
@@ -238,6 +283,15 @@ $back = DOL_URL_ROOT . '/user/card.php?id=' . $userid;
       <input type="number" name="std_hours" value="<?= number_format((float)($pe->std_hours ?? 0), 2, '.', '') ?>"
              min="0" step="0.5" style="width:80px;" class="flat">
       <small style="color:#666;margin-left:0.5rem;">Pre-fills on pay run form</small>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0.5rem 1rem;"><label><strong>Standard hours / week</strong></label></td>
+    <td style="padding:0.5rem 1rem;">
+      <input type="number" name="std_weekly_hours" id="std_weekly_hours"
+             value="<?= number_format((float)($pe->std_weekly_hours ?? 0), 2, '.', '') ?>"
+             min="0" max="60" step="0.5" style="width:80px;" class="flat">
+      <small style="color:#666;margin-left:0.5rem;">Used for leave accrual. Typically 38 (full-time) or 40. Enter actual contracted hours/week for part-time.</small>
     </td>
   </tr>
   <tr id="row_ot_rates">
@@ -361,6 +415,40 @@ $back = DOL_URL_ROOT . '/user/card.php?id=' . $userid;
   </tbody>
 </table>
 
+<?php if (!$is_casual): ?>
+<h3 style="margin-top:1.5rem;">Leave Balances</h3>
+<p style="margin-top:0;color:#555;">
+  Current balances are shown below. To set an opening balance (e.g. carrying hours from a previous system), enter the hours and save.
+  Leave fields blank to keep the existing balance unchanged. Enter 0 to explicitly zero a balance.
+</p>
+<table class="noborder" style="max-width:750px;">
+  <tr>
+    <td style="padding:0.5rem 1rem;width:230px;"><label><strong>Annual leave balance</strong></label></td>
+    <td style="padding:0.5rem 1rem;">
+      <input type="number" name="opening_annual"
+             value="" placeholder="<?= number_format($leave_balances['annual'], 2) ?> h current"
+             min="0" step="0.5" style="width:100px;" class="flat">
+      <small style="color:#666;margin-left:0.5rem;">
+        Current: <strong><?= number_format($leave_balances['annual'], 2) ?> h</strong>
+        — leave blank to keep, enter new value to replace
+      </small>
+    </td>
+  </tr>
+  <tr>
+    <td style="padding:0.5rem 1rem;"><label><strong>Sick / carer's leave balance</strong></label></td>
+    <td style="padding:0.5rem 1rem;">
+      <input type="number" name="opening_sick"
+             value="" placeholder="<?= number_format($leave_balances['sick'], 2) ?> h current"
+             min="0" step="0.5" style="width:100px;" class="flat">
+      <small style="color:#666;margin-left:0.5rem;">
+        Current: <strong><?= number_format($leave_balances['sick'], 2) ?> h</strong>
+        — leave blank to keep, enter new value to replace
+      </small>
+    </td>
+  </tr>
+</table>
+<?php endif; ?>
+
 <div style="margin:1.5rem 1rem;">
   <button type="submit" class="button buttonaction">Save payroll profile</button>
   &nbsp;
@@ -378,11 +466,12 @@ function toggleHours() {
     var rt  = document.getElementById('pay_rate_type').value;
     var pt  = document.getElementById('position_type').value;
     var lbl = document.getElementById('rate_label');
-    var rowHrs = document.getElementById('row_std_hours');
-    var rowOT  = document.getElementById('row_ot_rates');
+    var rowHrs    = document.getElementById('row_std_hours');
+    var rowOT     = document.getElementById('row_ot_rates');
 
     var isSalaried = (rt === 'salary');
     var isHourly   = !isSalaried;
+    var isCasual   = (pt === 'CA' || pt === 'CAPT');
 
     lbl.textContent = isSalaried ? 'Salary (per period)' : 'Rate ($/hr)';
     rowHrs.style.display = isSalaried ? 'none' : '';

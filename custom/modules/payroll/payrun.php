@@ -29,7 +29,7 @@ $action = GETPOST('action', 'aZ09');
 
 $sql_emp = "SELECT u.rowid, u.login, u.firstname, u.lastname,"
     . " pe.position_type, pe.pay_period, pe.pay_rate, pe.pay_rate_type,"
-    . " pe.std_hours, pe.ot_rate1, pe.ot_rate2, pe.tax_scale, pe.has_hecs,"
+    . " pe.std_hours, pe.std_weekly_hours, pe.ot_rate1, pe.ot_rate2, pe.tax_scale, pe.has_hecs,"
     . " pe.has_medicare_adj, pe.medicare_dependants"
     . " FROM " . MAIN_DB_PREFIX . "user u"
     . " LEFT JOIN " . MAIN_DB_PREFIX . "payroll_employee pe"
@@ -145,22 +145,44 @@ if ($action === 'process') {
     }
 
     // Collect employees with earnings (base_gross only — additions added per-employee below)
-    $emp_rows = [];
+    $emp_rows     = [];
+    $emp_leave    = []; // [uid => ['al'=>h,'sick'=>h,'bere'=>h,'ord_hrs'=>h,'rate'=>r]]
+    $casual_types = ['CA', 'CAPT'];
+
     foreach ($employees as $uid => $emp) {
+        $is_casual_emp = in_array($emp->position_type ?? 'CA', $casual_types);
+        $al_hrs   = (!$is_casual_emp) ? (float)GETPOST('al_hrs_'   . $uid, 'alpha') : 0;
+        $sick_hrs = (!$is_casual_emp) ? (float)GETPOST('sick_hrs_' . $uid, 'alpha') : 0;
+        $bere_hrs = (!$is_casual_emp) ? (float)GETPOST('bere_hrs_' . $uid, 'alpha') : 0;
+
         $base_gross = 0;
+        $ord_hrs_val = 0;
+        $rate_val    = 0;
         if (($emp->pay_rate_type ?? 'hourly') === 'salary') {
             $base_gross = round((float)GETPOST('salary_' . $uid, 'alpha'), 2);
         } else {
-            $ord  = (float)GETPOST('ord_hrs_' . $uid, 'alpha');
-            $ot1  = (float)GETPOST('ot1_hrs_' . $uid, 'alpha');
-            $ot2  = (float)GETPOST('ot2_hrs_' . $uid, 'alpha');
-            $rate = (float)GETPOST('rate_'    . $uid, 'alpha');
-            $base_gross = round($ord * $rate + $ot1 * $rate * (float)($emp->ot_rate1 ?? 1.5)
-                              + $ot2 * $rate * (float)($emp->ot_rate2 ?? 2.0), 2);
+            $ord_hrs_val = (float)GETPOST('ord_hrs_' . $uid, 'alpha');
+            $ot1         = (float)GETPOST('ot1_hrs_' . $uid, 'alpha');
+            $ot2         = (float)GETPOST('ot2_hrs_' . $uid, 'alpha');
+            $rate_val    = (float)GETPOST('rate_'    . $uid, 'alpha');
+            $leave_pay   = ($al_hrs + $sick_hrs + $bere_hrs) * $rate_val;
+            $base_gross  = round($ord_hrs_val * $rate_val
+                              + $ot1 * $rate_val * (float)($emp->ot_rate1 ?? 1.5)
+                              + $ot2 * $rate_val * (float)($emp->ot_rate2 ?? 2.0)
+                              + $leave_pay, 2);
         }
         if ($base_gross > 0) {
             $emp_rows[$uid] = $base_gross;
         }
+        // Store leave data for every employee (even if no base pay — leave-only pay runs)
+        $emp_leave[$uid] = [
+            'al'       => $al_hrs,
+            'sick'     => $sick_hrs,
+            'bere'     => $bere_hrs,
+            'ord_hrs'  => $ord_hrs_val,
+            'rate'     => $rate_val,
+            'is_casual'=> $is_casual_emp,
+        ];
     }
 
     if (empty($emp_rows)) {
@@ -218,11 +240,12 @@ if ($action === 'process') {
             $salary->accountid      = $accountid;
             $salary->fk_user_author = $user->id;
 
+            $lv = $emp_leave[$uid];
             if (($emp->pay_rate_type ?? 'hourly') === 'salary') {
                 $salary->note = 'Salary $' . number_format($base_gross, 2) . ' gross';
             } else {
-                $ord = (float)GETPOST('ord_hrs_' . $uid, 'alpha');
-                $rt  = (float)GETPOST('rate_'    . $uid, 'alpha');
+                $ord = $lv['ord_hrs'];
+                $rt  = $lv['rate'];
                 $ot1 = (float)GETPOST('ot1_hrs_' . $uid, 'alpha');
                 $ot2 = (float)GETPOST('ot2_hrs_' . $uid, 'alpha');
                 $salary->note = sprintf('%.1f hrs @ $%.2f/hr', $ord, $rt);
@@ -233,6 +256,9 @@ if ($action === 'process') {
                     $salary->note .= sprintf(' + %.1f OT×%.2f hrs', $ot2, $emp->ot_rate2 ?? 2.0);
                 }
             }
+            if ($lv['al']   > 0) $salary->note .= sprintf(' + %.1f h annual leave',     $lv['al']);
+            if ($lv['sick'] > 0) $salary->note .= sprintf(' + %.1f h sick/carer\'s',    $lv['sick']);
+            if ($lv['bere'] > 0) $salary->note .= sprintf(' + %.1f h bereavement',       $lv['bere']);
             if ($add_total > 0) {
                 $add_note_parts = [];
                 foreach ($emp_add_amounts as $dtid => $amt) {
@@ -317,6 +343,77 @@ if ($action === 'process') {
                 $ded_totals[$dtid] = ($ded_totals[$dtid] ?? 0) + $amount;
             }
 
+            // 6. Leave accrual and balance update
+            $lv = $emp_leave[$uid];
+            if (!$lv['is_casual']) {
+                $period_weeks = [
+                    'weekly'      => 1.0,
+                    'fortnightly' => 2.0,
+                    'halfmonthly' => 26.0 / 12.0,
+                    'monthly'     => 52.0 / 12.0,
+                    'fourweekly'  => 4.0,
+                ];
+                $wks = $period_weeks[$emp->pay_period ?? 'weekly'] ?? 1.0;
+
+                if (($emp->pay_rate_type ?? 'hourly') === 'salary') {
+                    // Salaried: accrue on contracted weekly hours × weeks in period
+                    $paid_ordinary = (float)($emp->std_weekly_hours ?? 0) * $wks;
+                } else {
+                    // Hourly: accrue on all paid ordinary hours (worked + leave taken)
+                    $paid_ordinary = $lv['ord_hrs'] + $lv['al'] + $lv['sick'] + $lv['bere'];
+                }
+
+                $accrual_al   = round($paid_ordinary / 13.0, 4);  // 4 weeks/52 = 1/13
+                $accrual_sick = round($paid_ordinary / 26.0, 4);  // 10 days/yr ≈ 1/26
+
+                $date_tx = dol_print_date($dateep, '%Y-%m-%d');
+
+                // Helper: upsert balance and write transactions
+                $leave_updates = [
+                    'annual' => ['accrual' => $accrual_al,   'taken' => $lv['al']],
+                    'sick'   => ['accrual' => $accrual_sick, 'taken' => $lv['sick']],
+                ];
+                foreach ($leave_updates as $lt => $vals) {
+                    if ($vals['accrual'] > 0 || $vals['taken'] > 0) {
+                        // Write accrual transaction
+                        if ($vals['accrual'] > 0) {
+                            $db->query("INSERT INTO " . MAIN_DB_PREFIX . "payroll_leave_transaction"
+                                . " (fk_user, entity, leave_type, transaction_type, hours, date_transaction, fk_salary)"
+                                . " VALUES (" . (int)$uid . ", " . (int)$conf->entity
+                                . ", '" . $db->escape($lt) . "', 'accrual', " . (float)$vals['accrual']
+                                . ", '" . $db->escape($date_tx) . "', " . (int)$salary_id . ")");
+                        }
+                        // Write taken transaction
+                        if ($vals['taken'] > 0) {
+                            $db->query("INSERT INTO " . MAIN_DB_PREFIX . "payroll_leave_transaction"
+                                . " (fk_user, entity, leave_type, transaction_type, hours, date_transaction, fk_salary)"
+                                . " VALUES (" . (int)$uid . ", " . (int)$conf->entity
+                                . ", '" . $db->escape($lt) . "', 'taken', " . (float)$vals['taken']
+                                . ", '" . $db->escape($date_tx) . "', " . (int)$salary_id . ")");
+                        }
+                        // Upsert running balance: old_balance + accrual - taken
+                        $db->query("INSERT INTO " . MAIN_DB_PREFIX . "payroll_leave_balance"
+                            . " (fk_user, entity, leave_type, balance_hours, date_updated)"
+                            . " VALUES (" . (int)$uid . ", " . (int)$conf->entity
+                            . ", '" . $db->escape($lt) . "'"
+                            . ", " . round($vals['accrual'] - $vals['taken'], 4)
+                            . ", NOW())"
+                            . " ON DUPLICATE KEY UPDATE"
+                            . "   balance_hours = GREATEST(0, balance_hours + " . round($vals['accrual'] - $vals['taken'], 4) . ")"
+                            . ", date_updated = NOW()");
+                    }
+                }
+
+                // Bereavement: transaction only (no balance)
+                if ($lv['bere'] > 0) {
+                    $db->query("INSERT INTO " . MAIN_DB_PREFIX . "payroll_leave_transaction"
+                        . " (fk_user, entity, leave_type, transaction_type, hours, date_transaction, fk_salary)"
+                        . " VALUES (" . (int)$uid . ", " . (int)$conf->entity
+                        . ", 'bereavement', 'taken', " . (float)$lv['bere']
+                        . ", '" . $db->escape($date_tx) . "', " . (int)$salary_id . ")");
+                }
+            }
+
             $result_rows[] = [
                 'name'       => $empname,
                 'base_gross' => $base_gross,
@@ -324,6 +421,7 @@ if ($action === 'process') {
                 'gross'      => $gross,
                 'net'        => $net,
                 'deds'       => $emp_ded_amounts,
+                'leave'      => $emp_leave[$uid],
             ];
         }
 
@@ -334,6 +432,15 @@ if ($action === 'process') {
             $db->rollback();
         }
     }
+}
+
+// ── Leave balances for all employees ─────────────────────────────────────────
+
+$leave_bals = [];
+$res_lb = $db->query("SELECT fk_user, leave_type, balance_hours FROM " . MAIN_DB_PREFIX . "payroll_leave_balance"
+    . " WHERE entity = " . (int)$conf->entity);
+while ($obj = $db->fetch_object($res_lb)) {
+    $leave_bals[(int)$obj->fk_user][$obj->leave_type] = (float)$obj->balance_hours;
 }
 
 // ── Deduction columns (mandatory + any employee has it active) ─────────────
@@ -648,6 +755,43 @@ llxHeader('', 'Pay Run');
       $<span id="net_<?= $uid ?>">0.00</span>
     </td>
   </tr>
+  <?php
+  $is_casual_pr = in_array($emp->position_type ?? 'CA', ['CA', 'CAPT']);
+  if (!$is_casual_pr):
+      $bal_al   = $leave_bals[$uid]['annual'] ?? 0.0;
+      $bal_sick = $leave_bals[$uid]['sick']   ?? 0.0;
+  ?>
+  <tr class="leave-row" data-uid="<?= $uid ?>" style="background:#fafbff;">
+    <td colspan="20" style="padding:0.25rem 0.75rem 0.4rem 2rem;font-size:0.85em;color:#444;">
+      <span style="color:#666;margin-right:1rem;">Leave this period:</span>
+      <label style="margin-right:1.5rem;">
+        Annual leave
+        <input type="number" name="al_hrs_<?= $uid ?>" id="al_hrs_<?= $uid ?>"
+               value="<?= GETPOST('al_hrs_'.$uid,'alpha') ?: '0' ?>"
+               min="0" step="0.5" style="width:60px;text-align:right;" class="flat"
+               onchange="recalcRow(<?= $uid ?>)" oninput="recalcRow(<?= $uid ?>)"> h
+        <span id="al_warn_<?= $uid ?>" style="color:#c00;display:none;margin-left:0.3rem;">⚠</span>
+        <small style="color:#888;margin-left:0.3rem;">(bal: <span id="al_bal_<?= $uid ?>"><?= number_format($bal_al, 2) ?></span> h)</small>
+      </label>
+      <label style="margin-right:1.5rem;">
+        Sick / carer's
+        <input type="number" name="sick_hrs_<?= $uid ?>" id="sick_hrs_<?= $uid ?>"
+               value="<?= GETPOST('sick_hrs_'.$uid,'alpha') ?: '0' ?>"
+               min="0" step="0.5" style="width:60px;text-align:right;" class="flat"
+               onchange="recalcRow(<?= $uid ?>)" oninput="recalcRow(<?= $uid ?>)"> h
+        <span id="sick_warn_<?= $uid ?>" style="color:#c00;display:none;margin-left:0.3rem;">⚠</span>
+        <small style="color:#888;margin-left:0.3rem;">(bal: <span id="sick_bal_<?= $uid ?>"><?= number_format($bal_sick, 2) ?></span> h)</small>
+      </label>
+      <label>
+        Bereavement / compassionate
+        <input type="number" name="bere_hrs_<?= $uid ?>" id="bere_hrs_<?= $uid ?>"
+               value="<?= GETPOST('bere_hrs_'.$uid,'alpha') ?: '0' ?>"
+               min="0" step="0.5" style="width:60px;text-align:right;" class="flat"
+               onchange="recalcRow(<?= $uid ?>)" oninput="recalcRow(<?= $uid ?>)"> h
+      </label>
+    </td>
+  </tr>
+  <?php endif; ?>
   <?php endforeach; ?>
   </tbody>
 </table>
@@ -691,6 +835,7 @@ foreach ($employees as $uid => $emp) {
     }
     $emp_js[(string)$uid] = [
         'is_salary'        => ($emp->pay_rate_type ?? 'hourly') === 'salary',
+        'is_casual'        => in_array($emp->position_type ?? 'CA', ['CA', 'CAPT']),
         'rate'             => (float)($emp->pay_rate ?? 0),
         'ot1'              => (float)($emp->ot_rate1 ?? 1.5),
         'ot2'              => (float)($emp->ot_rate2 ?? 2.0),
@@ -699,6 +844,8 @@ foreach ($employees as $uid => $emp) {
         'has_hecs'         => (bool)($emp->has_hecs ?? false),
         'medicare_adj'     => (bool)($emp->has_medicare_adj ?? false),
         'medicare_deps'    => (int)($emp->medicare_dependants ?? 0),
+        'bal_annual'       => (float)($leave_bals[$uid]['annual'] ?? 0),
+        'bal_sick'         => (float)($leave_bals[$uid]['sick']   ?? 0),
         'deds'             => $deds,
     ];
 }
@@ -832,15 +979,31 @@ function medicareWLA(x, scale, hasMedicareAdj, dependants) {
 function recalcRow(uid) {
     var emp = EMP[uid]; if (!emp) return;
     var baseGross = 0;
+
+    // Leave hours (FT/PT only — zero for casuals)
+    var alHrs   = emp.is_casual ? 0 : (parseFloat((document.getElementById('al_hrs_'  +uid)||{value:0}).value)||0);
+    var sickHrs = emp.is_casual ? 0 : (parseFloat((document.getElementById('sick_hrs_'+uid)||{value:0}).value)||0);
+    var bereHrs = emp.is_casual ? 0 : (parseFloat((document.getElementById('bere_hrs_'+uid)||{value:0}).value)||0);
+
+    // Balance warnings
+    if (!emp.is_casual) {
+        var alWarn   = document.getElementById('al_warn_'  +uid);
+        var sickWarn = document.getElementById('sick_warn_'+uid);
+        if (alWarn)   alWarn.style.display   = (alHrs   > emp.bal_annual) ? '' : 'none';
+        if (sickWarn) sickWarn.style.display = (sickHrs > emp.bal_sick)   ? '' : 'none';
+    }
+
     if (emp.is_salary) {
         var el = document.getElementById('salary_'+uid);
         baseGross = el ? (parseFloat(el.value)||0) : 0;
+        // Salaried: leave hours don't change the dollar amount — salary is fixed per period
     } else {
         var ord = parseFloat((document.getElementById('ord_hrs_'+uid)||{value:0}).value)||0;
         var ot1 = parseFloat((document.getElementById('ot1_hrs_'+uid)||{value:0}).value)||0;
         var ot2 = parseFloat((document.getElementById('ot2_hrs_'+uid)||{value:0}).value)||0;
         var rt  = parseFloat((document.getElementById('rate_'+uid)||{value:0}).value)||0;
-        baseGross = Math.round((ord*rt + ot1*rt*emp.ot1 + ot2*rt*emp.ot2)*100)/100;
+        // Leave hours are paid at base rate (same as ordinary hours)
+        baseGross = Math.round((ord*rt + ot1*rt*emp.ot1 + ot2*rt*emp.ot2 + (alHrs+sickHrs+bereHrs)*rt)*100)/100;
     }
 
     // Sum additions — added to gross before tax; track super-applicable separately

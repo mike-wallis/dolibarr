@@ -112,6 +112,8 @@ class modPayroll extends DolibarrModules
             'llx_payroll_test_mla6',        // ATO MLA Scale 6 (half Medicare, children)
             'llx_payroll_test_stsl',        // ATO Schedule 8 STSL/HECS total withholding
             'llx_payroll_mla_params',       // MLA formula parameters (DB-driven, replaces hardcoded values)
+            'llx_payroll_leave_balance',    // running leave balance per employee per type
+            'llx_payroll_leave_transaction',// full audit ledger of all leave movements
             'llx_payroll_alter',
         ];
         foreach ($tables_to_create as $table) {
@@ -133,6 +135,7 @@ class modPayroll extends DolibarrModules
             ['llx_payroll_deduction_type', 'is_super_applicable',  'TINYINT NOT NULL DEFAULT 0'],
             ['llx_payroll_employee',       'has_medicare_adj',      'TINYINT NOT NULL DEFAULT 0'],
             ['llx_payroll_employee',       'medicare_dependants',   'TINYINT NOT NULL DEFAULT 0'],
+            ['llx_payroll_employee',       'std_weekly_hours',      'DECIMAL(5,2) NOT NULL DEFAULT 0 AFTER std_hours'],
             ['llx_payroll_fy_config',      'start_date',            'DATE NULL AFTER fy'],
             ['llx_payroll_fy_config',      'end_date',              'DATE NULL AFTER start_date'],
         ];

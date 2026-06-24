@@ -41,7 +41,8 @@ the ATO (PAYG via BAS, super via SBSCH).</p>
     <li><a href="#each-july">Each July — annual update</a></li>
     <li><a href="#tax-config">Tax Table Config page — tabs explained</a></li>
     <li><a href="#balances">Checking payroll balances</a></li>
-    <li><a href="#hecs">HECS/HELP — how it works</a></li>
+    <li><a href="#leave">Leave tracking — annual, sick &amp; bereavement</a></li>
+    <li><a href="#hecs">STSL/HECS — how it works</a></li>
     <li><a href="#medicare">Medicare levy — scales, exemptions &amp; adjustment</a></li>
     <li><a href="#troubleshoot">Troubleshooting</a></li>
   </ol>
@@ -792,6 +793,125 @@ at the top of this page, or via <strong>Setup → Modules → Payroll → gear i
     </div>
   </div>
 </div>
+
+<hr>
+
+<!-- ── 12. Leave tracking ──────────────────────────────────────────────────────── -->
+<h2 id="leave">12. Leave tracking — annual, sick &amp; bereavement</h2>
+
+<p>The Payroll module tracks three leave types for full-time and part-time employees.
+Casual employees have no entitlement to annual or sick leave under the NES — the module skips
+leave accrual for employees with position type CA or CAPT.</p>
+
+<table class="noborder" style="width:100%;max-width:820px;margin-bottom:1rem;">
+  <thead>
+    <tr style="background:#f5f5f5;">
+      <th style="padding:0.4rem 1rem;">Leave type</th>
+      <th style="padding:0.4rem 1rem;">NES entitlement</th>
+      <th style="padding:0.4rem 1rem;">Accrual</th>
+      <th style="padding:0.4rem 1rem;">Balance tracked?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>Annual leave</strong></td>
+      <td style="padding:0.35rem 1rem;">4 weeks/year of ordinary hours (FT/PT)</td>
+      <td style="padding:0.35rem 1rem;font-family:monospace;">paid_hours ÷ 13</td>
+      <td style="padding:0.35rem 1rem;">Yes — running balance; paid out on termination</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 1rem;"><strong>Sick / carer's leave</strong></td>
+      <td style="padding:0.35rem 1rem;">10 days/year FT; pro-rata PT; shared pool</td>
+      <td style="padding:0.35rem 1rem;font-family:monospace;">paid_hours ÷ 26</td>
+      <td style="padding:0.35rem 1rem;">Yes — running balance; unused carries over</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>Bereavement / compassionate</strong></td>
+      <td style="padding:0.35rem 1rem;">2 days per occasion (all employees incl. casuals)</td>
+      <td style="padding:0.35rem 1rem;">Does not accrue</td>
+      <td style="padding:0.35rem 1rem;">No — recorded in history only</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>How accrual is calculated</h3>
+<p><strong>Paid ordinary hours</strong> = ordinary hours worked + any leave taken that period.
+Leave accrues during paid leave — an employee on annual leave still accrues sick leave, and vice versa.
+Overtime hours do not count toward accrual.</p>
+
+<table class="noborder" style="width:100%;max-width:700px;margin-bottom:1rem;">
+  <thead>
+    <tr style="background:#f5f5f5;">
+      <th style="padding:0.4rem 1rem;">Employee type</th>
+      <th style="padding:0.4rem 1rem;">Paid ordinary hours for accrual</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:0.35rem 1rem;">Hourly (FT/PT)</td>
+      <td style="padding:0.35rem 1rem;">Ord hrs + annual leave taken + sick leave taken + bereavement taken</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 1rem;">Salaried (FT/PT)</td>
+      <td style="padding:0.35rem 1rem;">Standard weekly hours × weeks in pay period (always full contracted hours)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>Example — weekly, 38 h/wk FT employee:</strong></p>
+<ul style="margin:0 0 0.5rem 1.5rem;">
+  <li>Annual leave accrual per week: 38 ÷ 13 = <strong>2.92 h</strong></li>
+  <li>Sick leave accrual per week: 38 ÷ 26 = <strong>1.46 h</strong></li>
+  <li>Over a full year: 2.92 × 52 = 151.9 h annual leave ≈ 4 weeks; 1.46 × 52 = 76 h sick = 10 days ✓</li>
+</ul>
+
+<h3>Setting up an employee for leave tracking</h3>
+<p>On the employee's <a href="/dolibarr/custom/payroll/employee_payroll.php">payroll profile</a>:</p>
+<ol>
+  <li><strong>Standard hours / week</strong> — enter their contracted weekly hours (38, 40, or the actual hours for part-time).
+      This is required for salaried employees so the module knows their ordinary hours per period.</li>
+  <li><strong>Position type</strong> — must be FT, FTT, PT, AP, or O for leave to accrue.
+      CA and CAPT employees are skipped automatically.</li>
+  <li><strong>Leave balances section</strong> — if the employee has existing entitlements (e.g. hours carried from a
+      previous system), enter those here as opening balances and save. Leave blank to start at zero.</li>
+</ol>
+
+<h3>Entering leave on a pay run</h3>
+<p>Each employee row in the pay run form has a leave sub-row showing three fields:</p>
+<ul style="margin:0 0 0.5rem 1.5rem;">
+  <li><strong>Annual leave</strong> — hours of paid annual leave taken this period. Current balance shown in brackets.
+      A ⚠ warning appears if entered hours exceed the current balance (this is allowed but should be investigated).</li>
+  <li><strong>Sick / carer's leave</strong> — hours of paid sick or carer's leave this period. Same balance display and warning.</li>
+  <li><strong>Bereavement / compassionate</strong> — hours taken for bereavement (2 days per occasion per NES). No balance shown — just recorded.</li>
+</ul>
+<p>For <strong>hourly employees</strong>: leave hours are paid at base rate and added to gross pay.
+   Enter ordinary hours worked separately — leave hours are on top of (or instead of) ordinary hours depending on what actually happened that week.</p>
+<p>For <strong>salaried employees</strong>: the salary amount does not change regardless of leave taken.
+   The leave fields only update the leave balance records — leave a field blank (0) if no leave was taken.</p>
+
+<h3>Leave loading (17.5%)</h3>
+<p>The NES does not require leave loading — it is award-specific.
+  Many awards (including cleaning services) include 17.5% leave loading on top of base rate when an employee takes annual leave.
+  The module does not calculate this automatically. To pay leave loading:</p>
+<ol>
+  <li>Add an <strong>Annual Leave Loading</strong> addition type in <a href="/dolibarr/custom/payroll/setup.php">Payroll Setup</a>
+      (set calc_type = manual, account = your wages expense account).</li>
+  <li>On the pay run, enter the loading dollar amount manually in that employee's addition column.</li>
+</ol>
+<p>Confirm with your accountant or BAS agent which award applies and whether leave loading is payable.</p>
+
+<h3>Viewing leave history</h3>
+<p>Leave transactions (accruals, taken, opening balances) are stored in the
+<code>llx_payroll_leave_transaction</code> table. Each transaction is linked to the salary record created
+by that pay run (<code>fk_salary</code>). Current balances are in <code>llx_payroll_leave_balance</code>.
+You can query these directly via the dev DB, or check the employee profile page which shows current balances.</p>
+
+<h3>Termination — annual leave payout</h3>
+<p>Under the NES, unused annual leave <strong>must be paid out</strong> when employment ends,
+at the employee's current base rate (plus any leave loading entitlement under their award).
+The module does not currently automate termination payouts — calculate the payout manually
+(balance hours × current hourly rate), enter it as the final pay run, and record the leave
+hours as annual leave taken to zero the balance. Mark the employee as inactive in Dolibarr after processing.</p>
 
 <hr>
 
