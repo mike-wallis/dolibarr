@@ -1935,7 +1935,7 @@ $wth_by_fy = group_by_fy($test_wth_rows);
   <span>1. Withholding Amounts — Schedule 1 (NAT 1004)</span>
   <span style="font-size:0.7em;font-weight:400;">
     <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld" target="_blank" style="color:#1a7cb8;">ATO formulas ↗</a>
-    <!-- sample data page: add URL here once confirmed -->
+    &nbsp;·&nbsp;<a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld/sample-data/withholding-amounts-sample-data" target="_blank" style="color:#1a7cb8;">Sample data ↗</a>
   </span>
 </h3>
 <p style="font-size:0.88em;max-width:800px;">
@@ -1951,7 +1951,7 @@ $wth_by_fy = group_by_fy($test_wth_rows);
       'Columns: <code>label,gross,period,scale,expected_payg,source</code><br>'
       . '<code>scale</code>: scale1–scale6 &nbsp;·&nbsp; <code>period</code>: weekly | fortnightly | monthly'
   ); ?>
-  <?php payroll_bundled_ato_card($base_url, 'withholding', 'Withholding amounts sample data', '685 rows — all 5 scales, 3 periods'); ?>
+  <?php payroll_bundled_ato_card($base_url, 'withholding', 'Withholding amounts sample data', '720 rows — all 5 scales, 3 periods'); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -1976,7 +1976,7 @@ $mla2_by_fy = group_by_fy($test_mla2_rows);
   <span>2. Medicare Levy Adjustment — Scale 2 (NAT 1008)</span>
   <span style="font-size:0.7em;font-weight:400;">
     <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld#ato-Medicarelevyadjustment" target="_blank" style="color:#27ae60;">ATO formulas ↗</a>
-    <!-- sample data page: add URL here once confirmed -->
+    &nbsp;·&nbsp;<a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld/sample-data/medicare-level-adjustment-scale-2-sample-data" target="_blank" style="color:#27ae60;">Sample data ↗</a>
   </span>
 </h3>
 <p style="font-size:0.88em;max-width:800px;">
@@ -1992,7 +1992,7 @@ $mla2_by_fy = group_by_fy($test_mla2_rows);
       'Columns: <code>label,gross,period,num_dependants,expected_adjustment,source</code><br>'
       . '<code>num_dependants</code>: 0=spouse only, 1–5=number of children'
   ); ?>
-  <?php payroll_bundled_ato_card($base_url, 'mla2', 'Medicare levy adjustment scale 2 sample data', '804 rows — 3 periods, spouse + 5 child counts'); ?>
+  <?php payroll_bundled_ato_card($base_url, 'mla2', 'Medicare levy adjustment scale 2 sample data', '864 rows — 3 periods, spouse + 5 child counts'); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -2018,7 +2018,7 @@ $mla6_by_fy = group_by_fy($test_mla6_rows);
   <span>3. Medicare Half-Levy Adjustment — Scale 6 (NAT 1009)</span>
   <span style="font-size:0.7em;font-weight:400;">
     <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld#ato-Medicarelevyadjustment" target="_blank" style="color:#8e44ad;">ATO formulas ↗</a>
-    <!-- sample data page: add URL here once confirmed -->
+    &nbsp;·&nbsp;<a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld/sample-data/medicare-half-levy-adjustment-scale-6-sample-data" target="_blank" style="color:#8e44ad;">Sample data ↗</a>
   </span>
 </h3>
 <p style="font-size:0.88em;max-width:800px;">
@@ -2033,7 +2033,7 @@ $mla6_by_fy = group_by_fy($test_mla6_rows);
       'Columns: <code>label,gross,period,num_children,expected_adjustment,source</code><br>'
       . '<code>num_children</code>: 1–5'
   ); ?>
-  <?php payroll_bundled_ato_card($base_url, 'mla6', 'Medicare half-levy adjustment scale 6 sample data', '660 rows — 3 periods, 1–5 children'); ?>
+  <?php payroll_bundled_ato_card($base_url, 'mla6', 'Medicare half-levy adjustment scale 6 sample data', '720 rows — 3 periods, 1–5 children'); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -2058,7 +2058,7 @@ $stsl_by_fy = group_by_fy($test_stsl_rows);
   <span>4. STSL — Schedule 8 (NAT 3539)</span>
   <span style="font-size:0.7em;font-weight:400;">
     <a href="https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components" target="_blank" style="color:#e67e22;">ATO formulas ↗</a>
-    <!-- sample data page: add URL here once confirmed -->
+    &nbsp;·&nbsp;<a href="https://www.ato.gov.au/api/public/content/f9885733974348d3b17aa7e657acaee0?v=9aaf689f" target="_blank" style="color:#e67e22;">Sample data (Excel) ↗</a>
   </span>
 </h3>
 <p style="font-size:0.88em;max-width:800px;">
@@ -2075,7 +2075,7 @@ $stsl_by_fy = group_by_fy($test_stsl_rows);
       'Columns: <code>label,gross,period,scale,expected_payg,source</code><br>'
       . 'Same format as Withholding amounts; <code>scale</code>: scale1–scale3, scale5, scale6'
   ); ?>
-  <?php payroll_bundled_ato_card($base_url, 'stsl', 'STSL Sample Data (NAT 3539)', '1,425 rows — 3 periods, 5 scales', 'Verification coming in a future update.'); ?>
+  <?php payroll_bundled_ato_card($base_url, 'stsl', 'STSL Sample Data (NAT 3539)', '885 rows — 3 periods, 5 scales (from ATO Excel NAT 3539)'); ?>
 </div>
 
 <?php payroll_test_data_table(

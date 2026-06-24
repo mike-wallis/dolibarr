@@ -274,6 +274,55 @@ Michael prefers:
 
 Avoid: large unexplained code dumps, unnecessary theory, overcomplicated architecture, changing core files without warning, assuming Dolibarr is already suitable for Australian accounting, assuming this will definitely go live.
 
+## Playwright for ATO Data Scraping
+
+Playwright is installed in `C:\Users\mhwal\AppData\Local\Temp\pw_ato\` and is used to scrape ATO web pages for tax table data and verification test data.
+
+**Why headed mode is required**: The ATO website blocks headless browsers ("Access Denied"). Always launch with `headless: false`.
+
+**Project location**: `C:\Users\mhwal\AppData\Local\Temp\pw_ato\`
+- `package.json` / `node_modules\` — npm project with `playwright` and `xlsx` packages
+- `ato_browse.mjs` — general browser/link exploration script
+- `ato_scrape.mjs` — scrapes ATO sample data tables into CSVs
+- `convert_stsl.mjs` — converts the ATO STSL Excel (NAT 3539) download to CSV
+
+**Running a script**:
+```powershell
+Set-Location "C:\Users\mhwal\AppData\Local\Temp\pw_ato"
+node ato_scrape.mjs
+```
+
+**ATO sample data pages (all confirmed 2026-07-01 update)**:
+- Withholding amounts: `.../sample-data/withholding-amounts-sample-data`
+- MLA Scale 2: `.../sample-data/medicare-level-adjustment-scale-2-sample-data`
+- MLA Scale 6: `.../sample-data/medicare-half-levy-adjustment-scale-6-sample-data`
+  - All 3 are under: `https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld/`
+  - Data is inline HTML tables (no CSV download); scrape with Playwright
+- STSL Schedule 8 Excel: `https://www.ato.gov.au/api/public/content/f9885733974348d3b17aa7e657acaee0?v=9aaf689f`
+  - Direct file download (xlsx); convert with `convert_stsl.mjs` using the `xlsx` npm package
+
+**Bundled CSV outputs** (copy to `custom/modules/payroll/data/` after scraping):
+- `ato-withholding-2026-27.csv` — 720 rows, 5 scales × 3 periods
+- `ato-mla2-2026-27.csv` — 864 rows, spouse+5 children × 3 periods
+- `ato-mla6-2026-27.csv` — 720 rows, 1–5 children × 3 periods
+- `ato-stsl-2026-27.csv` — 885 rows, 5 scales × 3 periods (from ATO Excel, not scraped)
+
+**Anti-bot config** (copy into new scripts if writing a new one):
+```javascript
+const browser = await chromium.launch({
+  headless: false,
+  args: ['--disable-blink-features=AutomationControlled', '--no-sandbox'],
+});
+const context = await browser.newContext({
+  userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+  locale: 'en-AU',
+  timezoneId: 'Australia/Sydney',
+});
+await context.addInitScript(() => {
+  Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+});
+```
+
 ## Decision-Making Standard
 
 The aim is not just to make Dolibarr work technically. The aim is to decide whether Dolibarr is reliable, understandable, maintainable, accounting-compatible, practical, and safe enough to go live on 1 July 2026.

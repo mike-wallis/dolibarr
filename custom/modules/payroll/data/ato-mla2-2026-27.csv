@@ -1,805 +1,865 @@
-﻿label,gross,period,num_dependants,expected_adjustment,source
-MLA2 $537/wk (spouse only),537,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $537/wk (1 child),537,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $537/wk (2 children),537,weekly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $537/wk (3 children),537,weekly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $537/wk (4 children),537,weekly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $537/wk (5 children),537,weekly,5,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $538/wk (spouse only),538,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $538/wk (1 child),538,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $538/wk (2 children),538,weekly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $538/wk (3 children),538,weekly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $538/wk (4 children),538,weekly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $538/wk (5 children),538,weekly,5,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $604/wk (spouse only),604,weekly,0,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $604/wk (1 child),604,weekly,1,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $604/wk (2 children),604,weekly,2,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $604/wk (3 children),604,weekly,3,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $604/wk (4 children),604,weekly,4,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $604/wk (5 children),604,weekly,5,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $605/wk (spouse only),605,weekly,0,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $605/wk (1 child),605,weekly,1,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $605/wk (2 children),605,weekly,2,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $605/wk (3 children),605,weekly,3,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $605/wk (4 children),605,weekly,4,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $605/wk (5 children),605,weekly,5,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $672/wk (spouse only),672,weekly,0,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $672/wk (1 child),672,weekly,1,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $672/wk (2 children),672,weekly,2,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $672/wk (3 children),672,weekly,3,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $672/wk (4 children),672,weekly,4,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $672/wk (5 children),672,weekly,5,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $673/wk (spouse only),673,weekly,0,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $673/wk (1 child),673,weekly,1,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $673/wk (2 children),673,weekly,2,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $673/wk (3 children),673,weekly,3,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $673/wk (4 children),673,weekly,4,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $673/wk (5 children),673,weekly,5,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $706/wk (spouse only),706,weekly,0,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $706/wk (1 child),706,weekly,1,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $706/wk (2 children),706,weekly,2,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $706/wk (3 children),706,weekly,3,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $706/wk (4 children),706,weekly,4,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $706/wk (5 children),706,weekly,5,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $707/wk (spouse only),707,weekly,0,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $707/wk (1 child),707,weekly,1,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $707/wk (2 children),707,weekly,2,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $707/wk (3 children),707,weekly,3,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $707/wk (4 children),707,weekly,4,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $707/wk (5 children),707,weekly,5,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $740/wk (spouse only),740,weekly,0,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $740/wk (1 child),740,weekly,1,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $740/wk (2 children),740,weekly,2,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $740/wk (3 children),740,weekly,3,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $740/wk (4 children),740,weekly,4,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $740/wk (5 children),740,weekly,5,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $741/wk (spouse only),741,weekly,0,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $741/wk (1 child),741,weekly,1,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $741/wk (2 children),741,weekly,2,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $741/wk (3 children),741,weekly,3,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $741/wk (4 children),741,weekly,4,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $741/wk (5 children),741,weekly,5,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $774/wk (spouse only),774,weekly,0,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $774/wk (1 child),774,weekly,1,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $774/wk (2 children),774,weekly,2,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $774/wk (3 children),774,weekly,3,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $774/wk (4 children),774,weekly,4,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $774/wk (5 children),774,weekly,5,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $775/wk (spouse only),775,weekly,0,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $775/wk (1 child),775,weekly,1,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $775/wk (2 children),775,weekly,2,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $775/wk (3 children),775,weekly,3,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $775/wk (4 children),775,weekly,4,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $775/wk (5 children),775,weekly,5,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $808/wk (spouse only),808,weekly,0,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $808/wk (1 child),808,weekly,1,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $808/wk (2 children),808,weekly,2,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $808/wk (3 children),808,weekly,3,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $808/wk (4 children),808,weekly,4,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $808/wk (5 children),808,weekly,5,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $809/wk (spouse only),809,weekly,0,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $809/wk (1 child),809,weekly,1,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $809/wk (2 children),809,weekly,2,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $809/wk (3 children),809,weekly,3,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $809/wk (4 children),809,weekly,4,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $809/wk (5 children),809,weekly,5,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $842/wk (spouse only),842,weekly,0,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $842/wk (1 child),842,weekly,1,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $842/wk (2 children),842,weekly,2,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $842/wk (3 children),842,weekly,3,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $842/wk (4 children),842,weekly,4,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $842/wk (5 children),842,weekly,5,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $843/wk (spouse only),843,weekly,0,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $843/wk (1 child),843,weekly,1,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $843/wk (2 children),843,weekly,2,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $843/wk (3 children),843,weekly,3,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $843/wk (4 children),843,weekly,4,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $843/wk (5 children),843,weekly,5,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $876/wk (spouse only),876,weekly,0,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $876/wk (1 child),876,weekly,1,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $876/wk (2 children),876,weekly,2,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $876/wk (3 children),876,weekly,3,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $876/wk (4 children),876,weekly,4,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $876/wk (5 children),876,weekly,5,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $877/wk (spouse only),877,weekly,0,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $877/wk (1 child),877,weekly,1,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $877/wk (2 children),877,weekly,2,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $877/wk (3 children),877,weekly,3,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $877/wk (4 children),877,weekly,4,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $877/wk (5 children),877,weekly,5,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $910/wk (spouse only),910,weekly,0,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $910/wk (1 child),910,weekly,1,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $910/wk (2 children),910,weekly,2,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $910/wk (3 children),910,weekly,3,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $910/wk (4 children),910,weekly,4,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $910/wk (5 children),910,weekly,5,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $911/wk (spouse only),911,weekly,0,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $911/wk (1 child),911,weekly,1,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $911/wk (2 children),911,weekly,2,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $911/wk (3 children),911,weekly,3,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $911/wk (4 children),911,weekly,4,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $911/wk (5 children),911,weekly,5,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $944/wk (spouse only),944,weekly,0,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $944/wk (1 child),944,weekly,1,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $944/wk (2 children),944,weekly,2,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $944/wk (3 children),944,weekly,3,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $944/wk (4 children),944,weekly,4,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $944/wk (5 children),944,weekly,5,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $945/wk (spouse only),945,weekly,0,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $945/wk (1 child),945,weekly,1,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $945/wk (2 children),945,weekly,2,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $945/wk (3 children),945,weekly,3,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $945/wk (4 children),945,weekly,4,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $945/wk (5 children),945,weekly,5,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $978/wk (spouse only),978,weekly,0,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $978/wk (1 child),978,weekly,1,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $978/wk (2 children),978,weekly,2,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $978/wk (3 children),978,weekly,3,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $978/wk (4 children),978,weekly,4,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $978/wk (5 children),978,weekly,5,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $979/wk (spouse only),979,weekly,0,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $979/wk (1 child),979,weekly,1,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $979/wk (2 children),979,weekly,2,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $979/wk (3 children),979,weekly,3,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $979/wk (4 children),979,weekly,4,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $979/wk (5 children),979,weekly,5,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1012/wk (spouse only),1012,weekly,0,10,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1012/wk (1 child),1012,weekly,1,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1012/wk (2 children),1012,weekly,2,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1012/wk (3 children),1012,weekly,3,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1012/wk (4 children),1012,weekly,4,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1012/wk (5 children),1012,weekly,5,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1013/wk (spouse only),1013,weekly,0,10,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1013/wk (1 child),1013,weekly,1,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1013/wk (2 children),1013,weekly,2,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1013/wk (3 children),1013,weekly,3,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1013/wk (4 children),1013,weekly,4,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1013/wk (5 children),1013,weekly,5,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1047/wk (spouse only),1047,weekly,0,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1047/wk (1 child),1047,weekly,1,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1047/wk (2 children),1047,weekly,2,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1047/wk (3 children),1047,weekly,3,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1047/wk (4 children),1047,weekly,4,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1047/wk (5 children),1047,weekly,5,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1048/wk (spouse only),1048,weekly,0,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1048/wk (1 child),1048,weekly,1,15,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1048/wk (2 children),1048,weekly,2,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1048/wk (3 children),1048,weekly,3,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1048/wk (4 children),1048,weekly,4,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1048/wk (5 children),1048,weekly,5,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1081/wk (spouse only),1081,weekly,0,4,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1081/wk (1 child),1081,weekly,1,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1081/wk (2 children),1081,weekly,2,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1081/wk (3 children),1081,weekly,3,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1081/wk (4 children),1081,weekly,4,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1081/wk (5 children),1081,weekly,5,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1114/wk (spouse only),1114,weekly,0,2,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1114/wk (1 child),1114,weekly,1,10,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1114/wk (2 children),1114,weekly,2,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1114/wk (3 children),1114,weekly,3,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1114/wk (4 children),1114,weekly,4,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1114/wk (5 children),1114,weekly,5,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1115/wk (spouse only),1115,weekly,0,2,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1115/wk (1 child),1115,weekly,1,10,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1115/wk (2 children),1115,weekly,2,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1115/wk (3 children),1115,weekly,3,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1115/wk (4 children),1115,weekly,4,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1115/wk (5 children),1115,weekly,5,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1148/wk (spouse only),1148,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1148/wk (1 child),1148,weekly,1,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1148/wk (2 children),1148,weekly,2,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1148/wk (3 children),1148,weekly,3,23,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1148/wk (4 children),1148,weekly,4,23,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1148/wk (5 children),1148,weekly,5,23,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1149/wk (spouse only),1149,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1149/wk (1 child),1149,weekly,1,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1149/wk (2 children),1149,weekly,2,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1149/wk (3 children),1149,weekly,3,23,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1149/wk (4 children),1149,weekly,4,23,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1149/wk (5 children),1149,weekly,5,23,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1182/wk (spouse only),1182,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1182/wk (1 child),1182,weekly,1,5,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1182/wk (2 children),1182,weekly,2,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1182/wk (3 children),1182,weekly,3,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1182/wk (4 children),1182,weekly,4,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1182/wk (5 children),1182,weekly,5,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1183/wk (spouse only),1183,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1183/wk (1 child),1183,weekly,1,4,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1183/wk (2 children),1183,weekly,2,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1183/wk (3 children),1183,weekly,3,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1183/wk (4 children),1183,weekly,4,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1183/wk (5 children),1183,weekly,5,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1217/wk (spouse only),1217,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1217/wk (1 child),1217,weekly,1,2,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1217/wk (2 children),1217,weekly,2,10,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1217/wk (3 children),1217,weekly,3,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1217/wk (4 children),1217,weekly,4,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1217/wk (5 children),1217,weekly,5,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1218/wk (spouse only),1218,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1218/wk (1 child),1218,weekly,1,2,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1218/wk (2 children),1218,weekly,2,10,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1218/wk (3 children),1218,weekly,3,18,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1218/wk (4 children),1218,weekly,4,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1218/wk (5 children),1218,weekly,5,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1250/wk (spouse only),1250,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1250/wk (1 child),1250,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1250/wk (2 children),1250,weekly,2,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1250/wk (3 children),1250,weekly,3,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1250/wk (4 children),1250,weekly,4,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1250/wk (5 children),1250,weekly,5,25,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1251/wk (spouse only),1251,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1251/wk (1 child),1251,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1251/wk (2 children),1251,weekly,2,7,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1251/wk (3 children),1251,weekly,3,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1251/wk (4 children),1251,weekly,4,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1251/wk (5 children),1251,weekly,5,25,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1284/wk (spouse only),1284,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1284/wk (1 child),1284,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1284/wk (2 children),1284,weekly,2,5,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1284/wk (3 children),1284,weekly,3,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1284/wk (4 children),1284,weekly,4,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1284/wk (5 children),1284,weekly,5,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1285/wk (spouse only),1285,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1285/wk (1 child),1285,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1285/wk (2 children),1285,weekly,2,5,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1285/wk (3 children),1285,weekly,3,13,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1285/wk (4 children),1285,weekly,4,21,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1285/wk (5 children),1285,weekly,5,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1319/wk (spouse only),1319,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1319/wk (1 child),1319,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1319/wk (2 children),1319,weekly,2,2,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1319/wk (3 children),1319,weekly,3,10,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1319/wk (4 children),1319,weekly,4,19,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1319/wk (5 children),1319,weekly,5,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1551/wk (spouse only),1551,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1551/wk (1 child),1551,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1551/wk (2 children),1551,weekly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1551/wk (3 children),1551,weekly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1551/wk (4 children),1551,weekly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1551/wk (5 children),1551,weekly,5,8,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1552/wk (spouse only),1552,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1552/wk (1 child),1552,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1552/wk (2 children),1552,weekly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1552/wk (3 children),1552,weekly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1552/wk (4 children),1552,weekly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1552/wk (5 children),1552,weekly,5,8,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1655/wk (spouse only),1655,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1655/wk (1 child),1655,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1655/wk (2 children),1655,weekly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1655/wk (3 children),1655,weekly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1655/wk (4 children),1655,weekly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1655/wk (5 children),1655,weekly,5,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1656/wk (spouse only),1656,weekly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1656/wk (1 child),1656,weekly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1656/wk (2 children),1656,weekly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1656/wk (3 children),1656,weekly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1656/wk (4 children),1656,weekly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1656/wk (5 children),1656,weekly,5,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1074/fn (spouse only),1074,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1074/fn (1 child),1074,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1074/fn (2 children),1074,fortnightly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1074/fn (3 children),1074,fortnightly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1074/fn (4 children),1074,fortnightly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1074/fn (5 children),1074,fortnightly,5,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1076/fn (spouse only),1076,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1076/fn (1 child),1076,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1076/fn (2 children),1076,fortnightly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1076/fn (3 children),1076,fortnightly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1076/fn (4 children),1076,fortnightly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1076/fn (5 children),1076,fortnightly,5,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1208/fn (spouse only),1208,fortnightly,0,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1208/fn (1 child),1208,fortnightly,1,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1208/fn (2 children),1208,fortnightly,2,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1208/fn (3 children),1208,fortnightly,3,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1208/fn (4 children),1208,fortnightly,4,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1208/fn (5 children),1208,fortnightly,5,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1210/fn (spouse only),1210,fortnightly,0,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1210/fn (1 child),1210,fortnightly,1,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1210/fn (2 children),1210,fortnightly,2,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1210/fn (3 children),1210,fortnightly,3,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1210/fn (4 children),1210,fortnightly,4,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1210/fn (5 children),1210,fortnightly,5,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1344/fn (spouse only),1344,fortnightly,0,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1344/fn (1 child),1344,fortnightly,1,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1344/fn (2 children),1344,fortnightly,2,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1344/fn (3 children),1344,fortnightly,3,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1344/fn (4 children),1344,fortnightly,4,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1344/fn (5 children),1344,fortnightly,5,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1346/fn (spouse only),1346,fortnightly,0,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1346/fn (1 child),1346,fortnightly,1,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1346/fn (2 children),1346,fortnightly,2,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1346/fn (3 children),1346,fortnightly,3,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1346/fn (4 children),1346,fortnightly,4,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1346/fn (5 children),1346,fortnightly,5,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1412/fn (spouse only),1412,fortnightly,0,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1412/fn (1 child),1412,fortnightly,1,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1412/fn (2 children),1412,fortnightly,2,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1412/fn (3 children),1412,fortnightly,3,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1412/fn (4 children),1412,fortnightly,4,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1412/fn (5 children),1412,fortnightly,5,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1414/fn (spouse only),1414,fortnightly,0,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1414/fn (1 child),1414,fortnightly,1,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1414/fn (2 children),1414,fortnightly,2,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1414/fn (3 children),1414,fortnightly,3,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1414/fn (4 children),1414,fortnightly,4,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1414/fn (5 children),1414,fortnightly,5,28,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1480/fn (spouse only),1480,fortnightly,0,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1480/fn (1 child),1480,fortnightly,1,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1480/fn (2 children),1480,fortnightly,2,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1480/fn (3 children),1480,fortnightly,3,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1480/fn (4 children),1480,fortnightly,4,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1480/fn (5 children),1480,fortnightly,5,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1482/fn (spouse only),1482,fortnightly,0,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1482/fn (1 child),1482,fortnightly,1,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1482/fn (2 children),1482,fortnightly,2,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1482/fn (3 children),1482,fortnightly,3,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1482/fn (4 children),1482,fortnightly,4,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1482/fn (5 children),1482,fortnightly,5,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1548/fn (spouse only),1548,fortnightly,0,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1548/fn (1 child),1548,fortnightly,1,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1548/fn (2 children),1548,fortnightly,2,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1548/fn (3 children),1548,fortnightly,3,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1548/fn (4 children),1548,fortnightly,4,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1548/fn (5 children),1548,fortnightly,5,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1550/fn (spouse only),1550,fortnightly,0,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1550/fn (1 child),1550,fortnightly,1,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1550/fn (2 children),1550,fortnightly,2,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1550/fn (3 children),1550,fortnightly,3,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1550/fn (4 children),1550,fortnightly,4,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1550/fn (5 children),1550,fortnightly,5,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1616/fn (spouse only),1616,fortnightly,0,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1616/fn (1 child),1616,fortnightly,1,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1616/fn (2 children),1616,fortnightly,2,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1616/fn (3 children),1616,fortnightly,3,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1616/fn (4 children),1616,fortnightly,4,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1616/fn (5 children),1616,fortnightly,5,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1618/fn (spouse only),1618,fortnightly,0,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1618/fn (1 child),1618,fortnightly,1,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1618/fn (2 children),1618,fortnightly,2,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1618/fn (3 children),1618,fortnightly,3,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1618/fn (4 children),1618,fortnightly,4,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1618/fn (5 children),1618,fortnightly,5,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1684/fn (spouse only),1684,fortnightly,0,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1684/fn (1 child),1684,fortnightly,1,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1684/fn (2 children),1684,fortnightly,2,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1684/fn (3 children),1684,fortnightly,3,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1684/fn (4 children),1684,fortnightly,4,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1684/fn (5 children),1684,fortnightly,5,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1686/fn (spouse only),1686,fortnightly,0,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1686/fn (1 child),1686,fortnightly,1,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1686/fn (2 children),1686,fortnightly,2,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1686/fn (3 children),1686,fortnightly,3,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1686/fn (4 children),1686,fortnightly,4,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1686/fn (5 children),1686,fortnightly,5,34,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1752/fn (spouse only),1752,fortnightly,0,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1752/fn (1 child),1752,fortnightly,1,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1752/fn (2 children),1752,fortnightly,2,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1752/fn (3 children),1752,fortnightly,3,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1752/fn (4 children),1752,fortnightly,4,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1752/fn (5 children),1752,fortnightly,5,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1754/fn (spouse only),1754,fortnightly,0,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1754/fn (1 child),1754,fortnightly,1,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1754/fn (2 children),1754,fortnightly,2,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1754/fn (3 children),1754,fortnightly,3,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1754/fn (4 children),1754,fortnightly,4,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1754/fn (5 children),1754,fortnightly,5,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1820/fn (spouse only),1820,fortnightly,0,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1820/fn (1 child),1820,fortnightly,1,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1820/fn (2 children),1820,fortnightly,2,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1820/fn (3 children),1820,fortnightly,3,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1820/fn (4 children),1820,fortnightly,4,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1820/fn (5 children),1820,fortnightly,5,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1822/fn (spouse only),1822,fortnightly,0,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1822/fn (1 child),1822,fortnightly,1,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1822/fn (2 children),1822,fortnightly,2,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1822/fn (3 children),1822,fortnightly,3,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1822/fn (4 children),1822,fortnightly,4,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1822/fn (5 children),1822,fortnightly,5,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1888/fn (spouse only),1888,fortnightly,0,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1888/fn (1 child),1888,fortnightly,1,38,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1888/fn (2 children),1888,fortnightly,2,38,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1888/fn (3 children),1888,fortnightly,3,38,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1888/fn (4 children),1888,fortnightly,4,38,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1888/fn (5 children),1888,fortnightly,5,38,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1890/fn (spouse only),1890,fortnightly,0,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1890/fn (1 child),1890,fortnightly,1,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1890/fn (2 children),1890,fortnightly,2,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1890/fn (3 children),1890,fortnightly,3,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1890/fn (4 children),1890,fortnightly,4,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1890/fn (5 children),1890,fortnightly,5,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1956/fn (spouse only),1956,fortnightly,0,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1956/fn (1 child),1956,fortnightly,1,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1956/fn (2 children),1956,fortnightly,2,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1956/fn (3 children),1956,fortnightly,3,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1956/fn (4 children),1956,fortnightly,4,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1956/fn (5 children),1956,fortnightly,5,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1958/fn (spouse only),1958,fortnightly,0,24,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1958/fn (1 child),1958,fortnightly,1,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1958/fn (2 children),1958,fortnightly,2,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1958/fn (3 children),1958,fortnightly,3,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1958/fn (4 children),1958,fortnightly,4,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $1958/fn (5 children),1958,fortnightly,5,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2024/fn (spouse only),2024,fortnightly,0,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2024/fn (1 child),2024,fortnightly,1,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2024/fn (2 children),2024,fortnightly,2,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2024/fn (3 children),2024,fortnightly,3,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2024/fn (4 children),2024,fortnightly,4,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2024/fn (5 children),2024,fortnightly,5,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2026/fn (spouse only),2026,fortnightly,0,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2026/fn (1 child),2026,fortnightly,1,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2026/fn (2 children),2026,fortnightly,2,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2026/fn (3 children),2026,fortnightly,3,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2026/fn (4 children),2026,fortnightly,4,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2026/fn (5 children),2026,fortnightly,5,40,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2092/fn (spouse only),2092,fortnightly,0,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2092/fn (1 child),2092,fortnightly,1,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2092/fn (2 children),2092,fortnightly,2,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2092/fn (3 children),2092,fortnightly,3,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2092/fn (4 children),2092,fortnightly,4,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2092/fn (5 children),2092,fortnightly,5,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2094/fn (spouse only),2094,fortnightly,0,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2094/fn (1 child),2094,fortnightly,1,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2094/fn (2 children),2094,fortnightly,2,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2094/fn (3 children),2094,fortnightly,3,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2094/fn (4 children),2094,fortnightly,4,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2094/fn (5 children),2094,fortnightly,5,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2160/fn (spouse only),2160,fortnightly,0,8,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2160/fn (1 child),2160,fortnightly,1,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2160/fn (2 children),2160,fortnightly,2,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2160/fn (3 children),2160,fortnightly,3,44,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2160/fn (4 children),2160,fortnightly,4,44,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2160/fn (5 children),2160,fortnightly,5,44,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2162/fn (spouse only),2162,fortnightly,0,8,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2162/fn (1 child),2162,fortnightly,1,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2162/fn (2 children),2162,fortnightly,2,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2162/fn (3 children),2162,fortnightly,3,44,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2162/fn (4 children),2162,fortnightly,4,44,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2162/fn (5 children),2162,fortnightly,5,44,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2228/fn (spouse only),2228,fortnightly,0,4,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2228/fn (1 child),2228,fortnightly,1,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2228/fn (2 children),2228,fortnightly,2,36,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2228/fn (3 children),2228,fortnightly,3,44,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2228/fn (4 children),2228,fortnightly,4,44,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2228/fn (5 children),2228,fortnightly,5,44,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2296/fn (spouse only),2296,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2296/fn (1 child),2296,fortnightly,1,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2296/fn (2 children),2296,fortnightly,2,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2296/fn (3 children),2296,fortnightly,3,46,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2296/fn (4 children),2296,fortnightly,4,46,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2296/fn (5 children),2296,fortnightly,5,46,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2298/fn (spouse only),2298,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2298/fn (1 child),2298,fortnightly,1,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2298/fn (2 children),2298,fortnightly,2,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2298/fn (3 children),2298,fortnightly,3,46,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2298/fn (4 children),2298,fortnightly,4,46,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2298/fn (5 children),2298,fortnightly,5,46,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2364/fn (spouse only),2364,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2364/fn (1 child),2364,fortnightly,1,8,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2364/fn (2 children),2364,fortnightly,2,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2364/fn (3 children),2364,fortnightly,3,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2364/fn (4 children),2364,fortnightly,4,48,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2364/fn (5 children),2364,fortnightly,5,48,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2366/fn (spouse only),2366,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2366/fn (1 child),2366,fortnightly,1,8,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2366/fn (2 children),2366,fortnightly,2,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2366/fn (3 children),2366,fortnightly,3,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2366/fn (4 children),2366,fortnightly,4,48,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2366/fn (5 children),2366,fortnightly,5,48,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2432/fn (spouse only),2432,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2432/fn (1 child),2432,fortnightly,1,4,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2432/fn (2 children),2432,fortnightly,2,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2432/fn (3 children),2432,fortnightly,3,38,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2432/fn (4 children),2432,fortnightly,4,48,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2432/fn (5 children),2432,fortnightly,5,48,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2434/fn (spouse only),2434,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2434/fn (1 child),2434,fortnightly,1,4,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2434/fn (2 children),2434,fortnightly,2,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2434/fn (3 children),2434,fortnightly,3,38,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2434/fn (4 children),2434,fortnightly,4,48,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2434/fn (5 children),2434,fortnightly,5,48,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2500/fn (spouse only),2500,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2500/fn (1 child),2500,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2500/fn (2 children),2500,fortnightly,2,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2500/fn (3 children),2500,fortnightly,3,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2500/fn (4 children),2500,fortnightly,4,48,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2500/fn (5 children),2500,fortnightly,5,50,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2502/fn (spouse only),2502,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2502/fn (1 child),2502,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2502/fn (2 children),2502,fortnightly,2,14,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2502/fn (3 children),2502,fortnightly,3,32,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2502/fn (4 children),2502,fortnightly,4,48,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2502/fn (5 children),2502,fortnightly,5,50,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2568/fn (spouse only),2568,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2568/fn (1 child),2568,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2568/fn (2 children),2568,fortnightly,2,10,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2568/fn (3 children),2568,fortnightly,3,26,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2568/fn (4 children),2568,fortnightly,4,42,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2568/fn (5 children),2568,fortnightly,5,52,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2570/fn (spouse only),2570,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2570/fn (1 child),2570,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2570/fn (2 children),2570,fortnightly,2,4,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2570/fn (3 children),2570,fortnightly,3,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2570/fn (4 children),2570,fortnightly,4,38,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2570/fn (5 children),2570,fortnightly,5,52,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2636/fn (spouse only),2636,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2636/fn (1 child),2636,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2636/fn (2 children),2636,fortnightly,2,4,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2636/fn (3 children),2636,fortnightly,3,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2636/fn (4 children),2636,fortnightly,4,38,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2636/fn (5 children),2636,fortnightly,5,52,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2638/fn (spouse only),2638,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2638/fn (1 child),2638,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2638/fn (2 children),2638,fortnightly,2,4,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2638/fn (3 children),2638,fortnightly,3,20,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2638/fn (4 children),2638,fortnightly,4,38,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2638/fn (5 children),2638,fortnightly,5,52,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3102/fn (spouse only),3102,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3102/fn (1 child),3102,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3102/fn (2 children),3102,fortnightly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3102/fn (3 children),3102,fortnightly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3102/fn (4 children),3102,fortnightly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3102/fn (5 children),3102,fortnightly,5,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3104/fn (spouse only),3104,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3104/fn (1 child),3104,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3104/fn (2 children),3104,fortnightly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3104/fn (3 children),3104,fortnightly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3104/fn (4 children),3104,fortnightly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3104/fn (5 children),3104,fortnightly,5,16,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3310/fn (spouse only),3310,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3310/fn (1 child),3310,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3310/fn (2 children),3310,fortnightly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3310/fn (3 children),3310,fortnightly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3310/fn (4 children),3310,fortnightly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3310/fn (5 children),3310,fortnightly,5,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3312/fn (spouse only),3312,fortnightly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3312/fn (1 child),3312,fortnightly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3312/fn (2 children),3312,fortnightly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3312/fn (3 children),3312,fortnightly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3312/fn (4 children),3312,fortnightly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3312/fn (5 children),3312,fortnightly,5,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2327/mo (spouse only),2327,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2327/mo (1 child),2327,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2327/mo (2 children),2327,monthly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2327/mo (3 children),2327,monthly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2327/mo (4 children),2327,monthly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2327/mo (5 children),2327,monthly,5,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2331.33/mo (spouse only),2331.33,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2331.33/mo (1 child),2331.33,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2331.33/mo (2 children),2331.33,monthly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2331.33/mo (3 children),2331.33,monthly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2331.33/mo (4 children),2331.33,monthly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $2331.33/mo (5 children),2331.33,monthly,5,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3059.33/mo (spouse only),3059.33,monthly,0,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3059.33/mo (1 child),3059.33,monthly,1,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3059.33/mo (2 children),3059.33,monthly,2,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3059.33/mo (3 children),3059.33,monthly,3,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3059.33/mo (4 children),3059.33,monthly,4,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3059.33/mo (5 children),3059.33,monthly,5,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3063.67/mo (spouse only),3063.67,monthly,0,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3063.67/mo (1 child),3063.67,monthly,1,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3063.67/mo (2 children),3063.67,monthly,2,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3063.67/mo (3 children),3063.67,monthly,3,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3063.67/mo (4 children),3063.67,monthly,4,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3063.67/mo (5 children),3063.67,monthly,5,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3206.67/mo (spouse only),3206.67,monthly,0,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3206.67/mo (1 child),3206.67,monthly,1,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3206.67/mo (2 children),3206.67,monthly,2,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3206.67/mo (3 children),3206.67,monthly,3,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3206.67/mo (4 children),3206.67,monthly,4,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3206.67/mo (5 children),3206.67,monthly,5,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3211/mo (spouse only),3211,monthly,0,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3211/mo (1 child),3211,monthly,1,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3211/mo (2 children),3211,monthly,2,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3211/mo (3 children),3211,monthly,3,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3211/mo (4 children),3211,monthly,4,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3211/mo (5 children),3211,monthly,5,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3354/mo (spouse only),3354,monthly,0,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3354/mo (1 child),3354,monthly,1,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3354/mo (2 children),3354,monthly,2,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3354/mo (3 children),3354,monthly,3,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3354/mo (4 children),3354,monthly,4,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3354/mo (5 children),3354,monthly,5,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3358.33/mo (spouse only),3358.33,monthly,0,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3358.33/mo (1 child),3358.33,monthly,1,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3358.33/mo (2 children),3358.33,monthly,2,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3358.33/mo (3 children),3358.33,monthly,3,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3358.33/mo (4 children),3358.33,monthly,4,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3358.33/mo (5 children),3358.33,monthly,5,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3501.33/mo (spouse only),3501.33,monthly,0,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3501.33/mo (1 child),3501.33,monthly,1,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3501.33/mo (2 children),3501.33,monthly,2,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3501.33/mo (3 children),3501.33,monthly,3,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3501.33/mo (4 children),3501.33,monthly,4,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3501.33/mo (5 children),3501.33,monthly,5,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3505.67/mo (spouse only),3505.67,monthly,0,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3505.67/mo (1 child),3505.67,monthly,1,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3505.67/mo (2 children),3505.67,monthly,2,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3505.67/mo (3 children),3505.67,monthly,3,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3505.67/mo (4 children),3505.67,monthly,4,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3505.67/mo (5 children),3505.67,monthly,5,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3648.67/mo (spouse only),3648.67,monthly,0,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3648.67/mo (1 child),3648.67,monthly,1,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3648.67/mo (2 children),3648.67,monthly,2,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3648.67/mo (3 children),3648.67,monthly,3,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3648.67/mo (4 children),3648.67,monthly,4,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3648.67/mo (5 children),3648.67,monthly,5,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3653/mo (spouse only),3653,monthly,0,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3653/mo (1 child),3653,monthly,1,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3653/mo (2 children),3653,monthly,2,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3653/mo (3 children),3653,monthly,3,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3653/mo (4 children),3653,monthly,4,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3653/mo (5 children),3653,monthly,5,74,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3796/mo (spouse only),3796,monthly,0,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3796/mo (1 child),3796,monthly,1,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3796/mo (2 children),3796,monthly,2,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3796/mo (3 children),3796,monthly,3,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3796/mo (4 children),3796,monthly,4,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3796/mo (5 children),3796,monthly,5,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3800.33/mo (spouse only),3800.33,monthly,0,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3800.33/mo (1 child),3800.33,monthly,1,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3800.33/mo (2 children),3800.33,monthly,2,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3800.33/mo (3 children),3800.33,monthly,3,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3800.33/mo (4 children),3800.33,monthly,4,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3800.33/mo (5 children),3800.33,monthly,5,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3943.33/mo (spouse only),3943.33,monthly,0,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3943.33/mo (1 child),3943.33,monthly,1,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3943.33/mo (2 children),3943.33,monthly,2,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3943.33/mo (3 children),3943.33,monthly,3,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3943.33/mo (4 children),3943.33,monthly,4,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3943.33/mo (5 children),3943.33,monthly,5,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3947.67/mo (spouse only),3947.67,monthly,0,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3947.67/mo (1 child),3947.67,monthly,1,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3947.67/mo (2 children),3947.67,monthly,2,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3947.67/mo (3 children),3947.67,monthly,3,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3947.67/mo (4 children),3947.67,monthly,4,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $3947.67/mo (5 children),3947.67,monthly,5,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4090.67/mo (spouse only),4090.67,monthly,0,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4090.67/mo (1 child),4090.67,monthly,1,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4090.67/mo (2 children),4090.67,monthly,2,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4090.67/mo (3 children),4090.67,monthly,3,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4090.67/mo (4 children),4090.67,monthly,4,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4090.67/mo (5 children),4090.67,monthly,5,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4095/mo (spouse only),4095,monthly,0,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4095/mo (1 child),4095,monthly,1,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4095/mo (2 children),4095,monthly,2,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4095/mo (3 children),4095,monthly,3,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4095/mo (4 children),4095,monthly,4,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4095/mo (5 children),4095,monthly,5,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4238/mo (spouse only),4238,monthly,0,56,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4238/mo (1 child),4238,monthly,1,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4238/mo (2 children),4238,monthly,2,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4238/mo (3 children),4238,monthly,3,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4238/mo (4 children),4238,monthly,4,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4238/mo (5 children),4238,monthly,5,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4242.33/mo (spouse only),4242.33,monthly,0,52,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4242.33/mo (1 child),4242.33,monthly,1,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4242.33/mo (2 children),4242.33,monthly,2,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4242.33/mo (3 children),4242.33,monthly,3,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4242.33/mo (4 children),4242.33,monthly,4,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4242.33/mo (5 children),4242.33,monthly,5,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4385.33/mo (spouse only),4385.33,monthly,0,43,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4385.33/mo (1 child),4385.33,monthly,1,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4385.33/mo (2 children),4385.33,monthly,2,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4385.33/mo (3 children),4385.33,monthly,3,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4385.33/mo (4 children),4385.33,monthly,4,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4385.33/mo (5 children),4385.33,monthly,5,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4389.67/mo (spouse only),4389.67,monthly,0,43,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4389.67/mo (1 child),4389.67,monthly,1,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4389.67/mo (2 children),4389.67,monthly,2,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4389.67/mo (3 children),4389.67,monthly,3,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4389.67/mo (4 children),4389.67,monthly,4,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4389.67/mo (5 children),4389.67,monthly,5,87,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4532.67/mo (spouse only),4532.67,monthly,0,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4532.67/mo (1 child),4532.67,monthly,1,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4532.67/mo (2 children),4532.67,monthly,2,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4532.67/mo (3 children),4532.67,monthly,3,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4532.67/mo (4 children),4532.67,monthly,4,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4532.67/mo (5 children),4532.67,monthly,5,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4537/mo (spouse only),4537,monthly,0,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4537/mo (1 child),4537,monthly,1,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4537/mo (2 children),4537,monthly,2,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4537/mo (3 children),4537,monthly,3,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4537/mo (4 children),4537,monthly,4,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4537/mo (5 children),4537,monthly,5,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4680/mo (spouse only),4680,monthly,0,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4680/mo (1 child),4680,monthly,1,56,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4680/mo (2 children),4680,monthly,2,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4680/mo (3 children),4680,monthly,3,95,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4680/mo (4 children),4680,monthly,4,95,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4680/mo (5 children),4680,monthly,5,95,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4684.33/mo (spouse only),4684.33,monthly,0,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4684.33/mo (1 child),4684.33,monthly,1,56,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4684.33/mo (2 children),4684.33,monthly,2,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4684.33/mo (3 children),4684.33,monthly,3,95,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4684.33/mo (4 children),4684.33,monthly,4,95,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4684.33/mo (5 children),4684.33,monthly,5,95,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4974.67/mo (spouse only),4974.67,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4974.67/mo (1 child),4974.67,monthly,1,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4974.67/mo (2 children),4974.67,monthly,2,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4974.67/mo (3 children),4974.67,monthly,3,100,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4974.67/mo (4 children),4974.67,monthly,4,100,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4974.67/mo (5 children),4974.67,monthly,5,100,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4979/mo (spouse only),4979,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4979/mo (1 child),4979,monthly,1,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4979/mo (2 children),4979,monthly,2,69,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4979/mo (3 children),4979,monthly,3,100,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4979/mo (4 children),4979,monthly,4,100,ATO MLA Scale 2 2026-27 sample data
-MLA2 $4979/mo (5 children),4979,monthly,5,100,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5122/mo (spouse only),5122,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5122/mo (1 child),5122,monthly,1,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5122/mo (2 children),5122,monthly,2,56,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5122/mo (3 children),5122,monthly,3,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5122/mo (4 children),5122,monthly,4,104,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5122/mo (5 children),5122,monthly,5,104,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5126.33/mo (spouse only),5126.33,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5126.33/mo (1 child),5126.33,monthly,1,22,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5126.33/mo (2 children),5126.33,monthly,2,56,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5126.33/mo (3 children),5126.33,monthly,3,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5126.33/mo (4 children),5126.33,monthly,4,104,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5126.33/mo (5 children),5126.33,monthly,5,104,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5269.33/mo (spouse only),5269.33,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5269.33/mo (1 child),5269.33,monthly,1,9,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5269.33/mo (2 children),5269.33,monthly,2,43,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5269.33/mo (3 children),5269.33,monthly,3,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5269.33/mo (4 children),5269.33,monthly,4,104,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5269.33/mo (5 children),5269.33,monthly,5,104,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5273.67/mo (spouse only),5273.67,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5273.67/mo (1 child),5273.67,monthly,1,9,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5273.67/mo (2 children),5273.67,monthly,2,43,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5273.67/mo (3 children),5273.67,monthly,3,78,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5273.67/mo (4 children),5273.67,monthly,4,104,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5273.67/mo (5 children),5273.67,monthly,5,104,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5416.67/mo (spouse only),5416.67,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5416.67/mo (1 child),5416.67,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5416.67/mo (2 children),5416.67,monthly,2,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5416.67/mo (3 children),5416.67,monthly,3,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5416.67/mo (4 children),5416.67,monthly,4,104,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5416.67/mo (5 children),5416.67,monthly,5,108,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5421/mo (spouse only),5421,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5421/mo (1 child),5421,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5421/mo (2 children),5421,monthly,2,30,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5421/mo (3 children),5421,monthly,3,65,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5421/mo (4 children),5421,monthly,4,104,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5421/mo (5 children),5421,monthly,5,108,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5564/mo (spouse only),5564,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5564/mo (1 child),5564,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5564/mo (2 children),5564,monthly,2,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5564/mo (3 children),5564,monthly,3,52,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5564/mo (4 children),5564,monthly,4,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5564/mo (5 children),5564,monthly,5,113,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5568.33/mo (spouse only),5568.33,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5568.33/mo (1 child),5568.33,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5568.33/mo (2 children),5568.33,monthly,2,17,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5568.33/mo (3 children),5568.33,monthly,3,52,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5568.33/mo (4 children),5568.33,monthly,4,91,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5568.33/mo (5 children),5568.33,monthly,5,113,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5711.33/mo (spouse only),5711.33,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5711.33/mo (1 child),5711.33,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5711.33/mo (2 children),5711.33,monthly,2,9,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5711.33/mo (3 children),5711.33,monthly,3,43,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5711.33/mo (4 children),5711.33,monthly,4,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5711.33/mo (5 children),5711.33,monthly,5,113,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5715.67/mo (spouse only),5715.67,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5715.67/mo (1 child),5715.67,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5715.67/mo (2 children),5715.67,monthly,2,9,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5715.67/mo (3 children),5715.67,monthly,3,43,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5715.67/mo (4 children),5715.67,monthly,4,82,ATO MLA Scale 2 2026-27 sample data
-MLA2 $5715.67/mo (5 children),5715.67,monthly,5,113,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6721/mo (spouse only),6721,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6721/mo (1 child),6721,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6721/mo (2 children),6721,monthly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6721/mo (3 children),6721,monthly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6721/mo (4 children),6721,monthly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6721/mo (5 children),6721,monthly,5,35,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6725.33/mo (spouse only),6725.33,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6725.33/mo (1 child),6725.33,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6725.33/mo (2 children),6725.33,monthly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6725.33/mo (3 children),6725.33,monthly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6725.33/mo (4 children),6725.33,monthly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $6725.33/mo (5 children),6725.33,monthly,5,35,ATO MLA Scale 2 2026-27 sample data
-MLA2 $7176/mo (spouse only),7176,monthly,0,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $7176/mo (1 child),7176,monthly,1,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $7176/mo (2 children),7176,monthly,2,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $7176/mo (3 children),7176,monthly,3,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $7176/mo (4 children),7176,monthly,4,0,ATO MLA Scale 2 2026-27 sample data
-MLA2 $7176/mo (5 children),7176,monthly,5,0,ATO MLA Scale 2 2026-27 sample data
+label,gross,period,num_dependants,expected_adjustment,source
+"MLA2 $537/weekly/spouse",537,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $537/weekly/1ch",537,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $537/weekly/2ch",537,weekly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $537/weekly/3ch",537,weekly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $537/weekly/4ch",537,weekly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $537/weekly/5ch",537,weekly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $538/weekly/spouse",538,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $538/weekly/1ch",538,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $538/weekly/2ch",538,weekly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $538/weekly/3ch",538,weekly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $538/weekly/4ch",538,weekly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $538/weekly/5ch",538,weekly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $604/weekly/spouse",604,weekly,0,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $604/weekly/1ch",604,weekly,1,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $604/weekly/2ch",604,weekly,2,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $604/weekly/3ch",604,weekly,3,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $604/weekly/4ch",604,weekly,4,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $604/weekly/5ch",604,weekly,5,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $605/weekly/spouse",605,weekly,0,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $605/weekly/1ch",605,weekly,1,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $605/weekly/2ch",605,weekly,2,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $605/weekly/3ch",605,weekly,3,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $605/weekly/4ch",605,weekly,4,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $605/weekly/5ch",605,weekly,5,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $672/weekly/spouse",672,weekly,0,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $672/weekly/1ch",672,weekly,1,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $672/weekly/2ch",672,weekly,2,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $672/weekly/3ch",672,weekly,3,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $672/weekly/4ch",672,weekly,4,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $672/weekly/5ch",672,weekly,5,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $673/weekly/spouse",673,weekly,0,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $673/weekly/1ch",673,weekly,1,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $673/weekly/2ch",673,weekly,2,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $673/weekly/3ch",673,weekly,3,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $673/weekly/4ch",673,weekly,4,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $673/weekly/5ch",673,weekly,5,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $706/weekly/spouse",706,weekly,0,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $706/weekly/1ch",706,weekly,1,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $706/weekly/2ch",706,weekly,2,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $706/weekly/3ch",706,weekly,3,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $706/weekly/4ch",706,weekly,4,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $706/weekly/5ch",706,weekly,5,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $707/weekly/spouse",707,weekly,0,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $707/weekly/1ch",707,weekly,1,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $707/weekly/2ch",707,weekly,2,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $707/weekly/3ch",707,weekly,3,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $707/weekly/4ch",707,weekly,4,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $707/weekly/5ch",707,weekly,5,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $740/weekly/spouse",740,weekly,0,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $740/weekly/1ch",740,weekly,1,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $740/weekly/2ch",740,weekly,2,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $740/weekly/3ch",740,weekly,3,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $740/weekly/4ch",740,weekly,4,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $740/weekly/5ch",740,weekly,5,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $741/weekly/spouse",741,weekly,0,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $741/weekly/1ch",741,weekly,1,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $741/weekly/2ch",741,weekly,2,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $741/weekly/3ch",741,weekly,3,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $741/weekly/4ch",741,weekly,4,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $741/weekly/5ch",741,weekly,5,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $774/weekly/spouse",774,weekly,0,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $774/weekly/1ch",774,weekly,1,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $774/weekly/2ch",774,weekly,2,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $774/weekly/3ch",774,weekly,3,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $774/weekly/4ch",774,weekly,4,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $774/weekly/5ch",774,weekly,5,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $775/weekly/spouse",775,weekly,0,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $775/weekly/1ch",775,weekly,1,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $775/weekly/2ch",775,weekly,2,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $775/weekly/3ch",775,weekly,3,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $775/weekly/4ch",775,weekly,4,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $775/weekly/5ch",775,weekly,5,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $808/weekly/spouse",808,weekly,0,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $808/weekly/1ch",808,weekly,1,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $808/weekly/2ch",808,weekly,2,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $808/weekly/3ch",808,weekly,3,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $808/weekly/4ch",808,weekly,4,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $808/weekly/5ch",808,weekly,5,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $809/weekly/spouse",809,weekly,0,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $809/weekly/1ch",809,weekly,1,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $809/weekly/2ch",809,weekly,2,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $809/weekly/3ch",809,weekly,3,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $809/weekly/4ch",809,weekly,4,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $809/weekly/5ch",809,weekly,5,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $842/weekly/spouse",842,weekly,0,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $842/weekly/1ch",842,weekly,1,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $842/weekly/2ch",842,weekly,2,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $842/weekly/3ch",842,weekly,3,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $842/weekly/4ch",842,weekly,4,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $842/weekly/5ch",842,weekly,5,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $843/weekly/spouse",843,weekly,0,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $843/weekly/1ch",843,weekly,1,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $843/weekly/2ch",843,weekly,2,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $843/weekly/3ch",843,weekly,3,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $843/weekly/4ch",843,weekly,4,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $843/weekly/5ch",843,weekly,5,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $876/weekly/spouse",876,weekly,0,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $876/weekly/1ch",876,weekly,1,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $876/weekly/2ch",876,weekly,2,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $876/weekly/3ch",876,weekly,3,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $876/weekly/4ch",876,weekly,4,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $876/weekly/5ch",876,weekly,5,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $877/weekly/spouse",877,weekly,0,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $877/weekly/1ch",877,weekly,1,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $877/weekly/2ch",877,weekly,2,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $877/weekly/3ch",877,weekly,3,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $877/weekly/4ch",877,weekly,4,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $877/weekly/5ch",877,weekly,5,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $910/weekly/spouse",910,weekly,0,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $910/weekly/1ch",910,weekly,1,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $910/weekly/2ch",910,weekly,2,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $910/weekly/3ch",910,weekly,3,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $910/weekly/4ch",910,weekly,4,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $910/weekly/5ch",910,weekly,5,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $911/weekly/spouse",911,weekly,0,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $911/weekly/1ch",911,weekly,1,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $911/weekly/2ch",911,weekly,2,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $911/weekly/3ch",911,weekly,3,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $911/weekly/4ch",911,weekly,4,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $911/weekly/5ch",911,weekly,5,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $944/weekly/spouse",944,weekly,0,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $944/weekly/1ch",944,weekly,1,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $944/weekly/2ch",944,weekly,2,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $944/weekly/3ch",944,weekly,3,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $944/weekly/4ch",944,weekly,4,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $944/weekly/5ch",944,weekly,5,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $945/weekly/spouse",945,weekly,0,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $945/weekly/1ch",945,weekly,1,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $945/weekly/2ch",945,weekly,2,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $945/weekly/3ch",945,weekly,3,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $945/weekly/4ch",945,weekly,4,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $945/weekly/5ch",945,weekly,5,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $978/weekly/spouse",978,weekly,0,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $978/weekly/1ch",978,weekly,1,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $978/weekly/2ch",978,weekly,2,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $978/weekly/3ch",978,weekly,3,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $978/weekly/4ch",978,weekly,4,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $978/weekly/5ch",978,weekly,5,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $979/weekly/spouse",979,weekly,0,12,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $979/weekly/1ch",979,weekly,1,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $979/weekly/2ch",979,weekly,2,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $979/weekly/3ch",979,weekly,3,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $979/weekly/4ch",979,weekly,4,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $979/weekly/5ch",979,weekly,5,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1012/weekly/spouse",1012,weekly,0,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1012/weekly/1ch",1012,weekly,1,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1012/weekly/2ch",1012,weekly,2,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1012/weekly/3ch",1012,weekly,3,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1012/weekly/4ch",1012,weekly,4,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1012/weekly/5ch",1012,weekly,5,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1013/weekly/spouse",1013,weekly,0,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1013/weekly/1ch",1013,weekly,1,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1013/weekly/2ch",1013,weekly,2,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1013/weekly/3ch",1013,weekly,3,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1013/weekly/4ch",1013,weekly,4,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1013/weekly/5ch",1013,weekly,5,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1046/weekly/spouse",1046,weekly,0,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1046/weekly/1ch",1046,weekly,1,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1046/weekly/2ch",1046,weekly,2,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1046/weekly/3ch",1046,weekly,3,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1046/weekly/4ch",1046,weekly,4,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1046/weekly/5ch",1046,weekly,5,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1047/weekly/spouse",1047,weekly,0,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1047/weekly/1ch",1047,weekly,1,15,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1047/weekly/2ch",1047,weekly,2,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1047/weekly/3ch",1047,weekly,3,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1047/weekly/4ch",1047,weekly,4,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1047/weekly/5ch",1047,weekly,5,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1080/weekly/spouse",1080,weekly,0,4,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1080/weekly/1ch",1080,weekly,1,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1080/weekly/2ch",1080,weekly,2,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1080/weekly/3ch",1080,weekly,3,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1080/weekly/4ch",1080,weekly,4,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1080/weekly/5ch",1080,weekly,5,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1081/weekly/spouse",1081,weekly,0,4,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1081/weekly/1ch",1081,weekly,1,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1081/weekly/2ch",1081,weekly,2,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1081/weekly/3ch",1081,weekly,3,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1081/weekly/4ch",1081,weekly,4,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1081/weekly/5ch",1081,weekly,5,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1114/weekly/spouse",1114,weekly,0,2,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1114/weekly/1ch",1114,weekly,1,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1114/weekly/2ch",1114,weekly,2,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1114/weekly/3ch",1114,weekly,3,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1114/weekly/4ch",1114,weekly,4,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1114/weekly/5ch",1114,weekly,5,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1115/weekly/spouse",1115,weekly,0,2,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1115/weekly/1ch",1115,weekly,1,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1115/weekly/2ch",1115,weekly,2,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1115/weekly/3ch",1115,weekly,3,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1115/weekly/4ch",1115,weekly,4,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1115/weekly/5ch",1115,weekly,5,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1148/weekly/spouse",1148,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1148/weekly/1ch",1148,weekly,1,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1148/weekly/2ch",1148,weekly,2,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1148/weekly/3ch",1148,weekly,3,23,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1148/weekly/4ch",1148,weekly,4,23,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1148/weekly/5ch",1148,weekly,5,23,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1149/weekly/spouse",1149,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1149/weekly/1ch",1149,weekly,1,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1149/weekly/2ch",1149,weekly,2,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1149/weekly/3ch",1149,weekly,3,23,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1149/weekly/4ch",1149,weekly,4,23,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1149/weekly/5ch",1149,weekly,5,23,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1182/weekly/spouse",1182,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1182/weekly/1ch",1182,weekly,1,5,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1182/weekly/2ch",1182,weekly,2,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1182/weekly/3ch",1182,weekly,3,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1182/weekly/4ch",1182,weekly,4,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1182/weekly/5ch",1182,weekly,5,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1183/weekly/spouse",1183,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1183/weekly/1ch",1183,weekly,1,4,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1183/weekly/2ch",1183,weekly,2,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1183/weekly/3ch",1183,weekly,3,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1183/weekly/4ch",1183,weekly,4,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1183/weekly/5ch",1183,weekly,5,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1216/weekly/spouse",1216,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1216/weekly/1ch",1216,weekly,1,2,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1216/weekly/2ch",1216,weekly,2,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1216/weekly/3ch",1216,weekly,3,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1216/weekly/4ch",1216,weekly,4,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1216/weekly/5ch",1216,weekly,5,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1217/weekly/spouse",1217,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1217/weekly/1ch",1217,weekly,1,2,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1217/weekly/2ch",1217,weekly,2,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1217/weekly/3ch",1217,weekly,3,18,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1217/weekly/4ch",1217,weekly,4,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1217/weekly/5ch",1217,weekly,5,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1250/weekly/spouse",1250,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1250/weekly/1ch",1250,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1250/weekly/2ch",1250,weekly,2,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1250/weekly/3ch",1250,weekly,3,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1250/weekly/4ch",1250,weekly,4,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1250/weekly/5ch",1250,weekly,5,25,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1251/weekly/spouse",1251,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1251/weekly/1ch",1251,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1251/weekly/2ch",1251,weekly,2,7,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1251/weekly/3ch",1251,weekly,3,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1251/weekly/4ch",1251,weekly,4,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1251/weekly/5ch",1251,weekly,5,25,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1284/weekly/spouse",1284,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1284/weekly/1ch",1284,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1284/weekly/2ch",1284,weekly,2,5,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1284/weekly/3ch",1284,weekly,3,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1284/weekly/4ch",1284,weekly,4,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1284/weekly/5ch",1284,weekly,5,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1285/weekly/spouse",1285,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1285/weekly/1ch",1285,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1285/weekly/2ch",1285,weekly,2,5,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1285/weekly/3ch",1285,weekly,3,13,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1285/weekly/4ch",1285,weekly,4,21,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1285/weekly/5ch",1285,weekly,5,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1318/weekly/spouse",1318,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1318/weekly/1ch",1318,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1318/weekly/2ch",1318,weekly,2,2,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1318/weekly/3ch",1318,weekly,3,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1318/weekly/4ch",1318,weekly,4,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1318/weekly/5ch",1318,weekly,5,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1319/weekly/spouse",1319,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1319/weekly/1ch",1319,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1319/weekly/2ch",1319,weekly,2,2,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1319/weekly/3ch",1319,weekly,3,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1319/weekly/4ch",1319,weekly,4,19,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1319/weekly/5ch",1319,weekly,5,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1551/weekly/spouse",1551,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1551/weekly/1ch",1551,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1551/weekly/2ch",1551,weekly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1551/weekly/3ch",1551,weekly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1551/weekly/4ch",1551,weekly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1551/weekly/5ch",1551,weekly,5,8,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1552/weekly/spouse",1552,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1552/weekly/1ch",1552,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1552/weekly/2ch",1552,weekly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1552/weekly/3ch",1552,weekly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1552/weekly/4ch",1552,weekly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1552/weekly/5ch",1552,weekly,5,8,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1655/weekly/spouse",1655,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1655/weekly/1ch",1655,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1655/weekly/2ch",1655,weekly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1655/weekly/3ch",1655,weekly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1655/weekly/4ch",1655,weekly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1655/weekly/5ch",1655,weekly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1656/weekly/spouse",1656,weekly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1656/weekly/1ch",1656,weekly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1656/weekly/2ch",1656,weekly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1656/weekly/3ch",1656,weekly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1656/weekly/4ch",1656,weekly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1656/weekly/5ch",1656,weekly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1074/fortnightly/spouse",1074,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1074/fortnightly/1ch",1074,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1074/fortnightly/2ch",1074,fortnightly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1074/fortnightly/3ch",1074,fortnightly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1074/fortnightly/4ch",1074,fortnightly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1074/fortnightly/5ch",1074,fortnightly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1076/fortnightly/spouse",1076,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1076/fortnightly/1ch",1076,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1076/fortnightly/2ch",1076,fortnightly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1076/fortnightly/3ch",1076,fortnightly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1076/fortnightly/4ch",1076,fortnightly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1076/fortnightly/5ch",1076,fortnightly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1208/fortnightly/spouse",1208,fortnightly,0,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1208/fortnightly/1ch",1208,fortnightly,1,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1208/fortnightly/2ch",1208,fortnightly,2,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1208/fortnightly/3ch",1208,fortnightly,3,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1208/fortnightly/4ch",1208,fortnightly,4,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1208/fortnightly/5ch",1208,fortnightly,5,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1210/fortnightly/spouse",1210,fortnightly,0,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1210/fortnightly/1ch",1210,fortnightly,1,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1210/fortnightly/2ch",1210,fortnightly,2,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1210/fortnightly/3ch",1210,fortnightly,3,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1210/fortnightly/4ch",1210,fortnightly,4,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1210/fortnightly/5ch",1210,fortnightly,5,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1344/fortnightly/spouse",1344,fortnightly,0,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1344/fortnightly/1ch",1344,fortnightly,1,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1344/fortnightly/2ch",1344,fortnightly,2,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1344/fortnightly/3ch",1344,fortnightly,3,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1344/fortnightly/4ch",1344,fortnightly,4,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1344/fortnightly/5ch",1344,fortnightly,5,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1346/fortnightly/spouse",1346,fortnightly,0,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1346/fortnightly/1ch",1346,fortnightly,1,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1346/fortnightly/2ch",1346,fortnightly,2,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1346/fortnightly/3ch",1346,fortnightly,3,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1346/fortnightly/4ch",1346,fortnightly,4,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1346/fortnightly/5ch",1346,fortnightly,5,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1412/fortnightly/spouse",1412,fortnightly,0,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1412/fortnightly/1ch",1412,fortnightly,1,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1412/fortnightly/2ch",1412,fortnightly,2,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1412/fortnightly/3ch",1412,fortnightly,3,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1412/fortnightly/4ch",1412,fortnightly,4,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1412/fortnightly/5ch",1412,fortnightly,5,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1414/fortnightly/spouse",1414,fortnightly,0,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1414/fortnightly/1ch",1414,fortnightly,1,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1414/fortnightly/2ch",1414,fortnightly,2,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1414/fortnightly/3ch",1414,fortnightly,3,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1414/fortnightly/4ch",1414,fortnightly,4,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1414/fortnightly/5ch",1414,fortnightly,5,28,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1480/fortnightly/spouse",1480,fortnightly,0,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1480/fortnightly/1ch",1480,fortnightly,1,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1480/fortnightly/2ch",1480,fortnightly,2,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1480/fortnightly/3ch",1480,fortnightly,3,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1480/fortnightly/4ch",1480,fortnightly,4,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1480/fortnightly/5ch",1480,fortnightly,5,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1482/fortnightly/spouse",1482,fortnightly,0,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1482/fortnightly/1ch",1482,fortnightly,1,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1482/fortnightly/2ch",1482,fortnightly,2,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1482/fortnightly/3ch",1482,fortnightly,3,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1482/fortnightly/4ch",1482,fortnightly,4,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1482/fortnightly/5ch",1482,fortnightly,5,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1548/fortnightly/spouse",1548,fortnightly,0,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1548/fortnightly/1ch",1548,fortnightly,1,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1548/fortnightly/2ch",1548,fortnightly,2,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1548/fortnightly/3ch",1548,fortnightly,3,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1548/fortnightly/4ch",1548,fortnightly,4,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1548/fortnightly/5ch",1548,fortnightly,5,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1550/fortnightly/spouse",1550,fortnightly,0,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1550/fortnightly/1ch",1550,fortnightly,1,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1550/fortnightly/2ch",1550,fortnightly,2,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1550/fortnightly/3ch",1550,fortnightly,3,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1550/fortnightly/4ch",1550,fortnightly,4,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1550/fortnightly/5ch",1550,fortnightly,5,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1616/fortnightly/spouse",1616,fortnightly,0,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1616/fortnightly/1ch",1616,fortnightly,1,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1616/fortnightly/2ch",1616,fortnightly,2,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1616/fortnightly/3ch",1616,fortnightly,3,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1616/fortnightly/4ch",1616,fortnightly,4,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1616/fortnightly/5ch",1616,fortnightly,5,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1618/fortnightly/spouse",1618,fortnightly,0,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1618/fortnightly/1ch",1618,fortnightly,1,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1618/fortnightly/2ch",1618,fortnightly,2,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1618/fortnightly/3ch",1618,fortnightly,3,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1618/fortnightly/4ch",1618,fortnightly,4,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1618/fortnightly/5ch",1618,fortnightly,5,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1684/fortnightly/spouse",1684,fortnightly,0,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1684/fortnightly/1ch",1684,fortnightly,1,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1684/fortnightly/2ch",1684,fortnightly,2,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1684/fortnightly/3ch",1684,fortnightly,3,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1684/fortnightly/4ch",1684,fortnightly,4,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1684/fortnightly/5ch",1684,fortnightly,5,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1686/fortnightly/spouse",1686,fortnightly,0,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1686/fortnightly/1ch",1686,fortnightly,1,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1686/fortnightly/2ch",1686,fortnightly,2,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1686/fortnightly/3ch",1686,fortnightly,3,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1686/fortnightly/4ch",1686,fortnightly,4,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1686/fortnightly/5ch",1686,fortnightly,5,34,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1752/fortnightly/spouse",1752,fortnightly,0,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1752/fortnightly/1ch",1752,fortnightly,1,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1752/fortnightly/2ch",1752,fortnightly,2,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1752/fortnightly/3ch",1752,fortnightly,3,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1752/fortnightly/4ch",1752,fortnightly,4,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1752/fortnightly/5ch",1752,fortnightly,5,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1754/fortnightly/spouse",1754,fortnightly,0,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1754/fortnightly/1ch",1754,fortnightly,1,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1754/fortnightly/2ch",1754,fortnightly,2,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1754/fortnightly/3ch",1754,fortnightly,3,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1754/fortnightly/4ch",1754,fortnightly,4,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1754/fortnightly/5ch",1754,fortnightly,5,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1820/fortnightly/spouse",1820,fortnightly,0,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1820/fortnightly/1ch",1820,fortnightly,1,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1820/fortnightly/2ch",1820,fortnightly,2,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1820/fortnightly/3ch",1820,fortnightly,3,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1820/fortnightly/4ch",1820,fortnightly,4,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1820/fortnightly/5ch",1820,fortnightly,5,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1822/fortnightly/spouse",1822,fortnightly,0,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1822/fortnightly/1ch",1822,fortnightly,1,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1822/fortnightly/2ch",1822,fortnightly,2,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1822/fortnightly/3ch",1822,fortnightly,3,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1822/fortnightly/4ch",1822,fortnightly,4,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1822/fortnightly/5ch",1822,fortnightly,5,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1888/fortnightly/spouse",1888,fortnightly,0,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1888/fortnightly/1ch",1888,fortnightly,1,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1888/fortnightly/2ch",1888,fortnightly,2,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1888/fortnightly/3ch",1888,fortnightly,3,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1888/fortnightly/4ch",1888,fortnightly,4,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1888/fortnightly/5ch",1888,fortnightly,5,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1890/fortnightly/spouse",1890,fortnightly,0,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1890/fortnightly/1ch",1890,fortnightly,1,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1890/fortnightly/2ch",1890,fortnightly,2,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1890/fortnightly/3ch",1890,fortnightly,3,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1890/fortnightly/4ch",1890,fortnightly,4,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1890/fortnightly/5ch",1890,fortnightly,5,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1956/fortnightly/spouse",1956,fortnightly,0,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1956/fortnightly/1ch",1956,fortnightly,1,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1956/fortnightly/2ch",1956,fortnightly,2,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1956/fortnightly/3ch",1956,fortnightly,3,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1956/fortnightly/4ch",1956,fortnightly,4,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1956/fortnightly/5ch",1956,fortnightly,5,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1958/fortnightly/spouse",1958,fortnightly,0,24,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1958/fortnightly/1ch",1958,fortnightly,1,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1958/fortnightly/2ch",1958,fortnightly,2,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1958/fortnightly/3ch",1958,fortnightly,3,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1958/fortnightly/4ch",1958,fortnightly,4,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $1958/fortnightly/5ch",1958,fortnightly,5,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2024/fortnightly/spouse",2024,fortnightly,0,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2024/fortnightly/1ch",2024,fortnightly,1,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2024/fortnightly/2ch",2024,fortnightly,2,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2024/fortnightly/3ch",2024,fortnightly,3,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2024/fortnightly/4ch",2024,fortnightly,4,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2024/fortnightly/5ch",2024,fortnightly,5,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2026/fortnightly/spouse",2026,fortnightly,0,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2026/fortnightly/1ch",2026,fortnightly,1,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2026/fortnightly/2ch",2026,fortnightly,2,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2026/fortnightly/3ch",2026,fortnightly,3,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2026/fortnightly/4ch",2026,fortnightly,4,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2026/fortnightly/5ch",2026,fortnightly,5,40,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2092/fortnightly/spouse",2092,fortnightly,0,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2092/fortnightly/1ch",2092,fortnightly,1,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2092/fortnightly/2ch",2092,fortnightly,2,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2092/fortnightly/3ch",2092,fortnightly,3,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2092/fortnightly/4ch",2092,fortnightly,4,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2092/fortnightly/5ch",2092,fortnightly,5,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2094/fortnightly/spouse",2094,fortnightly,0,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2094/fortnightly/1ch",2094,fortnightly,1,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2094/fortnightly/2ch",2094,fortnightly,2,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2094/fortnightly/3ch",2094,fortnightly,3,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2094/fortnightly/4ch",2094,fortnightly,4,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2094/fortnightly/5ch",2094,fortnightly,5,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2160/fortnightly/spouse",2160,fortnightly,0,8,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2160/fortnightly/1ch",2160,fortnightly,1,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2160/fortnightly/2ch",2160,fortnightly,2,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2160/fortnightly/3ch",2160,fortnightly,3,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2160/fortnightly/4ch",2160,fortnightly,4,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2160/fortnightly/5ch",2160,fortnightly,5,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2162/fortnightly/spouse",2162,fortnightly,0,8,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2162/fortnightly/1ch",2162,fortnightly,1,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2162/fortnightly/2ch",2162,fortnightly,2,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2162/fortnightly/3ch",2162,fortnightly,3,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2162/fortnightly/4ch",2162,fortnightly,4,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2162/fortnightly/5ch",2162,fortnightly,5,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2228/fortnightly/spouse",2228,fortnightly,0,4,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2228/fortnightly/1ch",2228,fortnightly,1,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2228/fortnightly/2ch",2228,fortnightly,2,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2228/fortnightly/3ch",2228,fortnightly,3,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2228/fortnightly/4ch",2228,fortnightly,4,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2228/fortnightly/5ch",2228,fortnightly,5,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2230/fortnightly/spouse",2230,fortnightly,0,4,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2230/fortnightly/1ch",2230,fortnightly,1,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2230/fortnightly/2ch",2230,fortnightly,2,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2230/fortnightly/3ch",2230,fortnightly,3,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2230/fortnightly/4ch",2230,fortnightly,4,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2230/fortnightly/5ch",2230,fortnightly,5,44,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2296/fortnightly/spouse",2296,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2296/fortnightly/1ch",2296,fortnightly,1,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2296/fortnightly/2ch",2296,fortnightly,2,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2296/fortnightly/3ch",2296,fortnightly,3,46,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2296/fortnightly/4ch",2296,fortnightly,4,46,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2296/fortnightly/5ch",2296,fortnightly,5,46,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2298/fortnightly/spouse",2298,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2298/fortnightly/1ch",2298,fortnightly,1,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2298/fortnightly/2ch",2298,fortnightly,2,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2298/fortnightly/3ch",2298,fortnightly,3,46,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2298/fortnightly/4ch",2298,fortnightly,4,46,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2298/fortnightly/5ch",2298,fortnightly,5,46,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2364/fortnightly/spouse",2364,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2364/fortnightly/1ch",2364,fortnightly,1,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2364/fortnightly/2ch",2364,fortnightly,2,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2364/fortnightly/3ch",2364,fortnightly,3,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2364/fortnightly/4ch",2364,fortnightly,4,48,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2364/fortnightly/5ch",2364,fortnightly,5,48,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2366/fortnightly/spouse",2366,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2366/fortnightly/1ch",2366,fortnightly,1,8,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2366/fortnightly/2ch",2366,fortnightly,2,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2366/fortnightly/3ch",2366,fortnightly,3,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2366/fortnightly/4ch",2366,fortnightly,4,48,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2366/fortnightly/5ch",2366,fortnightly,5,48,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2432/fortnightly/spouse",2432,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2432/fortnightly/1ch",2432,fortnightly,1,4,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2432/fortnightly/2ch",2432,fortnightly,2,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2432/fortnightly/3ch",2432,fortnightly,3,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2432/fortnightly/4ch",2432,fortnightly,4,48,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2432/fortnightly/5ch",2432,fortnightly,5,48,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2434/fortnightly/spouse",2434,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2434/fortnightly/1ch",2434,fortnightly,1,4,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2434/fortnightly/2ch",2434,fortnightly,2,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2434/fortnightly/3ch",2434,fortnightly,3,36,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2434/fortnightly/4ch",2434,fortnightly,4,48,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2434/fortnightly/5ch",2434,fortnightly,5,48,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2500/fortnightly/spouse",2500,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2500/fortnightly/1ch",2500,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2500/fortnightly/2ch",2500,fortnightly,2,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2500/fortnightly/3ch",2500,fortnightly,3,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2500/fortnightly/4ch",2500,fortnightly,4,48,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2500/fortnightly/5ch",2500,fortnightly,5,50,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2502/fortnightly/spouse",2502,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2502/fortnightly/1ch",2502,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2502/fortnightly/2ch",2502,fortnightly,2,14,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2502/fortnightly/3ch",2502,fortnightly,3,32,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2502/fortnightly/4ch",2502,fortnightly,4,48,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2502/fortnightly/5ch",2502,fortnightly,5,50,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2568/fortnightly/spouse",2568,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2568/fortnightly/1ch",2568,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2568/fortnightly/2ch",2568,fortnightly,2,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2568/fortnightly/3ch",2568,fortnightly,3,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2568/fortnightly/4ch",2568,fortnightly,4,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2568/fortnightly/5ch",2568,fortnightly,5,52,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2570/fortnightly/spouse",2570,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2570/fortnightly/1ch",2570,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2570/fortnightly/2ch",2570,fortnightly,2,10,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2570/fortnightly/3ch",2570,fortnightly,3,26,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2570/fortnightly/4ch",2570,fortnightly,4,42,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2570/fortnightly/5ch",2570,fortnightly,5,52,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2636/fortnightly/spouse",2636,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2636/fortnightly/1ch",2636,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2636/fortnightly/2ch",2636,fortnightly,2,4,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2636/fortnightly/3ch",2636,fortnightly,3,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2636/fortnightly/4ch",2636,fortnightly,4,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2636/fortnightly/5ch",2636,fortnightly,5,52,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2638/fortnightly/spouse",2638,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2638/fortnightly/1ch",2638,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2638/fortnightly/2ch",2638,fortnightly,2,4,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2638/fortnightly/3ch",2638,fortnightly,3,20,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2638/fortnightly/4ch",2638,fortnightly,4,38,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2638/fortnightly/5ch",2638,fortnightly,5,52,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3102/fortnightly/spouse",3102,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3102/fortnightly/1ch",3102,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3102/fortnightly/2ch",3102,fortnightly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3102/fortnightly/3ch",3102,fortnightly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3102/fortnightly/4ch",3102,fortnightly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3102/fortnightly/5ch",3102,fortnightly,5,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3104/fortnightly/spouse",3104,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3104/fortnightly/1ch",3104,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3104/fortnightly/2ch",3104,fortnightly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3104/fortnightly/3ch",3104,fortnightly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3104/fortnightly/4ch",3104,fortnightly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3104/fortnightly/5ch",3104,fortnightly,5,16,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3310/fortnightly/spouse",3310,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3310/fortnightly/1ch",3310,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3310/fortnightly/2ch",3310,fortnightly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3310/fortnightly/3ch",3310,fortnightly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3310/fortnightly/4ch",3310,fortnightly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3310/fortnightly/5ch",3310,fortnightly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3312/fortnightly/spouse",3312,fortnightly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3312/fortnightly/1ch",3312,fortnightly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3312/fortnightly/2ch",3312,fortnightly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3312/fortnightly/3ch",3312,fortnightly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3312/fortnightly/4ch",3312,fortnightly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3312/fortnightly/5ch",3312,fortnightly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2327.00/monthly/spouse",2327,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2327.00/monthly/1ch",2327,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2327.00/monthly/2ch",2327,monthly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2327.00/monthly/3ch",2327,monthly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2327.00/monthly/4ch",2327,monthly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2327.00/monthly/5ch",2327,monthly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2331.33/monthly/spouse",2331.33,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2331.33/monthly/1ch",2331.33,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2331.33/monthly/2ch",2331.33,monthly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2331.33/monthly/3ch",2331.33,monthly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2331.33/monthly/4ch",2331.33,monthly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2331.33/monthly/5ch",2331.33,monthly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2617.33/monthly/spouse",2617.33,monthly,0,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2617.33/monthly/1ch",2617.33,monthly,1,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2617.33/monthly/2ch",2617.33,monthly,2,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2617.33/monthly/3ch",2617.33,monthly,3,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2617.33/monthly/4ch",2617.33,monthly,4,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2617.33/monthly/5ch",2617.33,monthly,5,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2621.67/monthly/spouse",2621.67,monthly,0,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2621.67/monthly/1ch",2621.67,monthly,1,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2621.67/monthly/2ch",2621.67,monthly,2,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2621.67/monthly/3ch",2621.67,monthly,3,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2621.67/monthly/4ch",2621.67,monthly,4,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2621.67/monthly/5ch",2621.67,monthly,5,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2912.00/monthly/spouse",2912,monthly,0,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2912.00/monthly/1ch",2912,monthly,1,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2912.00/monthly/2ch",2912,monthly,2,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2912.00/monthly/3ch",2912,monthly,3,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2912.00/monthly/4ch",2912,monthly,4,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2912.00/monthly/5ch",2912,monthly,5,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2916.33/monthly/spouse",2916.33,monthly,0,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2916.33/monthly/1ch",2916.33,monthly,1,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2916.33/monthly/2ch",2916.33,monthly,2,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2916.33/monthly/3ch",2916.33,monthly,3,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2916.33/monthly/4ch",2916.33,monthly,4,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $2916.33/monthly/5ch",2916.33,monthly,5,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3059.33/monthly/spouse",3059.33,monthly,0,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3059.33/monthly/1ch",3059.33,monthly,1,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3059.33/monthly/2ch",3059.33,monthly,2,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3059.33/monthly/3ch",3059.33,monthly,3,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3059.33/monthly/4ch",3059.33,monthly,4,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3059.33/monthly/5ch",3059.33,monthly,5,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3063.67/monthly/spouse",3063.67,monthly,0,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3063.67/monthly/1ch",3063.67,monthly,1,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3063.67/monthly/2ch",3063.67,monthly,2,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3063.67/monthly/3ch",3063.67,monthly,3,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3063.67/monthly/4ch",3063.67,monthly,4,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3063.67/monthly/5ch",3063.67,monthly,5,61,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3206.67/monthly/spouse",3206.67,monthly,0,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3206.67/monthly/1ch",3206.67,monthly,1,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3206.67/monthly/2ch",3206.67,monthly,2,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3206.67/monthly/3ch",3206.67,monthly,3,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3206.67/monthly/4ch",3206.67,monthly,4,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3206.67/monthly/5ch",3206.67,monthly,5,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3211.00/monthly/spouse",3211,monthly,0,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3211.00/monthly/1ch",3211,monthly,1,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3211.00/monthly/2ch",3211,monthly,2,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3211.00/monthly/3ch",3211,monthly,3,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3211.00/monthly/4ch",3211,monthly,4,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3211.00/monthly/5ch",3211,monthly,5,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3354.00/monthly/spouse",3354,monthly,0,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3354.00/monthly/1ch",3354,monthly,1,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3354.00/monthly/2ch",3354,monthly,2,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3354.00/monthly/3ch",3354,monthly,3,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3354.00/monthly/4ch",3354,monthly,4,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3354.00/monthly/5ch",3354,monthly,5,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3358.33/monthly/spouse",3358.33,monthly,0,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3358.33/monthly/1ch",3358.33,monthly,1,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3358.33/monthly/2ch",3358.33,monthly,2,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3358.33/monthly/3ch",3358.33,monthly,3,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3358.33/monthly/4ch",3358.33,monthly,4,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3358.33/monthly/5ch",3358.33,monthly,5,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3501.33/monthly/spouse",3501.33,monthly,0,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3501.33/monthly/1ch",3501.33,monthly,1,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3501.33/monthly/2ch",3501.33,monthly,2,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3501.33/monthly/3ch",3501.33,monthly,3,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3501.33/monthly/4ch",3501.33,monthly,4,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3501.33/monthly/5ch",3501.33,monthly,5,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3505.67/monthly/spouse",3505.67,monthly,0,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3505.67/monthly/1ch",3505.67,monthly,1,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3505.67/monthly/2ch",3505.67,monthly,2,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3505.67/monthly/3ch",3505.67,monthly,3,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3505.67/monthly/4ch",3505.67,monthly,4,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3505.67/monthly/5ch",3505.67,monthly,5,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3648.67/monthly/spouse",3648.67,monthly,0,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3648.67/monthly/1ch",3648.67,monthly,1,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3648.67/monthly/2ch",3648.67,monthly,2,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3648.67/monthly/3ch",3648.67,monthly,3,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3648.67/monthly/4ch",3648.67,monthly,4,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3648.67/monthly/5ch",3648.67,monthly,5,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3653.00/monthly/spouse",3653,monthly,0,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3653.00/monthly/1ch",3653,monthly,1,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3653.00/monthly/2ch",3653,monthly,2,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3653.00/monthly/3ch",3653,monthly,3,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3653.00/monthly/4ch",3653,monthly,4,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3653.00/monthly/5ch",3653,monthly,5,74,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3796.00/monthly/spouse",3796,monthly,0,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3796.00/monthly/1ch",3796,monthly,1,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3796.00/monthly/2ch",3796,monthly,2,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3796.00/monthly/3ch",3796,monthly,3,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3796.00/monthly/4ch",3796,monthly,4,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3796.00/monthly/5ch",3796,monthly,5,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3800.33/monthly/spouse",3800.33,monthly,0,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3800.33/monthly/1ch",3800.33,monthly,1,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3800.33/monthly/2ch",3800.33,monthly,2,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3800.33/monthly/3ch",3800.33,monthly,3,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3800.33/monthly/4ch",3800.33,monthly,4,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3800.33/monthly/5ch",3800.33,monthly,5,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3943.33/monthly/spouse",3943.33,monthly,0,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3943.33/monthly/1ch",3943.33,monthly,1,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3943.33/monthly/2ch",3943.33,monthly,2,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3943.33/monthly/3ch",3943.33,monthly,3,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3943.33/monthly/4ch",3943.33,monthly,4,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3943.33/monthly/5ch",3943.33,monthly,5,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3947.67/monthly/spouse",3947.67,monthly,0,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3947.67/monthly/1ch",3947.67,monthly,1,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3947.67/monthly/2ch",3947.67,monthly,2,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3947.67/monthly/3ch",3947.67,monthly,3,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3947.67/monthly/4ch",3947.67,monthly,4,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $3947.67/monthly/5ch",3947.67,monthly,5,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4090.67/monthly/spouse",4090.67,monthly,0,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4090.67/monthly/1ch",4090.67,monthly,1,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4090.67/monthly/2ch",4090.67,monthly,2,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4090.67/monthly/3ch",4090.67,monthly,3,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4090.67/monthly/4ch",4090.67,monthly,4,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4090.67/monthly/5ch",4090.67,monthly,5,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4095.00/monthly/spouse",4095,monthly,0,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4095.00/monthly/1ch",4095,monthly,1,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4095.00/monthly/2ch",4095,monthly,2,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4095.00/monthly/3ch",4095,monthly,3,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4095.00/monthly/4ch",4095,monthly,4,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4095.00/monthly/5ch",4095,monthly,5,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4238.00/monthly/spouse",4238,monthly,0,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4238.00/monthly/1ch",4238,monthly,1,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4238.00/monthly/2ch",4238,monthly,2,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4238.00/monthly/3ch",4238,monthly,3,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4238.00/monthly/4ch",4238,monthly,4,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4238.00/monthly/5ch",4238,monthly,5,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4242.33/monthly/spouse",4242.33,monthly,0,52,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4242.33/monthly/1ch",4242.33,monthly,1,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4242.33/monthly/2ch",4242.33,monthly,2,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4242.33/monthly/3ch",4242.33,monthly,3,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4242.33/monthly/4ch",4242.33,monthly,4,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4242.33/monthly/5ch",4242.33,monthly,5,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4385.33/monthly/spouse",4385.33,monthly,0,43,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4385.33/monthly/1ch",4385.33,monthly,1,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4385.33/monthly/2ch",4385.33,monthly,2,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4385.33/monthly/3ch",4385.33,monthly,3,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4385.33/monthly/4ch",4385.33,monthly,4,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4385.33/monthly/5ch",4385.33,monthly,5,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4389.67/monthly/spouse",4389.67,monthly,0,43,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4389.67/monthly/1ch",4389.67,monthly,1,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4389.67/monthly/2ch",4389.67,monthly,2,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4389.67/monthly/3ch",4389.67,monthly,3,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4389.67/monthly/4ch",4389.67,monthly,4,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4389.67/monthly/5ch",4389.67,monthly,5,87,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4532.67/monthly/spouse",4532.67,monthly,0,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4532.67/monthly/1ch",4532.67,monthly,1,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4532.67/monthly/2ch",4532.67,monthly,2,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4532.67/monthly/3ch",4532.67,monthly,3,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4532.67/monthly/4ch",4532.67,monthly,4,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4532.67/monthly/5ch",4532.67,monthly,5,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4537.00/monthly/spouse",4537,monthly,0,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4537.00/monthly/1ch",4537,monthly,1,65,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4537.00/monthly/2ch",4537,monthly,2,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4537.00/monthly/3ch",4537,monthly,3,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4537.00/monthly/4ch",4537,monthly,4,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4537.00/monthly/5ch",4537,monthly,5,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4680.00/monthly/spouse",4680,monthly,0,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4680.00/monthly/1ch",4680,monthly,1,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4680.00/monthly/2ch",4680,monthly,2,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4680.00/monthly/3ch",4680,monthly,3,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4680.00/monthly/4ch",4680,monthly,4,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4680.00/monthly/5ch",4680,monthly,5,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4684.33/monthly/spouse",4684.33,monthly,0,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4684.33/monthly/1ch",4684.33,monthly,1,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4684.33/monthly/2ch",4684.33,monthly,2,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4684.33/monthly/3ch",4684.33,monthly,3,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4684.33/monthly/4ch",4684.33,monthly,4,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4684.33/monthly/5ch",4684.33,monthly,5,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4827.33/monthly/spouse",4827.33,monthly,0,9,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4827.33/monthly/1ch",4827.33,monthly,1,43,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4827.33/monthly/2ch",4827.33,monthly,2,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4827.33/monthly/3ch",4827.33,monthly,3,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4827.33/monthly/4ch",4827.33,monthly,4,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4827.33/monthly/5ch",4827.33,monthly,5,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4831.67/monthly/spouse",4831.67,monthly,0,9,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4831.67/monthly/1ch",4831.67,monthly,1,43,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4831.67/monthly/2ch",4831.67,monthly,2,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4831.67/monthly/3ch",4831.67,monthly,3,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4831.67/monthly/4ch",4831.67,monthly,4,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4831.67/monthly/5ch",4831.67,monthly,5,95,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4974.67/monthly/spouse",4974.67,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4974.67/monthly/1ch",4974.67,monthly,1,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4974.67/monthly/2ch",4974.67,monthly,2,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4974.67/monthly/3ch",4974.67,monthly,3,100,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4974.67/monthly/4ch",4974.67,monthly,4,100,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4974.67/monthly/5ch",4974.67,monthly,5,100,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4979.00/monthly/spouse",4979,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4979.00/monthly/1ch",4979,monthly,1,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4979.00/monthly/2ch",4979,monthly,2,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4979.00/monthly/3ch",4979,monthly,3,100,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4979.00/monthly/4ch",4979,monthly,4,100,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $4979.00/monthly/5ch",4979,monthly,5,100,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5122.00/monthly/spouse",5122,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5122.00/monthly/1ch",5122,monthly,1,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5122.00/monthly/2ch",5122,monthly,2,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5122.00/monthly/3ch",5122,monthly,3,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5122.00/monthly/4ch",5122,monthly,4,104,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5122.00/monthly/5ch",5122,monthly,5,104,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5126.33/monthly/spouse",5126.33,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5126.33/monthly/1ch",5126.33,monthly,1,17,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5126.33/monthly/2ch",5126.33,monthly,2,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5126.33/monthly/3ch",5126.33,monthly,3,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5126.33/monthly/4ch",5126.33,monthly,4,104,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5126.33/monthly/5ch",5126.33,monthly,5,104,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5269.33/monthly/spouse",5269.33,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5269.33/monthly/1ch",5269.33,monthly,1,9,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5269.33/monthly/2ch",5269.33,monthly,2,43,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5269.33/monthly/3ch",5269.33,monthly,3,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5269.33/monthly/4ch",5269.33,monthly,4,104,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5269.33/monthly/5ch",5269.33,monthly,5,104,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5273.67/monthly/spouse",5273.67,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5273.67/monthly/1ch",5273.67,monthly,1,9,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5273.67/monthly/2ch",5273.67,monthly,2,43,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5273.67/monthly/3ch",5273.67,monthly,3,78,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5273.67/monthly/4ch",5273.67,monthly,4,104,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5273.67/monthly/5ch",5273.67,monthly,5,104,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5416.67/monthly/spouse",5416.67,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5416.67/monthly/1ch",5416.67,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5416.67/monthly/2ch",5416.67,monthly,2,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5416.67/monthly/3ch",5416.67,monthly,3,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5416.67/monthly/4ch",5416.67,monthly,4,104,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5416.67/monthly/5ch",5416.67,monthly,5,108,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5421.00/monthly/spouse",5421,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5421.00/monthly/1ch",5421,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5421.00/monthly/2ch",5421,monthly,2,30,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5421.00/monthly/3ch",5421,monthly,3,69,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5421.00/monthly/4ch",5421,monthly,4,104,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5421.00/monthly/5ch",5421,monthly,5,108,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5564.00/monthly/spouse",5564,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5564.00/monthly/1ch",5564,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5564.00/monthly/2ch",5564,monthly,2,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5564.00/monthly/3ch",5564,monthly,3,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5564.00/monthly/4ch",5564,monthly,4,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5564.00/monthly/5ch",5564,monthly,5,113,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5568.33/monthly/spouse",5568.33,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5568.33/monthly/1ch",5568.33,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5568.33/monthly/2ch",5568.33,monthly,2,22,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5568.33/monthly/3ch",5568.33,monthly,3,56,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5568.33/monthly/4ch",5568.33,monthly,4,91,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5568.33/monthly/5ch",5568.33,monthly,5,113,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5711.33/monthly/spouse",5711.33,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5711.33/monthly/1ch",5711.33,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5711.33/monthly/2ch",5711.33,monthly,2,9,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5711.33/monthly/3ch",5711.33,monthly,3,43,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5711.33/monthly/4ch",5711.33,monthly,4,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5711.33/monthly/5ch",5711.33,monthly,5,113,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5715.67/monthly/spouse",5715.67,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5715.67/monthly/1ch",5715.67,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5715.67/monthly/2ch",5715.67,monthly,2,9,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5715.67/monthly/3ch",5715.67,monthly,3,43,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5715.67/monthly/4ch",5715.67,monthly,4,82,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $5715.67/monthly/5ch",5715.67,monthly,5,113,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6721.00/monthly/spouse",6721,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6721.00/monthly/1ch",6721,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6721.00/monthly/2ch",6721,monthly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6721.00/monthly/3ch",6721,monthly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6721.00/monthly/4ch",6721,monthly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6721.00/monthly/5ch",6721,monthly,5,35,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6725.33/monthly/spouse",6725.33,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6725.33/monthly/1ch",6725.33,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6725.33/monthly/2ch",6725.33,monthly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6725.33/monthly/3ch",6725.33,monthly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6725.33/monthly/4ch",6725.33,monthly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $6725.33/monthly/5ch",6725.33,monthly,5,35,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7171.67/monthly/spouse",7171.67,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7171.67/monthly/1ch",7171.67,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7171.67/monthly/2ch",7171.67,monthly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7171.67/monthly/3ch",7171.67,monthly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7171.67/monthly/4ch",7171.67,monthly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7171.67/monthly/5ch",7171.67,monthly,5,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7176.00/monthly/spouse",7176,monthly,0,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7176.00/monthly/1ch",7176,monthly,1,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7176.00/monthly/2ch",7176,monthly,2,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7176.00/monthly/3ch",7176,monthly,3,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7176.00/monthly/4ch",7176,monthly,4,0,"ATO MLA Scale 2 2026-27 sample data"
+"MLA2 $7176.00/monthly/5ch",7176,monthly,5,0,"ATO MLA Scale 2 2026-27 sample data"
