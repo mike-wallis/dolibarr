@@ -117,6 +117,30 @@ if ($action === 'download_template_stsl') {
     exit;
 }
 
+// ── Bundled ATO data file downloads ──────────────────────────────────────────
+// Serves the pre-built ATO sample data CSVs from the module's data/ directory.
+// Files are FY-specific; add a new file each July for the new financial year.
+$bundled_files = [
+    'download_ato_withholding' => ['ato-withholding-2026-27.csv', 'ato-withholding-2026-27.csv'],
+    'download_ato_mla2'        => ['ato-mla2-2026-27.csv',        'ato-mla2-2026-27.csv'],
+    'download_ato_mla6'        => ['ato-mla6-2026-27.csv',        'ato-mla6-2026-27.csv'],
+    'download_ato_stsl'        => ['ato-stsl-2026-27.csv',        'ato-stsl-2026-27.csv'],
+];
+if (isset($bundled_files[$action])) {
+    [$filename, $download_name] = $bundled_files[$action];
+    $path = dol_buildpath('/custom/payroll/data/' . $filename, 0);
+    if (!file_exists($path)) {
+        http_response_code(404);
+        echo 'File not found: ' . htmlspecialchars($filename);
+        exit;
+    }
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: attachment; filename="' . $download_name . '"');
+    header('Content-Length: ' . filesize($path));
+    readfile($path);
+    exit;
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function payroll_fy_options($db, $conf)
@@ -1450,10 +1474,15 @@ $wth_by_fy = group_by_fy($test_wth_rows);
       'Columns: <code>label,gross,period,scale,expected_payg,source</code><br>'
       . '<code>scale</code>: scale1–scale6 &nbsp;·&nbsp; <code>period</code>: weekly | fortnightly | monthly'
   ); ?>
-  <div style="font-size:0.85em;color:#555;max-width:280px;padding-top:0.5rem;">
-    <strong>Available file:</strong><br>
-    <code>imports/payroll/ato-withholding-2026-27.csv</code><br>
-    (685 rows — weekly, fortnightly, monthly, all 5 scales)
+  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:220px;max-width:280px;">
+    <strong>Bundled ATO data</strong>
+    <p style="font-size:0.85em;color:#555;margin:0.4rem 0 0.75rem;">
+      Pre-built 2026-27 file from the ATO's<br><em>Withholding amounts sample data</em> PDF.<br>
+      <span style="color:#888;">685 rows — all 5 scales, 3 periods.</span>
+    </p>
+    <a href="<?= $base_url ?>&amp;action=download_ato_withholding" class="button">
+      Download 2026-27 ATO data
+    </a>
   </div>
 </div>
 
@@ -1491,10 +1520,15 @@ $mla2_by_fy = group_by_fy($test_mla2_rows);
       'Columns: <code>label,gross,period,num_dependants,expected_adjustment,source</code><br>'
       . '<code>num_dependants</code>: 0=spouse only, 1–5=number of children'
   ); ?>
-  <div style="font-size:0.85em;color:#555;max-width:280px;padding-top:0.5rem;">
-    <strong>Available file:</strong><br>
-    <code>imports/payroll/ato-mla2-2026-27.csv</code><br>
-    (804 rows — weekly, fortnightly, monthly × 6 dep types)
+  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:220px;max-width:280px;">
+    <strong>Bundled ATO data</strong>
+    <p style="font-size:0.85em;color:#555;margin:0.4rem 0 0.75rem;">
+      Pre-built 2026-27 file from the ATO's<br><em>Medicare levy adjustment scale 2 sample data</em>.<br>
+      <span style="color:#888;">804 rows — 3 periods, spouse + 5 child counts.</span>
+    </p>
+    <a href="<?= $base_url ?>&amp;action=download_ato_mla2" class="button">
+      Download 2026-27 ATO data
+    </a>
   </div>
 </div>
 
@@ -1532,10 +1566,15 @@ $mla6_by_fy = group_by_fy($test_mla6_rows);
       'Columns: <code>label,gross,period,num_children,expected_adjustment,source</code><br>'
       . '<code>num_children</code>: 1–5'
   ); ?>
-  <div style="font-size:0.85em;color:#555;max-width:280px;padding-top:0.5rem;">
-    <strong>Available file:</strong><br>
-    <code>imports/payroll/ato-mla6-2026-27.csv</code><br>
-    (660 rows — weekly, fortnightly, monthly × 5 child counts)
+  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:220px;max-width:280px;">
+    <strong>Bundled ATO data</strong>
+    <p style="font-size:0.85em;color:#555;margin:0.4rem 0 0.75rem;">
+      Pre-built 2026-27 file from the ATO's<br><em>Medicare half-levy adjustment scale 6 sample data</em>.<br>
+      <span style="color:#888;">660 rows — 3 periods, 1–5 children.</span>
+    </p>
+    <a href="<?= $base_url ?>&amp;action=download_ato_mla6" class="button">
+      Download 2026-27 ATO data
+    </a>
   </div>
 </div>
 
@@ -1574,13 +1613,16 @@ $stsl_by_fy = group_by_fy($test_stsl_rows);
       'Columns: <code>label,gross,period,scale,expected_payg,source</code><br>'
       . 'Same format as Withholding amounts; <code>scale</code>: scale1–scale3, scale5, scale6'
   ); ?>
-  <div style="font-size:0.85em;color:#555;max-width:280px;padding-top:0.5rem;">
-    <strong>Available file:</strong><br>
-    <code>imports/payroll/ato-stsl-2026-27.csv</code><br>
-    (1,425 rows — weekly, fortnightly, monthly × 5 scales)
-    <br><br>
-    <em>Note: STSL verification on Payroll Setup is planned for a future update
-    once the STSL calculator is implemented.</em>
+  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:220px;max-width:280px;">
+    <strong>Bundled ATO data</strong>
+    <p style="font-size:0.85em;color:#555;margin:0.4rem 0 0.75rem;">
+      Pre-built 2026-27 file from the ATO's<br><em>STSL Sample Data</em> (NAT 3539).<br>
+      <span style="color:#888;">1,425 rows — 3 periods, 5 scales.</span><br>
+      <em style="color:#999;">Verification coming in a future update.</em>
+    </p>
+    <a href="<?= $base_url ?>&amp;action=download_ato_stsl" class="button">
+      Download 2026-27 ATO data
+    </a>
   </div>
 </div>
 
