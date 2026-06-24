@@ -118,24 +118,31 @@ if ($action === 'download_template_stsl') {
 }
 
 // ── Bundled ATO data file downloads ──────────────────────────────────────────
-// Serves the pre-built ATO sample data CSVs from the module's data/ directory.
-// Files are FY-specific; add a new file each July for the new financial year.
-$bundled_files = [
-    'download_ato_withholding' => ['ato-withholding-2026-27.csv', 'ato-withholding-2026-27.csv'],
-    'download_ato_mla2'        => ['ato-mla2-2026-27.csv',        'ato-mla2-2026-27.csv'],
-    'download_ato_mla6'        => ['ato-mla6-2026-27.csv',        'ato-mla6-2026-27.csv'],
-    'download_ato_stsl'        => ['ato-stsl-2026-27.csv',        'ato-stsl-2026-27.csv'],
+// fy parameter selects which year's file to serve (e.g. fy=2026-27).
+// Add new files to data/ each July — the download card auto-discovers them.
+$ato_download_datasets = [
+    'download_ato_withholding' => 'withholding',
+    'download_ato_mla2'        => 'mla2',
+    'download_ato_mla6'        => 'mla6',
+    'download_ato_stsl'        => 'stsl',
 ];
-if (isset($bundled_files[$action])) {
-    [$filename, $download_name] = $bundled_files[$action];
-    $path = dol_buildpath('/custom/payroll/data/' . $filename, 0);
+if (isset($ato_download_datasets[$action])) {
+    $dataset  = $ato_download_datasets[$action];
+    $fy       = preg_replace('/[^0-9-]/', '', GETPOST('fy', 'alpha'));
+    if (!preg_match('/^\d{4}-\d{2}$/', $fy)) {
+        http_response_code(400);
+        echo 'Invalid FY.';
+        exit;
+    }
+    $filename = 'ato-' . $dataset . '-' . $fy . '.csv';
+    $path     = dol_buildpath('/custom/payroll/data/' . $filename, 0);
     if (!file_exists($path)) {
         http_response_code(404);
         echo 'File not found: ' . htmlspecialchars($filename);
         exit;
     }
     header('Content-Type: text/csv; charset=utf-8');
-    header('Content-Disposition: attachment; filename="' . $download_name . '"');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
     header('Content-Length: ' . filesize($path));
     readfile($path);
     exit;
@@ -164,6 +171,64 @@ function payroll_scale_options()
         'scale5' => 'Scale 5 — Full Medicare levy exemption (TFT claimed)',
         'scale6' => 'Scale 6 — Half Medicare levy exemption',
     ];
+}
+
+/**
+ * Scan data/ for bundled ATO CSVs matching ato-{dataset}-{FY}.csv.
+ * Returns a sorted array of FY strings, e.g. ['2026-27', '2027-28'].
+ * New years appear automatically once the file is dropped into data/.
+ */
+function payroll_ato_available_years($dataset)
+{
+    $dir   = dol_buildpath('/custom/payroll/data', 0);
+    $years = [];
+    foreach (glob($dir . '/ato-' . $dataset . '-*.csv') ?: [] as $f) {
+        if (preg_match('/ato-' . preg_quote($dataset, '/') . '-(\d{4}-\d{2})\.csv$/', basename($f), $m)) {
+            $years[] = $m[1];
+        }
+    }
+    sort($years);
+    return $years;
+}
+
+/**
+ * Render the "Bundled ATO data" download card for one dataset section.
+ * One year available  → plain download link labelled with that year.
+ * Multiple years      → year <select> + Download link; JS updates href on change.
+ */
+function payroll_bundled_ato_card($base_url, $dataset, $source, $rows_desc, $note = '')
+{
+    $years  = payroll_ato_available_years($dataset);
+    $action = 'download_ato_' . $dataset;
+    $uid    = 'ato_' . $dataset;
+
+    echo '<div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:220px;max-width:280px;">';
+    echo '<strong>Bundled ATO data</strong>';
+    echo '<p style="font-size:0.85em;color:#555;margin:0.4rem 0 0.75rem;">';
+    echo 'Pre-built file from the ATO\'s<br><em>' . $source . '</em>.<br>';
+    echo '<span style="color:#888;">' . $rows_desc . '</span>';
+    if ($note) echo '<br><em style="color:#999;">' . $note . '</em>';
+    echo '</p>';
+    if (empty($years)) {
+        echo '<span style="font-size:0.85em;color:#999;">No bundled files found in data/.</span>';
+    } elseif (count($years) === 1) {
+        echo '<a href="' . $base_url . '&amp;action=' . $action . '&amp;fy=' . rawurlencode($years[0]) . '" class="button">'
+           . 'Download ' . htmlspecialchars($years[0]) . '</a>';
+    } else {
+        // Multiple years: select + link; JS updates href on change so no form needed.
+        $latest = end($years);
+        $js_pfx = addslashes($base_url . '&action=' . $action . '&fy=');
+        echo '<div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;">';
+        echo '<select id="sel_' . $uid . '" style="font-size:0.9em;padding:0.2rem 0.4rem;"'
+           . ' onchange="document.getElementById(\'btn_' . $uid . '\').href=\'' . $js_pfx . '\'+encodeURIComponent(this.value);">';
+        foreach (array_reverse($years) as $y) {
+            echo '<option value="' . htmlspecialchars($y) . '">' . htmlspecialchars($y) . '</option>';
+        }
+        echo '</select>';
+        echo '<a id="btn_' . $uid . '" href="' . $base_url . '&amp;action=' . $action . '&amp;fy=' . rawurlencode($latest) . '" class="button">Download</a>';
+        echo '</div>';
+    }
+    echo '</div>';
 }
 
 /**
@@ -1474,16 +1539,7 @@ $wth_by_fy = group_by_fy($test_wth_rows);
       'Columns: <code>label,gross,period,scale,expected_payg,source</code><br>'
       . '<code>scale</code>: scale1–scale6 &nbsp;·&nbsp; <code>period</code>: weekly | fortnightly | monthly'
   ); ?>
-  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:220px;max-width:280px;">
-    <strong>Bundled ATO data</strong>
-    <p style="font-size:0.85em;color:#555;margin:0.4rem 0 0.75rem;">
-      Pre-built 2026-27 file from the ATO's<br><em>Withholding amounts sample data</em> PDF.<br>
-      <span style="color:#888;">685 rows — all 5 scales, 3 periods.</span>
-    </p>
-    <a href="<?= $base_url ?>&amp;action=download_ato_withholding" class="button">
-      Download 2026-27 ATO data
-    </a>
-  </div>
+  <?php payroll_bundled_ato_card($base_url, 'withholding', 'Withholding amounts sample data', '685 rows — all 5 scales, 3 periods'); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -1520,16 +1576,7 @@ $mla2_by_fy = group_by_fy($test_mla2_rows);
       'Columns: <code>label,gross,period,num_dependants,expected_adjustment,source</code><br>'
       . '<code>num_dependants</code>: 0=spouse only, 1–5=number of children'
   ); ?>
-  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:220px;max-width:280px;">
-    <strong>Bundled ATO data</strong>
-    <p style="font-size:0.85em;color:#555;margin:0.4rem 0 0.75rem;">
-      Pre-built 2026-27 file from the ATO's<br><em>Medicare levy adjustment scale 2 sample data</em>.<br>
-      <span style="color:#888;">804 rows — 3 periods, spouse + 5 child counts.</span>
-    </p>
-    <a href="<?= $base_url ?>&amp;action=download_ato_mla2" class="button">
-      Download 2026-27 ATO data
-    </a>
-  </div>
+  <?php payroll_bundled_ato_card($base_url, 'mla2', 'Medicare levy adjustment scale 2 sample data', '804 rows — 3 periods, spouse + 5 child counts'); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -1566,16 +1613,7 @@ $mla6_by_fy = group_by_fy($test_mla6_rows);
       'Columns: <code>label,gross,period,num_children,expected_adjustment,source</code><br>'
       . '<code>num_children</code>: 1–5'
   ); ?>
-  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:220px;max-width:280px;">
-    <strong>Bundled ATO data</strong>
-    <p style="font-size:0.85em;color:#555;margin:0.4rem 0 0.75rem;">
-      Pre-built 2026-27 file from the ATO's<br><em>Medicare half-levy adjustment scale 6 sample data</em>.<br>
-      <span style="color:#888;">660 rows — 3 periods, 1–5 children.</span>
-    </p>
-    <a href="<?= $base_url ?>&amp;action=download_ato_mla6" class="button">
-      Download 2026-27 ATO data
-    </a>
-  </div>
+  <?php payroll_bundled_ato_card($base_url, 'mla6', 'Medicare half-levy adjustment scale 6 sample data', '660 rows — 3 periods, 1–5 children'); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -1613,17 +1651,7 @@ $stsl_by_fy = group_by_fy($test_stsl_rows);
       'Columns: <code>label,gross,period,scale,expected_payg,source</code><br>'
       . 'Same format as Withholding amounts; <code>scale</code>: scale1–scale3, scale5, scale6'
   ); ?>
-  <div style="background:#f0f7ff;border:1px solid #b0d0f0;border-radius:4px;padding:1rem;min-width:220px;max-width:280px;">
-    <strong>Bundled ATO data</strong>
-    <p style="font-size:0.85em;color:#555;margin:0.4rem 0 0.75rem;">
-      Pre-built 2026-27 file from the ATO's<br><em>STSL Sample Data</em> (NAT 3539).<br>
-      <span style="color:#888;">1,425 rows — 3 periods, 5 scales.</span><br>
-      <em style="color:#999;">Verification coming in a future update.</em>
-    </p>
-    <a href="<?= $base_url ?>&amp;action=download_ato_stsl" class="button">
-      Download 2026-27 ATO data
-    </a>
-  </div>
+  <?php payroll_bundled_ato_card($base_url, 'stsl', 'STSL Sample Data (NAT 3539)', '1,425 rows — 3 periods, 5 scales', 'Verification coming in a future update.'); ?>
 </div>
 
 <?php payroll_test_data_table(
