@@ -43,11 +43,16 @@ if (in_array($action, ['run_tests_withholding', 'run_tests_mla2', 'run_tests_mla
     $tbl  = MAIN_DB_PREFIX . $ds['tbl'];
     $type = $ds['type'];
 
-    $res_fy = $db->query("SELECT DISTINCT fy FROM $tbl WHERE entity=" . (int)$conf->entity . " ORDER BY fy DESC");
+    $filter_fy = trim(GETPOST('fy', 'alpha'));
+    if (!preg_match('/^\d{4}-\d{2}$/', $filter_fy)) {
+        echo json_encode(['error' => 'Invalid or missing fy parameter']);
+        exit;
+    }
     $result = ['dataset' => $type, 'fys' => []];
+    $fys_to_run = [$filter_fy];
 
-    while ($res_fy && ($fy_row = $db->fetch_object($res_fy))) {
-        $fy   = $fy_row->fy;
+    foreach ($fys_to_run as $fy) {
+        $fy   = $filter_fy;
         $pass = 0; $fail = 0; $failures = [];
 
         if ($type === 'withholding') {
@@ -1940,16 +1945,26 @@ function group_by_fy($rows)
 }
 
 // Helper: "Run Tests" card — triggers AJAX run of calculator against stored test rows
-function payroll_run_tests_card($base_url, $dataset)
+function payroll_run_tests_card($base_url, $dataset, $fy_options)
 {
-    $id = 'run-results-' . htmlspecialchars($dataset, ENT_QUOTES);
+    $rid   = 'run-results-' . htmlspecialchars($dataset, ENT_QUOTES);
+    $selid = 'run-fy-' . htmlspecialchars($dataset, ENT_QUOTES);
     echo '<div style="background:#f4f8fc;border:1px solid #cce0f0;border-radius:4px;padding:0.75rem 1rem;min-width:220px;">';
     echo '<div style="font-size:0.8em;font-weight:600;color:#1a7cb8;margin-bottom:0.5rem;">Run Tests</div>';
+    echo '<div style="display:flex;align-items:center;gap:0.4rem;">';
+    echo '<select id="' . $selid . '" class="flat" style="font-size:0.85em;">';
+    foreach ($fy_options as $fy_val => $fy_lbl) {
+        echo '<option value="' . htmlspecialchars($fy_val, ENT_QUOTES) . '">'
+            . htmlspecialchars($fy_lbl) . '</option>';
+    }
+    echo '</select>';
     echo '<button type="button"'
-        . ' onclick="payrollRunTests(\'' . $dataset . '\', \'' . addslashes($base_url) . '\', document.getElementById(\'' . $id . '\'))"'
+        . ' onclick="payrollRunTests(\'' . $dataset . '\', \'' . addslashes($base_url) . '\','
+        . ' document.getElementById(\'' . $rid . '\'), document.getElementById(\'' . $selid . '\').value)"'
         . ' style="background:#1a7cb8;color:#fff;border:none;border-radius:3px;padding:0.35rem 0.8rem;cursor:pointer;font-size:0.85em;">'
-        . '&#9654; Run all tests</button>';
-    echo '<div id="' . $id . '" style="margin-top:0.5rem;font-size:0.82em;max-width:700px;"></div>';
+        . '&#9654; Run</button>';
+    echo '</div>';
+    echo '<div id="' . $rid . '" style="margin-top:0.5rem;font-size:0.82em;max-width:700px;"></div>';
     echo '</div>';
 }
 
@@ -2064,7 +2079,7 @@ $wth_by_fy = group_by_fy($test_wth_rows);
       . '<code>scale</code>: scale1–scale6 &nbsp;·&nbsp; <code>period</code>: weekly | fortnightly | monthly'
   ); ?>
   <?php payroll_bundled_ato_card($base_url, 'withholding', 'Withholding amounts sample data', '720 rows — all 5 scales, 3 periods'); ?>
-  <?php payroll_run_tests_card($base_url, 'withholding'); ?>
+  <?php payroll_run_tests_card($base_url, 'withholding', $fy_options); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -2106,7 +2121,7 @@ $mla2_by_fy = group_by_fy($test_mla2_rows);
       . '<code>num_dependants</code>: 0=spouse only, 1–5=number of children'
   ); ?>
   <?php payroll_bundled_ato_card($base_url, 'mla2', 'Medicare levy adjustment scale 2 sample data', '864 rows — 3 periods, spouse + 5 child counts'); ?>
-  <?php payroll_run_tests_card($base_url, 'mla2'); ?>
+  <?php payroll_run_tests_card($base_url, 'mla2', $fy_options); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -2148,7 +2163,7 @@ $mla6_by_fy = group_by_fy($test_mla6_rows);
       . '<code>num_children</code>: 1–5'
   ); ?>
   <?php payroll_bundled_ato_card($base_url, 'mla6', 'Medicare half-levy adjustment scale 6 sample data', '720 rows — 3 periods, 1–5 children'); ?>
-  <?php payroll_run_tests_card($base_url, 'mla6'); ?>
+  <?php payroll_run_tests_card($base_url, 'mla6', $fy_options); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -2191,7 +2206,7 @@ $stsl_by_fy = group_by_fy($test_stsl_rows);
       . 'Same format as Withholding amounts; <code>scale</code>: scale1–scale3, scale5, scale6'
   ); ?>
   <?php payroll_bundled_ato_card($base_url, 'stsl', 'STSL Sample Data (NAT 3539)', '885 rows — 3 periods, 5 scales (from ATO Excel NAT 3539)'); ?>
-  <?php payroll_run_tests_card($base_url, 'stsl'); ?>
+  <?php payroll_run_tests_card($base_url, 'stsl', $fy_options); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -2211,9 +2226,9 @@ $stsl_by_fy = group_by_fy($test_stsl_rows);
 <?php endif; // end tab switch ?>
 
 <script>
-function payrollRunTests(dataset, baseUrl, resultEl) {
+function payrollRunTests(dataset, baseUrl, resultEl, fy) {
     resultEl.innerHTML = '<em style="color:#888;">Running…<\/em>';
-    var url = baseUrl + '&action=run_tests_' + dataset;
+    var url = baseUrl + '&action=run_tests_' + dataset + '&fy=' + encodeURIComponent(fy);
     fetch(url)
         .then(function(r) {
             if (!r.ok) throw new Error('HTTP ' + r.status);
