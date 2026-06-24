@@ -10,6 +10,7 @@
  */
 
 require '../../main.inc.php';
+require_once __DIR__ . '/lib/PaygCalculator.php';
 
 if (!$user->admin) {
     accessforbidden();
@@ -27,6 +28,93 @@ $rowid  = GETPOSTINT('rowid');
 
 $error   = '';
 $message = '';
+
+// ── Test runner — JSON endpoints (AJAX, early exit before HTML) ───────────────
+if (in_array($action, ['run_tests_withholding', 'run_tests_mla2', 'run_tests_mla6', 'run_tests_stsl'], true)) {
+    header('Content-Type: application/json; charset=utf-8');
+
+    $type_map = [
+        'run_tests_withholding' => ['tbl' => 'payroll_test_withholding', 'type' => 'withholding'],
+        'run_tests_mla2'        => ['tbl' => 'payroll_test_mla2',        'type' => 'mla2'],
+        'run_tests_mla6'        => ['tbl' => 'payroll_test_mla6',        'type' => 'mla6'],
+        'run_tests_stsl'        => ['tbl' => 'payroll_test_stsl',        'type' => 'stsl'],
+    ];
+    $ds   = $type_map[$action];
+    $tbl  = MAIN_DB_PREFIX . $ds['tbl'];
+    $type = $ds['type'];
+
+    $res_fy = $db->query("SELECT DISTINCT fy FROM $tbl WHERE entity=" . (int)$conf->entity . " ORDER BY fy DESC");
+    $result = ['dataset' => $type, 'fys' => []];
+
+    while ($res_fy && ($fy_row = $db->fetch_object($res_fy))) {
+        $fy   = $fy_row->fy;
+        $pass = 0; $fail = 0; $failures = [];
+
+        if ($type === 'withholding') {
+            $res = $db->query("SELECT label, gross, period, scale, expected_payg FROM $tbl"
+                . " WHERE fy='" . $db->escape($fy) . "' AND entity=" . (int)$conf->entity
+                . " ORDER BY position, rowid");
+            while ($res && ($r = $db->fetch_object($res))) {
+                $got = PaygCalculator::calculate((float)$r->gross, $r->period, $r->scale, false, $fy)['payg'];
+                $exp = (int)$r->expected_payg;
+                if ($got === $exp) { $pass++; } else {
+                    $fail++;
+                    $failures[] = ['label' => $r->label, 'gross' => (float)$r->gross,
+                        'period' => $r->period, 'scale' => $r->scale, 'expected' => $exp, 'got' => $got];
+                }
+            }
+        } elseif ($type === 'mla2') {
+            $res = $db->query("SELECT label, gross, period, num_dependants, expected_adjustment FROM $tbl"
+                . " WHERE fy='" . $db->escape($fy) . "' AND entity=" . (int)$conf->entity
+                . " ORDER BY position, rowid");
+            while ($res && ($r = $db->fetch_object($res))) {
+                $deps = (int)$r->num_dependants;
+                $base = PaygCalculator::calculate((float)$r->gross, $r->period, 'scale2', false, $fy)['payg'];
+                $adj  = PaygCalculator::calculate((float)$r->gross, $r->period, 'scale2', false, $fy, true, $deps)['payg'];
+                $got  = $base - $adj;
+                $exp  = (int)$r->expected_adjustment;
+                if ($got === $exp) { $pass++; } else {
+                    $fail++;
+                    $failures[] = ['label' => $r->label, 'gross' => (float)$r->gross,
+                        'period' => $r->period, 'num_deps' => $deps, 'expected' => $exp, 'got' => $got];
+                }
+            }
+        } elseif ($type === 'mla6') {
+            $res = $db->query("SELECT label, gross, period, num_children, expected_adjustment FROM $tbl"
+                . " WHERE fy='" . $db->escape($fy) . "' AND entity=" . (int)$conf->entity
+                . " ORDER BY position, rowid");
+            while ($res && ($r = $db->fetch_object($res))) {
+                $children = (int)$r->num_children;
+                $base = PaygCalculator::calculate((float)$r->gross, $r->period, 'scale6', false, $fy)['payg'];
+                $adj  = PaygCalculator::calculate((float)$r->gross, $r->period, 'scale6', false, $fy, true, $children)['payg'];
+                $got  = $base - $adj;
+                $exp  = (int)$r->expected_adjustment;
+                if ($got === $exp) { $pass++; } else {
+                    $fail++;
+                    $failures[] = ['label' => $r->label, 'gross' => (float)$r->gross,
+                        'period' => $r->period, 'num_children' => $children, 'expected' => $exp, 'got' => $got];
+                }
+            }
+        } elseif ($type === 'stsl') {
+            $res = $db->query("SELECT label, gross, period, scale, expected_payg FROM $tbl"
+                . " WHERE fy='" . $db->escape($fy) . "' AND entity=" . (int)$conf->entity
+                . " ORDER BY position, rowid");
+            while ($res && ($r = $db->fetch_object($res))) {
+                $got = PaygCalculator::calculate((float)$r->gross, $r->period, $r->scale, true, $fy)['total'];
+                $exp = (int)$r->expected_payg;
+                if ($got === $exp) { $pass++; } else {
+                    $fail++;
+                    $failures[] = ['label' => $r->label, 'gross' => (float)$r->gross,
+                        'period' => $r->period, 'scale' => $r->scale, 'expected' => $exp, 'got' => $got];
+                }
+            }
+        }
+        $result['fys'][$fy] = ['pass' => $pass, 'fail' => $fail, 'failures' => $failures];
+    }
+
+    echo json_encode($result);
+    exit;
+}
 
 // ── Template downloads (early exit — must run before any HTML output) ────────
 
@@ -1838,6 +1926,20 @@ function group_by_fy($rows)
     return $out;
 }
 
+// Helper: "Run Tests" card — triggers AJAX run of calculator against stored test rows
+function payroll_run_tests_card($base_url, $dataset)
+{
+    $id = 'run-results-' . htmlspecialchars($dataset, ENT_QUOTES);
+    echo '<div style="background:#f4f8fc;border:1px solid #cce0f0;border-radius:4px;padding:0.75rem 1rem;min-width:220px;">';
+    echo '<div style="font-size:0.8em;font-weight:600;color:#1a7cb8;margin-bottom:0.5rem;">Run Tests</div>';
+    echo '<button type="button"'
+        . ' onclick="payrollRunTests(\'' . $dataset . '\', \'' . addslashes($base_url) . '\', document.getElementById(\'' . $id . '\'))"'
+        . ' style="background:#1a7cb8;color:#fff;border:none;border-radius:3px;padding:0.35rem 0.8rem;cursor:pointer;font-size:0.85em;">'
+        . '&#9654; Run all tests</button>';
+    echo '<div id="' . $id . '" style="margin-top:0.5rem;font-size:0.82em;max-width:700px;"></div>';
+    echo '</div>';
+}
+
 // Helper: import form card
 function payroll_test_import_card($base_url, $fy_options, $action_name, $dl_action, $label, $desc)
 {
@@ -1952,6 +2054,7 @@ $wth_by_fy = group_by_fy($test_wth_rows);
       . '<code>scale</code>: scale1–scale6 &nbsp;·&nbsp; <code>period</code>: weekly | fortnightly | monthly'
   ); ?>
   <?php payroll_bundled_ato_card($base_url, 'withholding', 'Withholding amounts sample data', '720 rows — all 5 scales, 3 periods'); ?>
+  <?php payroll_run_tests_card($base_url, 'withholding'); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -1993,6 +2096,7 @@ $mla2_by_fy = group_by_fy($test_mla2_rows);
       . '<code>num_dependants</code>: 0=spouse only, 1–5=number of children'
   ); ?>
   <?php payroll_bundled_ato_card($base_url, 'mla2', 'Medicare levy adjustment scale 2 sample data', '864 rows — 3 periods, spouse + 5 child counts'); ?>
+  <?php payroll_run_tests_card($base_url, 'mla2'); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -2034,6 +2138,7 @@ $mla6_by_fy = group_by_fy($test_mla6_rows);
       . '<code>num_children</code>: 1–5'
   ); ?>
   <?php payroll_bundled_ato_card($base_url, 'mla6', 'Medicare half-levy adjustment scale 6 sample data', '720 rows — 3 periods, 1–5 children'); ?>
+  <?php payroll_run_tests_card($base_url, 'mla6'); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -2076,6 +2181,7 @@ $stsl_by_fy = group_by_fy($test_stsl_rows);
       . 'Same format as Withholding amounts; <code>scale</code>: scale1–scale3, scale5, scale6'
   ); ?>
   <?php payroll_bundled_ato_card($base_url, 'stsl', 'STSL Sample Data (NAT 3539)', '885 rows — 3 periods, 5 scales (from ATO Excel NAT 3539)'); ?>
+  <?php payroll_run_tests_card($base_url, 'stsl'); ?>
 </div>
 
 <?php payroll_test_data_table(
@@ -2093,6 +2199,74 @@ $stsl_by_fy = group_by_fy($test_stsl_rows);
 ); ?>
 
 <?php endif; // end tab switch ?>
+
+<script>
+function payrollRunTests(dataset, baseUrl, resultEl) {
+    resultEl.innerHTML = '<em style="color:#888;">Running…<\/em>';
+    var url = baseUrl + '&action=run_tests_' + dataset;
+    fetch(url)
+        .then(function(r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
+        .then(function(data) {
+            var html = '';
+            var fys  = Object.keys(data.fys);
+            if (fys.length === 0) {
+                html = '<em style="color:#888;">No test data imported yet — import a bundled CSV first.<\/em>';
+            } else {
+                fys.forEach(function(fy) {
+                    var res   = data.fys[fy];
+                    var total = res.pass + res.fail;
+                    if (res.fail === 0) {
+                        html += '<div style="display:inline-block;background:#d4edda;color:#155724;'
+                            + 'padding:0.25rem 0.7rem;border-radius:3px;margin:0.15rem 0.2rem 0.15rem 0;">'
+                            + '&#10003; ' + prEsc(fy) + ': all ' + total + ' passed<\/div>';
+                    } else {
+                        html += '<div style="background:#f8d7da;color:#721c24;padding:0.25rem 0.7rem;'
+                            + 'border-radius:3px;margin:0.15rem 0 0.3rem;">'
+                            + '&#10007; ' + prEsc(fy) + ': ' + res.fail + ' failed ('
+                            + res.pass + '\/' + total + ' passed)<\/div>';
+                        html += '<table style="width:100%;border-collapse:collapse;margin-bottom:0.5rem;">'
+                            + '<thead><tr style="background:#f4f4f4;">'
+                            + '<th style="text-align:left;padding:0.2rem 0.5rem;">Label<\/th>'
+                            + '<th style="text-align:right;padding:0.2rem 0.5rem;">Gross<\/th>'
+                            + '<th style="text-align:center;padding:0.2rem 0.4rem;">Period<\/th>'
+                            + '<th style="text-align:center;padding:0.2rem 0.4rem;">Scale\/Deps<\/th>'
+                            + '<th style="text-align:right;padding:0.2rem 0.5rem;">Expected<\/th>'
+                            + '<th style="text-align:right;padding:0.2rem 0.5rem;color:#c0392b;">Got<\/th>'
+                            + '<th style="text-align:right;padding:0.2rem 0.5rem;color:#c0392b;">Diff<\/th>'
+                            + '<\/tr><\/thead><tbody>';
+                        res.failures.forEach(function(f) {
+                            var scaleOrDeps = f.scale
+                                || (f.num_deps !== undefined ? f.num_deps + ' dep' : f.num_children + ' ch');
+                            var diff = f.got - f.expected;
+                            var sign = diff >= 0 ? '+' : '';
+                            html += '<tr style="background:#fff3f3;">'
+                                + '<td style="padding:0.15rem 0.5rem;">' + prEsc(f.label) + '<\/td>'
+                                + '<td style="text-align:right;padding:0.15rem 0.5rem;font-family:monospace;">$'
+                                + f.gross.toFixed(2) + '<\/td>'
+                                + '<td style="text-align:center;padding:0.15rem 0.4rem;">' + prEsc(f.period) + '<\/td>'
+                                + '<td style="text-align:center;padding:0.15rem 0.4rem;font-family:monospace;">' + prEsc(scaleOrDeps) + '<\/td>'
+                                + '<td style="text-align:right;padding:0.15rem 0.5rem;font-family:monospace;">$' + f.expected + '<\/td>'
+                                + '<td style="text-align:right;padding:0.15rem 0.5rem;font-family:monospace;color:#c0392b;">$' + f.got + '<\/td>'
+                                + '<td style="text-align:right;padding:0.15rem 0.5rem;font-family:monospace;color:#c0392b;">'
+                                + sign + diff + '<\/td><\/tr>';
+                        });
+                        html += '<\/tbody><\/table>';
+                    }
+                });
+            }
+            resultEl.innerHTML = html;
+        })
+        .catch(function(e) {
+            resultEl.innerHTML = '<span style="color:#c0392b;">Error: ' + prEsc(e.message) + '<\/span>';
+        });
+}
+function prEsc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
 
 <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid #eee;">
   <a href="setup.php?mainmenu=billing&leftmenu=payroll_setup" class="button">Payroll Setup (deductions)</a>
