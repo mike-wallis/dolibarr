@@ -659,7 +659,7 @@ HECS thresholds, financial year settings, and verification test cases. Access it
 <a href="/dolibarr/custom/payroll/config.php?mainmenu=admintools">Tax Table Config</a> quick link
 at the top of this page, or via <strong>Setup → Modules → Payroll → gear icon</strong>.</p>
 
-<p>It has four tabs:</p>
+<p>It has three tabs:</p>
 
 <table class="noborder" style="width:100%;max-width:820px;margin-bottom:1rem;">
   <thead>
@@ -672,42 +672,39 @@ at the top of this page, or via <strong>Setup → Modules → Payroll → gear i
   <tbody>
     <tr>
       <td style="padding:0.4rem 1rem;white-space:nowrap;"><strong>Financial Years</strong></td>
-      <td style="padding:0.4rem 1rem;">One row per FY — SGC rate (%), minimum weekly wage, HECS system (flat or marginal).
+      <td style="padding:0.4rem 1rem;">One row per FY — SGC rate (%), minimum weekly wage, HECS system (flat or marginal), and period dates (1 Jul – 30 Jun).
+          The dates are used at pay-run time to auto-select the correct tax tables for a given pay date.
           A row must exist before you can run a pay run for that FY.</td>
-      <td style="padding:0.4rem 1rem;">Add a row at the start of each new FY. Update SGC rate when the government changes it (was 11.5% for 2024-25, 12% from 2025-26).</td>
+      <td style="padding:0.4rem 1rem;">Add a row at the start of each new FY. Update SGC rate when it changes (11.5% for 2024-25, 12% from 2025-26).</td>
     </tr>
     <tr style="background:#fafafa;">
-      <td style="padding:0.4rem 1rem;white-space:nowrap;"><strong>Tax Coefficients</strong></td>
-      <td style="padding:0.4rem 1rem;">ATO Schedule 1 PAYG <em>a</em> and <em>b</em> coefficients for every tax scale and weekly income bracket.
-          These are the numbers the formula uses to calculate withholding.</td>
-      <td style="padding:0.4rem 1rem;">Update each July when the ATO publishes new NAT 1004 values.
-          Three load methods: <em>CSV import</em> (easiest), <em>Seed from PHP file</em>, or <em>Edit individual rows</em>.</td>
+      <td style="padding:0.4rem 1rem;white-space:nowrap;"><strong>Tax Tables</strong></td>
+      <td style="padding:0.4rem 1rem;">Four sections — all ATO tax data in one place:
+          <ol style="margin:0.3rem 0 0 1rem;font-size:0.9em;">
+            <li><strong>PAYG Coefficients (NAT 1004)</strong> — <em>a</em> and <em>b</em> values for every tax scale and weekly income bracket.
+                The pay-run formula: <code>withholding = round(a × (floor(weekly_gross) + 0.99) − b)</code>.</li>
+            <li><strong>MLA Scale 2 Parameters (NAT 1008)</strong> — The 7 threshold/rate values used by the Medicare levy adjustment formula for Scale 2 (resident, TFT claimed) employees with a Medicare levy variation declaration.</li>
+            <li><strong>MLA Scale 6 Parameters (NAT 1009)</strong> — Same formula, different values. For Scale 6 (half Medicare levy exemption) employees with children.</li>
+            <li><strong>STSL Brackets (NAT 3539)</strong> — Income thresholds and repayment rates for HELP/VSL/SSL/TSL/SFSS debt holders.
+                Marginal system (from 2025-26) stores rate + base amount per bracket.</li>
+          </ol>
+          Each section has: <em>Seed from PHP file</em>, <em>Import CSV</em>, <em>Download bundled file</em>, and <em>Add/edit individual rows</em>.
+          Bundled 2026-27 files are already loaded and available to download from the page.</td>
+      <td style="padding:0.4rem 1rem;">Update all four sections each July when the ATO publishes new values.
+          MLA parameters (sections 2 and 3) often don't change year to year — check the ATO page to confirm before reloading.</td>
     </tr>
     <tr>
-      <td style="padding:0.4rem 1rem;white-space:nowrap;"><strong>HECS Thresholds</strong></td>
-      <td style="padding:0.4rem 1rem;">Income brackets and repayment rates from NAT 3539 (Schedule 8).
-          The marginal-rate system (from 2025-26) stores multiple brackets; the flat system stores one rate per threshold band.</td>
-      <td style="padding:0.4rem 1rem;">Update each July if the ATO publishes new thresholds.
-          Same three load methods as coefficients.</td>
-    </tr>
-    <tr style="background:#fafafa;">
       <td style="padding:0.4rem 1rem;white-space:nowrap;"><strong>Verification Tests</strong></td>
-      <td style="padding:0.4rem 1rem;">Four sections matching the ATO's four test datasets:
-          <ol style="margin:0.3rem 0 0 1rem;font-size:0.9em;">
-            <li><strong>Withholding Amounts</strong> (NAT 1004) — base PAYG for all 5 scales</li>
-            <li><strong>MLA Scale 2</strong> — Medicare levy adjustment for Scale 2 with dependants</li>
-            <li><strong>MLA Scale 6</strong> — Half-levy adjustment for Scale 6 with children</li>
-            <li><strong>STSL / Schedule 8</strong> — Total withholding for HELP/HECS debt holders</li>
-          </ol>
-          Each section has its own import form and CSV format.
-          Pre-built 2026-27 CSV files are at <code>imports/payroll/</code>.</td>
-      <td style="padding:0.4rem 1rem;">Import all four datasets each July after updating coefficients, then go to
-          <strong>Payroll Setup</strong> and scroll to <strong>PAYG Calculation Verification</strong> to run them.</td>
+      <td style="padding:0.4rem 1rem;">Four import forms for the ATO's four sample data files:
+          Withholding Amounts, MLA Scale 2, MLA Scale 6, and STSL.
+          Pre-built 2026-27 files are available as bundled downloads on this tab (from <code>data/</code>).</td>
+      <td style="padding:0.4rem 1rem;">Import all four datasets each July after updating tax tables, then go to
+          <strong>Payroll Setup</strong> and scroll to <strong>PAYG Calculation Verification</strong> to run pass/fail tests.</td>
     </tr>
   </tbody>
 </table>
 
-<h3 style="margin-top:1rem;">Loading data — three methods (Coefficients and HECS tabs)</h3>
+<h3 style="margin-top:1rem;">Loading data — methods available on each Tax Tables section</h3>
 
 <table class="noborder" style="width:100%;max-width:820px;">
   <thead>
@@ -719,18 +716,32 @@ at the top of this page, or via <strong>Setup → Modules → Payroll → gear i
   </thead>
   <tbody>
     <tr>
-      <td style="padding:0.4rem 1rem;"><strong>CSV import</strong></td>
-      <td style="padding:0.4rem 1rem;">Click <strong>Download template</strong> (pre-filled from the PHP tax-table file if it exists),
-          update the values from the ATO PDF, then use <strong>Import from CSV</strong>.
-          Select the FY before importing. Replaces existing rows for the selected FY only.</td>
-      <td style="padding:0.4rem 1rem;">Annual update — quickest once you have the ATO numbers.</td>
+      <td style="padding:0.4rem 1rem;"><strong>Download bundled file</strong></td>
+      <td style="padding:0.4rem 1rem;">Click <strong>Download</strong> in the "Bundled ATO data" card next to each section.
+          A year selector appears if multiple years are available. These pre-built files live in
+          <code>data/</code> inside the payroll module and are ready to use without modification.</td>
+      <td style="padding:0.4rem 1rem;">First-time setup or restoring data — no editing needed.</td>
     </tr>
     <tr style="background:#fafafa;">
-      <td style="padding:0.4rem 1rem;"><strong>Seed from PHP file</strong></td>
-      <td style="padding:0.4rem 1rem;">Create <code>custom/modules/payroll/lib/tax-tables/YYYY-YY.php</code> with the new values
-          (copy from <code>2025-26.php</code>), deploy, then click <strong>Seed</strong>.
+      <td style="padding:0.4rem 1rem;"><strong>Import from CSV</strong></td>
+      <td style="padding:0.4rem 1rem;">Download a bundled file or the template, update values from the ATO PDF/page,
+          then use <strong>Import from CSV</strong>. Select the FY before importing.
+          Replaces existing rows for the selected FY (and any scales present in the file).</td>
+      <td style="padding:0.4rem 1rem;">Annual update when ATO changes the values — edit the CSV from last year.</td>
+    </tr>
+    <tr>
+      <td style="padding:0.4rem 1rem;"><strong>Seed from PHP file</strong><br><small style="color:#888;">(Coefficients and STSL only)</small></td>
+      <td style="padding:0.4rem 1rem;">Create <code>lib/tax-tables/YYYY-YY.php</code> with the new values
+          (copy from <code>2026-27.php</code>), deploy, then click <strong>Seed</strong> on the relevant section.
           Also update <code>PaygCalculator::$fy_table_map</code> and <code>availableYears()</code>.</td>
-      <td style="padding:0.4rem 1rem;">Developer workflow — keeps a copy of the ATO data in the repo.</td>
+      <td style="padding:0.4rem 1rem;">Developer workflow — keeps ATO data in the git repo.</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.4rem 1rem;"><strong>Seed defaults</strong><br><small style="color:#888;">(MLA sections only)</small></td>
+      <td style="padding:0.4rem 1rem;">Click <strong>Seed</strong> on the MLA Scale 2 or MLA Scale 6 section.
+          Inserts or updates the 7 ATO MLA threshold/rate parameters for the selected FY using the hardcoded 2026-27 values.
+          Safe to re-run — uses INSERT … ON DUPLICATE KEY UPDATE.</td>
+      <td style="padding:0.4rem 1rem;">First-time setup, or when the ATO confirms no change to MLA parameters year to year.</td>
     </tr>
     <tr>
       <td style="padding:0.4rem 1rem;"><strong>Edit individual rows</strong></td>
