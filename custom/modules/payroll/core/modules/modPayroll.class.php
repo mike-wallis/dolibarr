@@ -116,7 +116,8 @@ class modPayroll extends DolibarrModules
         foreach ($tables_to_create as $table) {
             $file = $sqldir . '/' . $table . '.sql';
             if (file_exists($file)) {
-                $queries = explode(';', file_get_contents($file));
+                $content = preg_replace('/^--[^\n]*$/m', '', file_get_contents($file));
+                $queries = explode(';', $content);
                 foreach ($queries as $q) {
                     $q = trim($q);
                     if ($q) {
