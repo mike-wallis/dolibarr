@@ -597,7 +597,7 @@ Do this checklist at the start of each new financial year:</p>
     Download <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld" target="_blank">NAT 1004 – Schedule 1</a>
     (PAYG coefficients) and
     <a href="https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components" target="_blank">NAT 3539 – Schedule 8</a>
-    (HECS thresholds) from the ATO website.
+    (STSL combined coefficient tables — Tables 3–7 give combined PAYG+STSL per scale) from the ATO website.
     Also download the <strong>Withholding amounts sample data</strong> PDF (published alongside NAT 1004)
     — you'll need it to verify the new coefficients in step 4.
   </li>
@@ -620,8 +620,10 @@ Do this checklist at the start of each new financial year:</p>
         </ul>
       </li>
       <li>
-        <strong>HECS Thresholds tab</strong> — update thresholds using CSV import or Seed from PHP file
-        (same options as above). Only needed if NAT 3539 published new thresholds.
+        <strong>STSL / HECS tab</strong> — update the STSL combined coefficient tables (2025-26+) or
+        legacy HECS bracket thresholds (2024-25 only) using CSV import or Seed from PHP file.
+        For 2025-26+, seed the five <code>stsl_scale*</code> tables from NAT 3539 Schedule 8 (Tables 3–7).
+        Only needed when the ATO publishes updated Schedule 8 coefficient values.
       </li>
     </ul>
   </li>
@@ -685,8 +687,10 @@ at the top of this page, or via <strong>Setup → Modules → Payroll → gear i
                 The pay-run formula: <code>withholding = round(a × (floor(weekly_gross) + 0.99) − b)</code>.</li>
             <li><strong>MLA Scale 2 Parameters (NAT 1008)</strong> — The 7 threshold/rate values used by the Medicare levy adjustment formula for Scale 2 (resident, TFT claimed) employees with a Medicare levy variation declaration.</li>
             <li><strong>MLA Scale 6 Parameters (NAT 1009)</strong> — Same formula, different values. For Scale 6 (half Medicare levy exemption) employees with children.</li>
-            <li><strong>STSL Brackets (NAT 3539)</strong> — Income thresholds and repayment rates for HELP/VSL/SSL/TSL/SFSS debt holders.
-                Marginal system (from 2025-26) stores rate + base amount per bracket.</li>
+            <li><strong>STSL Combined Tables (NAT 3539 – Schedule 8)</strong> — Combined PAYG+STSL coefficient tables for employees with a student loan (HELP/VSL/SSL/TSL/SFSS).
+                From 2025-26, five <code>stsl_scale*</code> tables (one per tax scale) replace the old income bracket approach.
+                The calculator uses the same <code>round(a × x − b)</code> formula as Schedule 1; STSL = combined − Schedule 1 PAYG.
+                For 2024-25 and earlier: legacy bracket thresholds are stored in the <code>hecs_YYYY_YY</code> arrays.</li>
           </ol>
           Each section has: <em>Seed from PHP file</em>, <em>Import CSV</em>, <em>Download bundled file</em>, and <em>Add/edit individual rows</em>.
           Bundled 2026-27 files are already loaded and available to download from the page.</td>
@@ -791,15 +795,15 @@ at the top of this page, or via <strong>Setup → Modules → Payroll → gear i
 
 <hr>
 
-<!-- ── 11. HECS ─────────────────────────────────────────────────────────────── -->
-<h2 id="hecs">11. HECS/HELP — how it works</h2>
+<!-- ── 11. HECS / STSL ────────────────────────────────────────────────────────── -->
+<h2 id="hecs">11. STSL/HECS — how it works</h2>
 
-<p>HECS (Higher Education Contribution Scheme) and HELP (Higher Education Loan Program) are student
-loans repaid through the tax system. The repayment is calculated on the employee's annual income
-and withheld from each pay in addition to PAYG. Both are remitted to the ATO together.</p>
+<p>STSL (Study and Training Support Loans) covers HELP, VSL, SSL, TSL, and SFSS student debt.
+Employees with a STSL debt have additional withholding calculated each pay and remitted to the ATO
+together with their PAYG. Tick <strong>HECS/HELP</strong> on their payroll profile to enable it.</p>
 
 <h3>Which system applies?</h3>
-<table class="noborder" style="width:100%;max-width:700px;">
+<table class="noborder" style="width:100%;max-width:780px;">
   <thead>
     <tr style="background:#f5f5f5;">
       <th style="padding:0.4rem 1rem;">FY</th>
@@ -810,49 +814,38 @@ and withheld from each pay in addition to PAYG. Both are remitted to the ATO tog
   <tbody>
     <tr>
       <td style="padding:0.4rem 1rem;">Up to 2024-25</td>
-      <td style="padding:0.4rem 1rem;">Flat rate on total income</td>
-      <td style="padding:0.4rem 1rem;">One flat rate (e.g. 3%) applied to the entire annual income once above the threshold ($54,435 in 2024-25)</td>
+      <td style="padding:0.4rem 1rem;">Flat rate on annualised income</td>
+      <td style="padding:0.4rem 1rem;">The module annualises the weekly gross, applies the ATO flat-rate table (e.g. 3% on total income above $54,435), then scales back to the pay period.</td>
     </tr>
     <tr style="background:#fafafa;">
       <td style="padding:0.4rem 1rem;">2025-26+</td>
-      <td style="padding:0.4rem 1rem;">Marginal rate on excess (Universities Accord)</td>
-      <td style="padding:0.4rem 1rem;">Rate applies only to income <em>above</em> each threshold — same logic as income tax brackets</td>
+      <td style="padding:0.4rem 1rem;">ATO Schedule 8 coefficient tables</td>
+      <td style="padding:0.4rem 1rem;">Uses the same coefficient formula as PAYG (Schedule 1) but with <em>combined</em> tables that give PAYG + STSL in one step. No annualisation needed. Source: <a href="https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components" target="_blank">NAT 3539 – Schedule 8</a>.</td>
     </tr>
   </tbody>
 </table>
 
-<h3>2025-26 HECS thresholds (marginal)</h3>
-<table class="noborder" style="width:100%;max-width:600px;">
-  <thead>
-    <tr style="background:#f5f5f5;">
-      <th style="padding:0.4rem 1rem;">Annual income</th>
-      <th style="padding:0.4rem 1rem;">Rate on excess</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding:0.35rem 1rem;">$0 – $67,000</td>
-      <td style="padding:0.35rem 1rem;">Nil</td>
-    </tr>
-    <tr style="background:#fafafa;">
-      <td style="padding:0.35rem 1rem;">$67,001 – $125,000</td>
-      <td style="padding:0.35rem 1rem;">15% on income above $67,000</td>
-    </tr>
-    <tr>
-      <td style="padding:0.35rem 1rem;">$125,001 – $179,285</td>
-      <td style="padding:0.35rem 1rem;">$8,700 + 17% on income above $125,000</td>
-    </tr>
-    <tr style="background:#fafafa;">
-      <td style="padding:0.35rem 1rem;">$179,286+</td>
-      <td style="padding:0.35rem 1rem;">10% of total income (flat)</td>
-    </tr>
-  </tbody>
-</table>
+<h3>How the 2025-26+ coefficient approach works</h3>
+<p>ATO Schedule 8 (Tables 3–7) publishes a separate set of <em>combined</em> <code>a</code> and <code>b</code>
+coefficients for each tax scale. These give the total withholding (PAYG + STSL) in one calculation:</p>
+<ol>
+  <li>Compute <code>x = floor(weekly_gross) + 0.99</code> — same as Schedule 1</li>
+  <li>Look up the <code>stsl_scale*</code> table for the employee's scale</li>
+  <li><code>weekly_combined = round(a × x − b)</code> — the total (PAYG + STSL)</li>
+  <li>Scale to the pay period (monthly: × 13 ÷ 3; fortnightly: × 2)</li>
+  <li>STSL component = combined total − Schedule 1 PAYG (shown separately on the pay run form)</li>
+</ol>
+<p>Scale 4 (no TFN) is exempt from STSL — the 47% flat rate applies regardless.</p>
 
-<p>The Payroll module annualises the employee's weekly gross, calculates the annual HECS, then scales
-back to the pay period. The HECS component is shown separately in the PAYG column on the pay run form
-(e.g. "PAYG $148 (incl. HECS $22)"). Verify current thresholds at
-<a href="https://www.ato.gov.au" target="_blank">ato.gov.au</a> — see NAT 3539.</p>
+<div class="alert alert-info" style="margin:1rem 0;max-width:700px;">
+  <strong>STSL on the pay run form:</strong> the PAYG column shows the full withholding including any STSL
+  component (e.g. "PAYG $246 (incl. STSL $12)"). Both are remitted to the ATO via BAS (label W2).
+</div>
+
+<p>Verify current Schedule 8 coefficient tables at
+<a href="https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components" target="_blank">ato.gov.au — Schedule 8 (NAT 3539)</a>.
+A built-in verification test (885 ATO sample data rows) is available on the
+<a href="/dolibarr/custom/payroll/config.php?mainmenu=admintools&tab=tests">Tax Table Config — Tests tab</a>.</p>
 
 <hr>
 

@@ -285,12 +285,21 @@ Playwright is installed in `C:\Users\mhwal\AppData\Local\Temp\pw_ato\` and is us
 - `ato_browse.mjs` — general browser/link exploration script
 - `ato_scrape.mjs` — scrapes ATO sample data tables into CSVs
 - `convert_stsl.mjs` — converts the ATO STSL Excel (NAT 3539) download to CSV
+- `browse_formulas.mjs` — browses the ATO Schedule 1 formula page and discovers related formula pages
+- `browse_schedule8.mjs` — scrapes ATO Schedule 8 page for STSL coefficient tables (Tables 3–7)
 
 **Running a script**:
 ```powershell
 Set-Location "C:\Users\mhwal\AppData\Local\Temp\pw_ato"
 node ato_scrape.mjs
 ```
+
+**ATO formula pages**:
+- Schedule 1 (PAYG): `https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld`
+- Schedule 8 (STSL combined): `https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components`
+  - Contains coefficient Tables 1–7: Tables 1–2 (STSL-only component by TFT status), Tables 3–7 (PAYG+STSL combined per scale)
+  - Use Tables 3–7 (combined): gives total withholding = PAYG + STSL; STSL component = combined − Schedule 1 PAYG
+  - Formula: `y = round(a × x − b)` where `x = floor(weekly_gross) + 0.99` — same x as Schedule 1
 
 **ATO sample data pages (all confirmed 2026-07-01 update)**:
 - Withholding amounts: `.../sample-data/withholding-amounts-sample-data`

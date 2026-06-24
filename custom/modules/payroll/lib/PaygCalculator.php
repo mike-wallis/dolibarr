@@ -6,13 +6,15 @@
  *   x = floor(weekly_equivalent) + 0.99
  *   weekly_withholding = round(a * x - b)
  *
- * HECS/HELP implemented separately (Schedule 8 / NAT 3539):
- *   - 2024-25: flat rate on total income (old graduated system)
- *   - 2025-26: marginal rate system (Universities Accord, from Sep 2025)
+ * STSL/HECS implemented via ATO Schedule 8 (NAT 3539):
+ *   - 2024-25: flat rate on annualised income (old graduated system)
+ *   - 2025-26+: ATO Schedule 8 combined coefficient tables per scale.
+ *     Formula: weekly_combined = round(a × x − b) using stsl_scale* table.
+ *     STSL component = period_combined − period_payg_from_schedule1.
  *
  * Usage:
- *   $result = PaygCalculator::calculate(955.00, 'weekly', 'scale2', true, '2025-26');
- *   // $result = ['payg' => 146.00, 'hecs' => 0.00, 'total' => 146.00]
+ *   $result = PaygCalculator::calculate(955.00, 'weekly', 'scale2', true, '2026-27');
+ *   // $result = ['payg' => int, 'hecs' => int, 'total' => int]
  */
 class PaygCalculator
 {
@@ -31,6 +33,9 @@ class PaygCalculator
         '2025-26' => '2025-26',
         '2026-27' => '2026-27',  // same coefficients confirmed by ATO (NAT 1004 published 17 June 2026)
     ];
+
+    // Cache for PHP tax-table files to avoid re-executing require
+    private static $php_table_cache = [];
 
     /**
      * Main entry point.
@@ -77,12 +82,30 @@ class PaygCalculator
             $period_payg = max(0, $period_payg - $period_wla);
         }
 
-        // Step 4: HECS repayment (annualised, then scaled to period)
+        // Step 4: STSL/HECS repayment
         $period_hecs = 0;
         if ($has_hecs) {
-            $annual_income = $weekly * 52;
-            $annual_hecs   = self::hecsAmount($annual_income, $fy, $tables);
-            $period_hecs   = (int) ceil(($annual_hecs / 52) * $divisor);
+            if ($fy === '2024-25') {
+                // 2024-25: flat-rate HECS on annualised income (old pre-Accord system)
+                $annual_income = $weekly * 52;
+                $annual_hecs   = self::hecsAmount($annual_income, $fy, $tables);
+                $period_hecs   = (int) ceil(($annual_hecs / 52) * $divisor);
+            } elseif ($scale !== 'scale4') {
+                // 2025-26+: ATO Schedule 8 combined PAYG+STSL coefficient tables.
+                // weekly_combined = round(a × x − b) using stsl_* table for this scale.
+                // STSL component = period_combined − period_payg_from_schedule1.
+                // Note: ATO Schedule 8 specifies monthly = weekly_combined × 13 ÷ 3.
+                $stsl_key = 'stsl_' . $scale;
+                if (isset($tables[$stsl_key])) {
+                    $weekly_combined  = (int) round(self::applyScale($x, $stsl_key, $tables));
+                    $period_combined  = ($period === 'monthly')
+                        ? (int) round($weekly_combined * 13 / 3)
+                        : (int) round($weekly_combined * $divisor);
+                    // PAYG base before MLA — same scaling formula as Step 2
+                    $period_payg_base = (int) round($weekly_payg * $divisor);
+                    $period_hecs      = max(0, $period_combined - $period_payg_base);
+                }
+            }
         }
 
         return [
@@ -120,7 +143,10 @@ class PaygCalculator
         if ($x < $p['weekly_threshold'] || $x >= $sop) {
             return 0.0;
         }
-        if ($x < min($p['mid_threshold'], $wft)) {
+        if ($x < $p['mid_threshold']) {
+            // Phase-in zone: from weekly_threshold up to mid_threshold.
+            // For Scale 2: mid_threshold < wft, so flat zone [mid_threshold, wft) follows.
+            // For Scale 6: mid_threshold > wft (for 1–2 children), so shade-out starts immediately after.
             $wla = ($x - $p['weekly_threshold']) * $p['phase_in_rate'];
         } elseif ($x < $wft) {
             $wla = $x * $p['levy_rate'];
@@ -237,26 +263,44 @@ class PaygCalculator
                 }
                 return $prev_base + $rate * ($annual_income - $prev_threshold);
             }
+            // Update prev_base BEFORE prev_threshold so the width ($threshold - $prev_threshold) is correct
+            $prev_base      = $base > 0 ? $base : $prev_base + $rate * ($threshold - $prev_threshold);
             $prev_threshold = $threshold;
-            $prev_base = $base > 0 ? $base : $prev_base + $rate * ($threshold - $prev_threshold);
         }
         // Final bracket: 10% flat on total income
         return $annual_income * 0.10;
     }
 
+    private static function loadPhpTables(string $file_key): array
+    {
+        if (!isset(self::$php_table_cache[$file_key])) {
+            $path = __DIR__ . '/tax-tables/' . $file_key . '.php';
+            if (!file_exists($path)) {
+                $path = __DIR__ . '/tax-tables/2025-26.php';
+            }
+            self::$php_table_cache[$file_key] = require $path;
+        }
+        return self::$php_table_cache[$file_key];
+    }
+
     private static function loadTables(string $fy): array
     {
-        $tables = self::loadTablesFromDb($fy);
+        $file_key = self::$fy_table_map[$fy] ?? '2025-26';
+        $tables   = self::loadTablesFromDb($fy);
         if ($tables !== null) {
+            // DB may have PAYG coefficients seeded but not STSL tables yet.
+            // Merge STSL tables from the PHP file for 2025-26+.
+            if (!isset($tables['stsl_scale1'])) {
+                $php = self::loadPhpTables($file_key);
+                foreach (['stsl_scale1', 'stsl_scale2', 'stsl_scale3', 'stsl_scale5', 'stsl_scale6'] as $k) {
+                    if (isset($php[$k])) {
+                        $tables[$k] = $php[$k];
+                    }
+                }
+            }
             return $tables;
         }
-
-        $file_key = self::$fy_table_map[$fy] ?? '2025-26';
-        $path = __DIR__ . '/tax-tables/' . $file_key . '.php';
-        if (!file_exists($path)) {
-            $path = __DIR__ . '/tax-tables/2025-26.php';
-        }
-        return require $path;
+        return self::loadPhpTables($file_key);
     }
 
     /**
@@ -324,25 +368,17 @@ class PaygCalculator
 
         // If DB HECS rows are missing, pull them from the PHP file as fallback
         if (empty($tables['hecs_2024_25']) || empty($tables['hecs_2025_26'])) {
-            $php_path = __DIR__ . '/tax-tables/2025-26.php';
-            if (file_exists($php_path)) {
-                $php = require $php_path;
-                if (empty($tables['hecs_2024_25'])) {
-                    $tables['hecs_2024_25'] = $php['hecs_2024_25'];
-                }
-                if (empty($tables['hecs_2025_26'])) {
-                    $tables['hecs_2025_26'] = $php['hecs_2025_26'];
-                }
+            $php = self::loadPhpTables('2025-26');
+            if (empty($tables['hecs_2024_25'])) {
+                $tables['hecs_2024_25'] = $php['hecs_2024_25'] ?? [];
+            }
+            if (empty($tables['hecs_2025_26'])) {
+                $tables['hecs_2025_26'] = $php['hecs_2025_26'] ?? [];
             }
         }
         if (empty($tables['hecs_2026_27'])) {
-            $php_path = __DIR__ . '/tax-tables/2026-27.php';
-            if (file_exists($php_path)) {
-                $php = require $php_path;
-                $tables['hecs_2026_27'] = $php['hecs_2026_27'] ?? $tables['hecs_2025_26'];
-            } else {
-                $tables['hecs_2026_27'] = $tables['hecs_2025_26'];
-            }
+            $php = self::loadPhpTables('2026-27');
+            $tables['hecs_2026_27'] = $php['hecs_2026_27'] ?? $tables['hecs_2025_26'];
         }
 
         return $tables;

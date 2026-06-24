@@ -116,7 +116,102 @@ return [
         [ PHP_INT_MAX, 0.4600, 655.7692 ],
     ],
 
-    // ── HECS/HELP repayment thresholds ───────────────────────────────────
+    // ── Schedule 8: STSL combined (PAYG + STSL) coefficient tables ───────────
+    //
+    // Source: ATO Schedule 8 – Statement of formulas for calculating study and
+    //         training support loans components, published 17 June 2026.
+    //         https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components
+    //
+    // Use when employee has a study/training loan (HELP, VSL, FS, SSL, AASL).
+    // Formula (same x as Schedule 1):
+    //   x = floor(weekly_gross) + 0.99
+    //   weekly_combined = round(a × x − b)   ← COMBINED PAYG + STSL, not PAYG only
+    // For monthly: period_combined = round(weekly_combined × 13 / 3)
+    // For fortnightly: period_combined = weekly_combined × 2
+    //
+    // STSL component = period_combined − period_payg_from_schedule1
+    // Max-weekly = ATO "Less than $X" → X−1. Last bracket = PHP_INT_MAX.
+    //
+    // Note: does NOT apply to scale4 (no TFN — 47% flat rate, no STSL).
+    // Note: does NOT apply when employee also has a Medicare levy variation
+    //       declaration (ATO Schedule 8 exclusion — treat as no-STSL case).
+
+    // Scale 1 combined — No tax-free threshold claimed
+    'stsl_scale1' => [
+        //  [max_weekly,       a,          b      ]
+        [  187,  0.1500,    0.1500  ],
+        [  370,  0.2084,   11.0185  ],
+        [  514,  0.1790,    0.1066  ],
+        [  931,  0.3227,   74.1674  ],
+        [  986,  0.3200,   71.6508  ],
+        [ 2143,  0.4700,  219.7124  ],
+        [ 2245,  0.4900,  262.6035  ],
+        [ 2726,  0.5600,  419.8343  ],
+        [ 3302,  0.4900,  228.8816  ],
+        [ PHP_INT_MAX, 0.5700, 493.1893 ],
+    ],
+
+    // Scale 2 combined — Tax-free threshold claimed
+    'stsl_scale2' => [
+        //  [max_weekly,       a,          b      ]
+        [  361,  0.0000,    0.0000  ],
+        [  537,  0.1500,   54.3462  ],
+        [  672,  0.2500,  108.2135  ],
+        [  720,  0.1700,   54.3473  ],
+        [  864,  0.1790,   60.8377  ],
+        [ 1281,  0.3227,  185.1935  ],
+        [ 1336,  0.3200,  181.7319  ],
+        [ 2493,  0.4700,  382.2935  ],
+        [ 2595,  0.4900,  432.1846  ],
+        [ 3576,  0.5600,  613.9154  ],
+        [ 3652,  0.4900,  363.4627  ],
+        [ PHP_INT_MAX, 0.5700, 655.7704 ],
+    ],
+
+    // Scale 3 combined — Foreign residents
+    'stsl_scale3' => [
+        //  [max_weekly,       a,          b      ]
+        [ 1336,  0.3000,    0.3000  ],
+        [ 2493,  0.4500,  200.5615  ],
+        [ 2595,  0.4700,  250.4527  ],
+        [ 3576,  0.5400,  432.1835  ],
+        [ 3652,  0.4700,  181.7308  ],
+        [ PHP_INT_MAX, 0.5500, 474.0385 ],
+    ],
+
+    // Scale 5 combined — Full Medicare levy exemption (TFT claimed)
+    'stsl_scale5' => [
+        //  [max_weekly,       a,          b      ]
+        [  361,  0.0000,    0.0000  ],
+        [  720,  0.1500,   54.3462  ],
+        [  864,  0.1590,   60.8365  ],
+        [ 1281,  0.3027,  185.1923  ],
+        [ 1336,  0.3000,  181.7308  ],
+        [ 2493,  0.4500,  382.2923  ],
+        [ 2595,  0.4700,  432.1835  ],
+        [ 3576,  0.5400,  613.9142  ],
+        [ 3652,  0.4700,  363.4615  ],
+        [ PHP_INT_MAX, 0.5500, 655.7692 ],
+    ],
+
+    // Scale 6 combined — Half Medicare levy exemption
+    'stsl_scale6' => [
+        //  [max_weekly,       a,          b      ]
+        [  361,  0.0000,    0.0000  ],
+        [  720,  0.1500,   54.3462  ],
+        [  864,  0.1590,   60.8365  ],
+        [  907,  0.3027,  185.1923  ],
+        [ 1134,  0.3527,  230.6135  ],
+        [ 1281,  0.3127,  185.1923  ],
+        [ 1336,  0.3100,  181.7308  ],
+        [ 2493,  0.4600,  382.2923  ],
+        [ 2595,  0.4800,  432.1835  ],
+        [ 3576,  0.5500,  613.9142  ],
+        [ 3652,  0.4800,  363.4615  ],
+        [ PHP_INT_MAX, 0.5600, 655.7692 ],
+    ],
+
+    // ── HECS/HELP repayment thresholds (2024-25 flat-rate, kept for legacy) ─
     // Source: ATO NAT 3539 – Schedule 8.
     //
     // 2024-25 (graduated flat-rate system — rate applied to TOTAL annual income):
