@@ -929,6 +929,15 @@ function payroll_select($name, $options, $selected, $class = 'flat')
     echo '</select>';
 }
 
+/** FY select with an "add a new year" hint link after the dropdown. */
+function payroll_fy_select($name, $fy_options, $default)
+{
+    payroll_select($name, $fy_options, $default);
+    echo ' <small style="margin-left:0.3rem;white-space:nowrap;">'
+       . '<a href="config.php?tab=fy&amp;mainmenu=admintools" style="color:#888;" title="Manage financial years">'
+       . '+ add year</a></small>';
+}
+
 // ── Output ────────────────────────────────────────────────────────────────────
 
 llxHeader('', 'Payroll Config');
@@ -1183,7 +1192,7 @@ foreach ($coeff_rows as $cr) {
     <form method="post" action="<?= $base_url ?>&tab=coeff" style="display:flex;gap:0.5rem;align-items:center;">
       <input type="hidden" name="token"  value="<?= newToken() ?>">
       <input type="hidden" name="action" value="seed_coeff">
-      <?php payroll_select('fy_seed', $fy_options, '2025-26') ?>
+      <?php payroll_fy_select('fy_seed', $fy_options, '2025-26') ?>
       <button type="submit" class="button buttonaction">Seed</button>
     </form>
   </div>
@@ -1202,7 +1211,7 @@ foreach ($coeff_rows as $cr) {
       <div style="display:flex;flex-direction:column;gap:0.5rem;">
         <div style="display:flex;gap:0.5rem;align-items:center;">
           <span style="font-size:0.87em;">FY:</span>
-          <?php payroll_select('fy_import', $fy_options, '2026-27') ?>
+          <?php payroll_fy_select('fy_import', $fy_options, '2026-27') ?>
         </div>
         <input type="file" name="csv_file" accept=".csv" required style="font-size:0.85em;">
         <div>
@@ -1227,7 +1236,7 @@ foreach ($coeff_rows as $cr) {
       <table>
         <tr>
           <td style="padding:0.3rem 0.5rem;">FY</td>
-          <td style="padding:0.3rem 0.5rem;"><?php payroll_select('fy', $fy_options, $edit_coeff->fy ?? '2025-26') ?></td>
+          <td style="padding:0.3rem 0.5rem;"><?php payroll_fy_select('fy', $fy_options, $edit_coeff->fy ?? '2025-26') ?></td>
         </tr>
         <tr>
           <td style="padding:0.3rem 0.5rem;">Scale</td>
@@ -1366,7 +1375,7 @@ foreach ($hecs_rows as $hr) {
     <form method="post" action="<?= $base_url ?>&tab=hecs" style="display:flex;gap:0.5rem;align-items:center;">
       <input type="hidden" name="token"  value="<?= newToken() ?>">
       <input type="hidden" name="action" value="seed_hecs">
-      <?php payroll_select('fy_seed', $fy_options, '2025-26') ?>
+      <?php payroll_fy_select('fy_seed', $fy_options, '2025-26') ?>
       <button type="submit" class="button buttonaction">Seed</button>
     </form>
   </div>
@@ -1385,7 +1394,7 @@ foreach ($hecs_rows as $hr) {
       <div style="display:flex;flex-direction:column;gap:0.5rem;">
         <div style="display:flex;gap:0.5rem;align-items:center;">
           <span style="font-size:0.87em;">FY:</span>
-          <?php payroll_select('fy_import', $fy_options, '2026-27') ?>
+          <?php payroll_fy_select('fy_import', $fy_options, '2026-27') ?>
         </div>
         <input type="file" name="csv_file" accept=".csv" required style="font-size:0.85em;">
         <div>
@@ -1410,7 +1419,7 @@ foreach ($hecs_rows as $hr) {
       <table>
         <tr>
           <td style="padding:0.3rem 0.5rem;">FY</td>
-          <td style="padding:0.3rem 0.5rem;"><?php payroll_select('fy', $fy_options, $edit_hecs->fy ?? '2025-26') ?></td>
+          <td style="padding:0.3rem 0.5rem;"><?php payroll_fy_select('fy', $fy_options, $edit_hecs->fy ?? '2025-26') ?></td>
         </tr>
         <tr>
           <td style="padding:0.3rem 0.5rem;">Income from $</td>
@@ -1502,7 +1511,7 @@ function payroll_test_import_card($base_url, $fy_options, $action_name, $dl_acti
     echo '<input type="hidden" name="action" value="' . $action_name . '">';
     echo '<div style="display:flex;flex-direction:column;gap:0.5rem;">';
     echo '<div style="display:flex;gap:0.5rem;align-items:center;"><span style="font-size:0.87em;">FY:</span>';
-    payroll_select('fy_import', $fy_options, $default_fy);
+    payroll_fy_select('fy_import', $fy_options, $default_fy);
     echo '</div>';
     echo '<input type="file" name="csv_file" accept=".csv" required style="font-size:0.85em;">';
     echo '<div><button type="submit" class="button buttonaction"'
@@ -1573,8 +1582,12 @@ function payroll_test_data_table($rows_by_fy, $base_url, $del_action, $headers, 
 // ── 1. Withholding amounts ────────────────────────────────────────────────────
 $wth_by_fy = group_by_fy($test_wth_rows);
 ?>
-<h3 style="border-bottom:2px solid #1a7cb8;padding-bottom:0.3rem;margin-top:2rem;color:#1a7cb8;">
-  1. Withholding Amounts — Schedule 1 (NAT 1004)
+<h3 style="border-bottom:2px solid #1a7cb8;padding-bottom:0.3rem;margin-top:2rem;color:#1a7cb8;display:flex;align-items:baseline;gap:1rem;">
+  <span>1. Withholding Amounts — Schedule 1 (NAT 1004)</span>
+  <span style="font-size:0.7em;font-weight:400;">
+    <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld" target="_blank" style="color:#1a7cb8;">ATO formulas ↗</a>
+    <!-- sample data page: add URL here once confirmed -->
+  </span>
 </h3>
 <p style="font-size:0.88em;max-width:800px;">
   Standard PAYG withholding for Scales 1–3, 5, 6. This is the primary verification dataset —
@@ -1610,8 +1623,12 @@ $wth_by_fy = group_by_fy($test_wth_rows);
 // ── 2. MLA Scale 2 ───────────────────────────────────────────────────────────
 $mla2_by_fy = group_by_fy($test_mla2_rows);
 ?>
-<h3 style="border-bottom:2px solid #27ae60;padding-bottom:0.3rem;margin-top:2.5rem;color:#27ae60;">
-  2. Medicare Levy Adjustment — Scale 2 (NAT 1008)
+<h3 style="border-bottom:2px solid #27ae60;padding-bottom:0.3rem;margin-top:2.5rem;color:#27ae60;display:flex;align-items:baseline;gap:1rem;">
+  <span>2. Medicare Levy Adjustment — Scale 2 (NAT 1008)</span>
+  <span style="font-size:0.7em;font-weight:400;">
+    <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld#ato-Medicarelevyadjustment" target="_blank" style="color:#27ae60;">ATO formulas ↗</a>
+    <!-- sample data page: add URL here once confirmed -->
+  </span>
 </h3>
 <p style="font-size:0.88em;max-width:800px;">
   Withholding reduction for Scale 2 low-income earners who have lodged a Medicare levy variation
@@ -1648,8 +1665,12 @@ $mla2_by_fy = group_by_fy($test_mla2_rows);
 // ── 3. MLA Scale 6 ───────────────────────────────────────────────────────────
 $mla6_by_fy = group_by_fy($test_mla6_rows);
 ?>
-<h3 style="border-bottom:2px solid #8e44ad;padding-bottom:0.3rem;margin-top:2.5rem;color:#8e44ad;">
-  3. Medicare Half-Levy Adjustment — Scale 6 (NAT 1009)
+<h3 style="border-bottom:2px solid #8e44ad;padding-bottom:0.3rem;margin-top:2.5rem;color:#8e44ad;display:flex;align-items:baseline;gap:1rem;">
+  <span>3. Medicare Half-Levy Adjustment — Scale 6 (NAT 1009)</span>
+  <span style="font-size:0.7em;font-weight:400;">
+    <a href="https://www.ato.gov.au/tax-rates-and-codes/payg-withholding-schedule-1-statement-of-formulas-for-calculating-amounts-to-be-withheld#ato-Medicarelevyadjustment" target="_blank" style="color:#8e44ad;">ATO formulas ↗</a>
+    <!-- sample data page: add URL here once confirmed -->
+  </span>
 </h3>
 <p style="font-size:0.88em;max-width:800px;">
   Withholding reduction for Scale 6 (half Medicare levy exemption) earners with children.
@@ -1684,8 +1705,12 @@ $mla6_by_fy = group_by_fy($test_mla6_rows);
 // ── 4. STSL ───────────────────────────────────────────────────────────────────
 $stsl_by_fy = group_by_fy($test_stsl_rows);
 ?>
-<h3 style="border-bottom:2px solid #e67e22;padding-bottom:0.3rem;margin-top:2.5rem;color:#e67e22;">
-  4. STSL — Schedule 8 (NAT 3539)
+<h3 style="border-bottom:2px solid #e67e22;padding-bottom:0.3rem;margin-top:2.5rem;color:#e67e22;display:flex;align-items:baseline;gap:1rem;">
+  <span>4. STSL — Schedule 8 (NAT 3539)</span>
+  <span style="font-size:0.7em;font-weight:400;">
+    <a href="https://www.ato.gov.au/tax-rates-and-codes/schedule-8-statement-of-formulas-for-calculating-study-and-training-support-loans-components" target="_blank" style="color:#e67e22;">ATO formulas ↗</a>
+    <!-- sample data page: add URL here once confirmed -->
+  </span>
 </h3>
 <p style="font-size:0.88em;max-width:800px;">
   Total withholding (PAYG + STSL component) for employees with a HELP, VSL, SSL, TSL, or SFSS debt.
