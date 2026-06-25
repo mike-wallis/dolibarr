@@ -16,6 +16,7 @@ the ATO (PAYG via BAS, super via SBSCH).</p>
   <strong>Quick links:</strong>
   &nbsp;<a href="/dolibarr/custom/payroll/employees.php?mainmenu=billing">Payroll Employees</a>
   &nbsp;|&nbsp;<a href="/dolibarr/custom/payroll/payrun.php?mainmenu=billing">Pay Run</a>
+  &nbsp;|&nbsp;<a href="/dolibarr/custom/payroll/payruns.php?mainmenu=billing">Pay Run History</a>
   &nbsp;|&nbsp;<a href="/dolibarr/custom/payroll/setup.php?mainmenu=billing">Payroll Setup (deductions)</a>
   &nbsp;|&nbsp;<a href="/dolibarr/custom/payroll/config.php?mainmenu=admintools">Tax Table Config</a>
 </div>
@@ -30,11 +31,13 @@ the ATO (PAYG via BAS, super via SBSCH).</p>
   <strong>Contents:</strong>
   <ol style="margin:0.5rem 0 0;padding-left:1.4rem;line-height:2;">
     <li><a href="#accounts">Accounts used</a></li>
-    <li><a href="#setup-employee">One-time: create an employee user</a></li>
+    <li><a href="#setup-employee">One-time: add a new employee</a></li>
     <li><a href="#payroll-profile">One-time: set up each employee's payroll profile</a></li>
     <li><a href="#deductions">Deduction &amp; addition types explained</a></li>
     <li><a href="#additions">Additions to pay — commission, allowances, bonuses</a></li>
     <li><a href="#payrun">Running a pay run — step by step</a></li>
+    <li><a href="#payslip">Payslips — results page, emailing, print all</a></li>
+    <li><a href="#history">Pay Run History — viewing completed runs</a></li>
     <li><a href="#journal">What gets posted to the ledger</a></li>
     <li><a href="#pay-payg">Paying PAYG to the ATO (via BAS)</a></li>
     <li><a href="#pay-super">Paying super (Payday Super — SBSCH)</a></li>
@@ -136,28 +139,65 @@ Super is an employer cost, not deducted from the employee.</p>
 
 <hr>
 
-<!-- ── 2. Create employee user ──────────────────────────────────────────────── -->
-<h2 id="setup-employee">2. One-time: create an employee user</h2>
+<!-- ── 2. Add new employee ──────────────────────────────────────────────────── -->
+<h2 id="setup-employee">2. One-time: add a new employee</h2>
 
-<p>Each employee needs a Dolibarr user account so they appear on the Payroll Employees list and can be selected on pay runs.</p>
+<p>Go to <strong>Billing | Payment &gt; Payroll Employees</strong> and click
+<strong>+ Add New Employee</strong>. This opens a short form:</p>
 
-<ol>
-  <li>Go to <strong>Users &amp; Groups &gt; New user</strong></li>
-  <li>Fill in:
-    <ul>
-      <li><strong>Login:</strong> firstname, e.g. <code>jane</code></li>
-      <li><strong>First name / Last name</strong></li>
-      <li><strong>Employee:</strong> tick this checkbox</li>
-      <li>Set a password (they don't need to log in — this is just a record)</li>
-    </ul>
-  </li>
-  <li>Save. Repeat for each employee.</li>
-</ol>
+<table class="noborder" style="width:100%;max-width:650px;margin-bottom:0.75rem;">
+  <thead>
+    <tr style="background:#f5f5f5;">
+      <th style="padding:0.4rem 1rem;">Field</th>
+      <th style="padding:0.4rem 1rem;">Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>First name</strong></td>
+      <td style="padding:0.35rem 1rem;">Optional but recommended — used on payslips</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 1rem;"><strong>Last name</strong> <span style="color:#c00;">*</span></td>
+      <td style="padding:0.35rem 1rem;">Required</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>Email</strong></td>
+      <td style="padding:0.35rem 1rem;">Optional — used on payslips and as their Dolibarr login email</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 1rem;"><strong>Login</strong> <span style="color:#c00;">*</span></td>
+      <td style="padding:0.35rem 1rem;">Auto-filled as initial + surname (e.g. Jane Smith → <code>jsmith</code>). Edit if that login is already taken.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Click <strong>Add employee &amp; set up payroll profile →</strong>. Two records are created:</p>
+<ul>
+  <li>A Dolibarr <strong>User</strong> with the Employee flag set — appears on pay runs</li>
+  <li>A <strong>Contact</strong> linked to the user — visible under <em>Third Parties → Contacts</em></li>
+</ul>
+<p>You land straight on the payroll profile page to fill in the rest of their details.</p>
 
 <div class="alert alert-info" style="margin:1rem 0;max-width:700px;">
-  Employee users don't need any module permissions — leave all permission boxes unticked.
-  They exist only so you can select them on pay runs.
+  <strong>No password is set by the Add Employee form.</strong> The employee record exists for payroll
+  purposes — they don't need to log in. If you want them to have a Dolibarr login,
+  set a password later via <em>Tools → Users &amp; Groups → Edit user → Change password</em>.
+  Leave all module permission boxes unticked unless they need access to a specific area.
 </div>
+
+<details style="margin:0.5rem 0;max-width:700px;">
+  <summary style="cursor:pointer;color:#555;font-size:0.9em;">Alternative: create via Tools → Users &amp; Groups</summary>
+  <div style="padding:0.75rem 0 0 1rem;font-size:0.9em;">
+    <ol>
+      <li>Go to <strong>Tools → Users &amp; Groups → New user</strong></li>
+      <li>Enter login, first name, last name, email</li>
+      <li>Tick the <strong>Employee</strong> checkbox</li>
+      <li>Save, then go to <strong>Payroll Employees</strong> and click <em>Set up payroll profile</em></li>
+    </ol>
+    <p style="margin:0.5rem 0 0;color:#777;">This does <em>not</em> create a Contact record automatically — use the Payroll Employees form if you want the Contact link.</p>
+  </div>
+</details>
 
 <hr>
 
@@ -201,13 +241,32 @@ Super is an employer cost, not deducted from the employee.</p>
           <td style="padding:0.35rem 0.8rem;"><strong>Tax scale</strong></td>
           <td style="padding:0.35rem 0.8rem;">Scale 2 (TFT claimed) for most employees; see <a href="#tax-scales">tax scales</a></td>
         </tr>
-        <tr>
+        <tr style="background:#fafafa;">
           <td style="padding:0.35rem 0.8rem;"><strong>HECS/HELP</strong></td>
           <td style="padding:0.35rem 0.8rem;">Tick if the employee has a student loan. Get their TFN declaration.</td>
         </tr>
+        <tr>
+          <td style="padding:0.35rem 0.8rem;"><strong>Super fund name</strong></td>
+          <td style="padding:0.35rem 0.8rem;">e.g. AustralianSuper — appears on payslips and the super payments list</td>
+        </tr>
+        <tr style="background:#fafafa;">
+          <td style="padding:0.35rem 0.8rem;"><strong>USI</strong></td>
+          <td style="padding:0.35rem 0.8rem;">Unique Superannuation Identifier — required when submitting via SBSCH. Find it on the fund's website or <a href="https://superfundlookup.gov.au" target="_blank">superfundlookup.gov.au</a>.</td>
+        </tr>
+        <tr>
+          <td style="padding:0.35rem 0.8rem;"><strong>Fund ABN</strong></td>
+          <td style="padding:0.35rem 0.8rem;">Optional — from the same lookup</td>
+        </tr>
+        <tr style="background:#fafafa;">
+          <td style="padding:0.35rem 0.8rem;"><strong>Member number</strong></td>
+          <td style="padding:0.35rem 0.8rem;">Employee's membership number with the fund — on their member statement or welcome letter</td>
+        </tr>
       </tbody>
     </table>
-    <p style="margin-top:0.75rem;">The <strong>Optional deductions</strong> section at the bottom lets you enable
+    <p style="margin-top:0.75rem;">Super fund details are <strong>snapshotted</strong> onto each pay run record at
+    processing time, so payslips always show the fund details that were current at the time of payment —
+    even if the employee changes fund later.</p>
+    <p>The <strong>Optional deductions</strong> section lets you enable
     Child Support for an individual employee and set the fixed amount per period.</p>
   </div>
 
@@ -365,35 +424,122 @@ on the pay run form.</p>
 <p>Go to <strong>Billing | Payment &gt; Pay Run</strong>.</p>
 
 <h3>Step 1 — Set the period</h3>
-<ul>
-  <li><strong>Period start / end:</strong> dates covered by this pay run (e.g. 16 Jun – 22 Jun 2026)</li>
-  <li><strong>Pay date:</strong> when the money hits employees' bank accounts</li>
-  <li><strong>Bank account:</strong> which bank account the net pay is drawn from</li>
-  <li><strong>Financial year:</strong> current FY — controls super rate and HECS thresholds</li>
-</ul>
 
-<h3>Step 2 — Enter hours or confirm salary</h3>
+<p>At the top of the pay run form, select the <strong>bank account</strong> and <strong>financial year</strong>.
+These apply to the whole pay run.</p>
 
-<div style="display:flex;gap:2rem;flex-wrap:wrap;max-width:800px;">
+<p>Below that, the form shows <strong>one date block per pay period type</strong> — one for weekly employees,
+one for fortnightly employees, and so on. Only the period types that have active employees are shown.</p>
+
+<table class="noborder" style="width:100%;max-width:680px;margin-bottom:0.75rem;">
+  <thead>
+    <tr style="background:#f5f5f5;">
+      <th style="padding:0.4rem 1rem;">Field</th>
+      <th style="padding:0.4rem 1rem;">Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>Period start</strong></td>
+      <td style="padding:0.35rem 1rem;">First day of this period (e.g. 16 Jun 2026). Auto-filled from the last pay run for this period type — check before processing.</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 1rem;"><strong>Period end</strong></td>
+      <td style="padding:0.35rem 1rem;">Last day of this period (e.g. 22 Jun 2026 for weekly). Auto-filled.</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>Pay date</strong></td>
+      <td style="padding:0.35rem 1rem;">When the money hits employees' bank accounts. Auto-filled to the same day as last time.</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 1rem;"><strong>Bank account</strong></td>
+      <td style="padding:0.35rem 1rem;">Which bank account net pay is drawn from — applies to all employees.</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>Financial year</strong></td>
+      <td style="padding:0.35rem 1rem;">Current FY — controls super rate and HECS thresholds.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>If dates were auto-filled, a small "↑ Auto-filled from last [weekly] pay" hint appears. Always verify
+the dates are correct — especially at the start of a new period or after a public holiday.</p>
+
+<h3>Step 2 — Include / exclude employees</h3>
+
+<p>Each employee row starts with a <strong>checkbox</strong>. All employees are ticked by default.
+Untick any employee who should be skipped this period — their row dims to make it visually clear they
+are excluded. Excluded employees get no salary record and no journal entries for this run.</p>
+
+<p>Common reasons to exclude someone: they are on unpaid leave, they didn't work this period, or they
+are on a different pay schedule being processed separately.</p>
+
+<h3>Step 3 — Enter hours or confirm salary</h3>
+
+<p>Under each period date block the employees are split into two sub-sections based on their position type:</p>
+
+<div style="display:flex;gap:2rem;flex-wrap:wrap;max-width:800px;margin-bottom:0.75rem;">
   <div style="flex:1;min-width:240px;">
-    <p><strong>Hourly employees (casual / part time):</strong></p>
+    <p><strong>Casual</strong> (position type CA or CAPT):</p>
     <ul>
-      <li>Enter <em>Ord hrs</em> (ordinary hours at base rate)</li>
+      <li>Enter <em>Ord hrs</em> worked at base rate</li>
       <li>Enter <em>OT×1.5 hrs</em> and/or <em>OT×2.0 hrs</em> if applicable</li>
-      <li>Rate defaults from their payroll profile — change if needed</li>
-      <li>Gross is calculated automatically: (ord hrs × rate) + (OT hrs × rate × multiplier)</li>
+      <li>Rate defaults from their payroll profile — change if needed for this period</li>
+      <li>No leave rows — casuals have no NES entitlement to annual or sick leave</li>
     </ul>
   </div>
   <div style="flex:1;min-width:240px;">
-    <p><strong>Salaried employees:</strong></p>
+    <p><strong>FT / PT</strong> (FT, FTT, PT, AP, O):</p>
     <ul>
-      <li>A single <em>Gross salary</em> field appears — defaults from their profile</li>
-      <li>Change it only if this period differs (e.g. extra day worked, salary increase)</li>
+      <li>Hourly: enter <em>Ord hrs</em>, <em>OT×1.5</em>, <em>OT×2.0</em> as above</li>
+      <li>Salaried: a single <em>Gross salary</em> field (defaults from profile)</li>
+      <li>Each employee has a <strong>leave sub-row</strong> (see below)</li>
     </ul>
   </div>
 </div>
 
-<h3>Step 3 — Review calculated amounts</h3>
+<p>If you have employees on different pay schedules (e.g. some weekly, some fortnightly), each group gets
+its own heading and date block. All weekly employees appear together, all fortnightly employees appear
+together — you only see the groups that actually have active employees.</p>
+
+<h4>Leave sub-row (FT / PT only)</h4>
+<p>Below each FT/PT employee's hours row, a shaded band shows three leave fields:</p>
+<table class="noborder" style="width:100%;max-width:780px;margin-bottom:0.75rem;">
+  <thead>
+    <tr style="background:#f5f5f5;">
+      <th style="padding:0.4rem 1rem;">Field</th>
+      <th style="padding:0.4rem 1rem;">What to enter</th>
+      <th style="padding:0.4rem 1rem;">Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>Annual leave</strong></td>
+      <td style="padding:0.35rem 1rem;">Hours of paid annual leave taken this period</td>
+      <td style="padding:0.35rem 1rem;">Current balance shown in brackets. ⚠ appears if hours exceed balance.</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 1rem;"><strong>Sick / carer's</strong></td>
+      <td style="padding:0.35rem 1rem;">Hours of personal / carer's leave taken this period</td>
+      <td style="padding:0.35rem 1rem;">Current balance shown. ⚠ if hours exceed balance.</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>Bereavement</strong></td>
+      <td style="padding:0.35rem 1rem;">Hours taken for compassionate/bereavement leave</td>
+      <td style="padding:0.35rem 1rem;">Shows FY usage to date. FWA: 2 days per occasion — no annual cap.</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 1rem;"><strong>Leave note</strong></td>
+      <td style="padding:0.35rem 1rem;">Optional explanation (e.g. "Sick Mon–Wed", "Dad's funeral")</td>
+      <td style="padding:0.35rem 1rem;">Appears on the payslip and in the leave audit ledger.</td>
+    </tr>
+  </tbody>
+</table>
+<p>Leave the leave fields at 0 if no leave was taken that period. For hourly FT/PT employees,
+leave hours are paid at base rate and add to gross — enter only the hours the employee was
+<em>actually absent and paid as leave</em>, not ordinary working hours.</p>
+
+<h3>Step 4 — Review calculated amounts</h3>
 <p>For each employee the form shows:</p>
 <table class="noborder" style="width:100%;max-width:700px;">
   <tbody>
@@ -422,18 +568,147 @@ on the pay run form.</p>
   and type it into the PAYG field. The field is always editable before you click Process.
 </div>
 
-<h3>Step 4 — Process the pay run</h3>
+<h3>Step 5 — Process the pay run</h3>
 <ol>
   <li>Check all amounts look right</li>
-  <li>Click <strong>Process pay run</strong></li>
-  <li>Dolibarr creates salary records and journal entries for all employees (see <a href="#journal">Section 6</a>)</li>
-  <li>A summary page shows each employee's amounts and the full journal entry breakdown — print or screenshot this for your records</li>
+  <li>Click the <strong>Process [Period] Pay →</strong> button in the heading of the period group you want to process
+      (e.g. <em>Process Weekly Pay →</em> for weekly employees). Each period group has its own button —
+      you can run weekly and fortnightly employees independently.</li>
+  <li>Dolibarr creates salary records and journal entries for the included employees in that period group
+      (see <a href="#journal">Section 6</a>)</li>
+  <li>A results page shows: a green header with the <strong>run reference</strong> (e.g. PR000042), pay period, and pay date;
+      the employee summary table with View and Email payslip buttons; and below that a
+      <strong>Super payments due</strong> table and <strong>Journal entries posted</strong> section</li>
 </ol>
+
+<div class="alert alert-warning" style="margin:1rem 0;max-width:700px;">
+  <strong>Duplicate prevention:</strong> if you click Process again for the same pay period end date,
+  Dolibarr will block it with an error for each affected employee — nothing is saved.
+  This prevents accidental double-ups. To redo a pay run you must first delete the existing
+  payrun_line record (and the linked salary/payment records) from the database.
+</div>
 
 <div class="alert alert-warning" style="margin:1rem 0;max-width:700px;">
   <strong>Transfer net pay from your bank separately.</strong> Dolibarr records the journal entry —
   it does not initiate a bank transfer. Log into your bank and send each employee their net pay amount.
 </div>
+
+<hr>
+
+<!-- ── Payslips ────────────────────────────────────────────────────────────── -->
+<h2 id="payslip">Payslips</h2>
+
+<h3>Results page — after processing</h3>
+<p>After processing, the results page shows a green header with the <strong>run reference</strong>
+(e.g. PR000042), pay period, and pay date. Below that is the employee summary table with per-row buttons:</p>
+
+<table class="noborder" style="width:100%;max-width:680px;margin-bottom:0.75rem;">
+  <thead>
+    <tr style="background:#f5f5f5;">
+      <th style="padding:0.4rem 1rem;">Button</th>
+      <th style="padding:0.4rem 1rem;">What it does</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>View</strong></td>
+      <td style="padding:0.35rem 1rem;">Opens the print-ready payslip for that employee in a new tab</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 1rem;"><strong>Email</strong> (teal)</td>
+      <td style="padding:0.35rem 1rem;">Sends the payslip as an HTML email to that employee's address. Only shown if the employee has an email on their profile. Uses Dolibarr's SMTP settings.</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 1rem;"><strong>Print all payslips</strong></td>
+      <td style="padding:0.35rem 1rem;">Opens each payslip in a new browser tab simultaneously. Your browser must allow popups from localhost. Print each tab, or use "Print all tabs".</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 1rem;"><strong>Email all payslips</strong></td>
+      <td style="padding:0.35rem 1rem;">Sends payslips to all employees who have an email address. Shows a summary of how many were sent and any failures.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>What's on the payslip</h3>
+<ul>
+  <li><strong>Header:</strong> company name and ABN (from Dolibarr company settings), pay date</li>
+  <li><strong>Employee:</strong> name, email, pay period dates, financial year</li>
+  <li><strong>Earnings:</strong> ordinary hours, overtime (×1.5 and ×2.0), annual/sick/bereavement leave hours,
+      plus any additions (commissions, allowances, bonuses) — with rates shown for each line</li>
+  <li><strong>Deductions:</strong> PAYG withholding (includes HECS if applicable), any other employee deductions</li>
+  <li><strong>Net pay</strong></li>
+  <li><strong>Employer super:</strong> SGC amount; fund name, USI, and member number (snapshotted from the employee profile at the time of the pay run)</li>
+  <li><strong>Leave balances</strong> (end of period — FT/PT only): annual leave and sick leave hours remaining; leave note if one was entered on the pay run</li>
+  <li><strong>Year-to-date:</strong> gross, PAYG, super, and net YTD across all pay runs for this employee in the same financial year</li>
+</ul>
+
+<h3>Printing a single payslip</h3>
+<p>Click <strong>Print payslip</strong> at the top of the payslip page. The Dolibarr navigation hides automatically
+when printing — the printed page shows only the payslip content.</p>
+
+<div class="alert alert-info" style="margin:1rem 0;max-width:700px;">
+  <strong>Fair Work requirement:</strong> Employers must provide a payslip to each employee within
+  1 business day of pay day. The payslip must include the mandatory fields listed above.
+  Keep copies — employees can request payslips up to 7 years after the date of payment.
+</div>
+
+<hr>
+
+<!-- ── Pay Run History ──────────────────────────────────────────────────────── -->
+<h2 id="history">Pay Run History</h2>
+
+<p>Go to <strong>Billing | Payment &gt; Pay Run History</strong> to browse all completed pay runs.
+You can also get here immediately after processing via the <strong>← All runs</strong> button.</p>
+
+<h3>List view</h3>
+<p>One row per completed run, showing: run reference (PR######), pay period start → end, pay date, FY,
+number of employees, and totals for gross, PAYG, super, and net pay. Filter by FY using the links at the top.
+Click <strong>View</strong> on any row to open the detail view for that run.</p>
+
+<h3>Detail view</h3>
+<p>Shows the per-employee breakdown for that run with the same View and Email payslip buttons as the
+post-processing results page. Also shows:</p>
+<ul>
+  <li>The green run header with reference number, period, and pay date</li>
+  <li><strong>Print all payslips</strong> and <strong>Email all payslips</strong> buttons</li>
+  <li>A <strong>Super payments due</strong> table (see below)</li>
+</ul>
+
+<h3>Super payments due table</h3>
+<p>Shown on both the post-processing results page and the Pay Run History detail view. Lists each employee
+with super_amount &gt; 0:</p>
+<table class="noborder" style="width:100%;max-width:680px;margin-bottom:0.75rem;">
+  <thead>
+    <tr style="background:#f5f5f5;">
+      <th style="padding:0.4rem 0.75rem;">Column</th>
+      <th style="padding:0.4rem 1rem;">Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:0.35rem 0.75rem;"><strong>Super fund</strong></td>
+      <td style="padding:0.35rem 1rem;">Snapshotted fund name. Shows <span style="color:#c00;">⚠ not set</span> if fund details weren't on the employee profile at pay time — go back and enter them via Payroll Employees &gt; Edit profile.</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 0.75rem;"><strong>USI</strong></td>
+      <td style="padding:0.35rem 1rem;">Unique Superannuation Identifier — required for SBSCH submission</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 0.75rem;"><strong>Member no.</strong></td>
+      <td style="padding:0.35rem 1rem;">Employee's membership number with their fund</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 0.75rem;"><strong>Amount</strong></td>
+      <td style="padding:0.35rem 1rem;">SGC contribution for this run (snapshotted at time of processing)</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 0.75rem;"><strong>SGC due</strong></td>
+      <td style="padding:0.35rem 1rem;">28 days after the end of the quarter the pay date falls in. Q1 Jul–Sep → 28 Oct; Q2 Oct–Dec → 28 Jan; Q3 Jan–Mar → 28 Apr; Q4 Apr–Jun → 28 Jul.</td>
+    </tr>
+  </tbody>
+</table>
+<p>Click <strong>Print SBSCH list</strong> to print this table — use it as your entry sheet when logging
+into ATO Online Services for Business &gt; SBSCH.</p>
 
 <hr>
 
@@ -569,9 +844,12 @@ Check account <strong><?= $_payg_cr ?> PAYG Tax</strong> balance — this is wha
 
 <h3>How to pay super each pay run</h3>
 <ol>
-  <li>Get the total super amount from the Pay Run summary (or check account <strong><?= $_super_cr ?></strong>)</li>
+  <li>After the pay run, use the <strong>Super payments due</strong> table on the results page — it lists each employee,
+      their fund name, USI, member number, and super amount for that run. Use this as your SBSCH entry sheet.
+      You can also find this table for any previous run via <strong>Pay Run History &gt; View</strong>
+      (in case you need to re-check or print it later).</li>
   <li>Log in to <strong>ATO Online Services for Business</strong> &gt; SBSCH (Small Business Super Clearing House)</li>
-  <li>Enter the payment for each employee and submit</li>
+  <li>Enter each employee's payment using the details from the super payments table and submit</li>
   <li>Transfer the money from your bank to SBSCH on or before pay day</li>
   <li>Record in Dolibarr — <strong>Accounting &gt; Journal entries &gt; New entry</strong> (General journal):
     <ul>
@@ -827,9 +1105,9 @@ leave accrual for employees with position type CA or CAPT.</p>
     </tr>
     <tr>
       <td style="padding:0.35rem 1rem;"><strong>Bereavement / compassionate</strong></td>
-      <td style="padding:0.35rem 1rem;">2 days per occasion (all employees incl. casuals)</td>
+      <td style="padding:0.35rem 1rem;">2 days per occasion (all employees incl. casuals); no annual cap</td>
       <td style="padding:0.35rem 1rem;">Does not accrue</td>
-      <td style="padding:0.35rem 1rem;">No — recorded in history only</td>
+      <td style="padding:0.35rem 1rem;">No running balance — FY usage is shown on the pay run form for reference</td>
     </tr>
   </tbody>
 </table>
@@ -877,17 +1155,20 @@ Overtime hours do not count toward accrual.</p>
 </ol>
 
 <h3>Entering leave on a pay run</h3>
-<p>Each employee row in the pay run form has a leave sub-row showing three fields:</p>
+<p>Each FT/PT employee row in the pay run form has a shaded <strong>leave sub-row</strong> with four fields
+(see <a href="#payrun">Step 2</a> for the full table). In brief:</p>
 <ul style="margin:0 0 0.5rem 1.5rem;">
   <li><strong>Annual leave</strong> — hours of paid annual leave taken this period. Current balance shown in brackets.
-      A ⚠ warning appears if entered hours exceed the current balance (this is allowed but should be investigated).</li>
-  <li><strong>Sick / carer's leave</strong> — hours of paid sick or carer's leave this period. Same balance display and warning.</li>
-  <li><strong>Bereavement / compassionate</strong> — hours taken for bereavement (2 days per occasion per NES). No balance shown — just recorded.</li>
+      A ⚠ warning appears if entered hours exceed the current balance.</li>
+  <li><strong>Sick / carer's leave</strong> — hours of paid personal/carer's leave this period. Same balance display and warning.</li>
+  <li><strong>Bereavement / compassionate</strong> — hours taken this period. FY usage to date is shown for reference.
+      The NES provides 2 days per occasion — there is no annual cap, but leave this field at 0 unless bereavement leave was actually taken.</li>
+  <li><strong>Leave note</strong> — optional free-text explanation (appears on the payslip and in the leave ledger).</li>
 </ul>
 <p>For <strong>hourly employees</strong>: leave hours are paid at base rate and added to gross pay.
-   Enter ordinary hours worked separately — leave hours are on top of (or instead of) ordinary hours depending on what actually happened that week.</p>
+   Enter ordinary hours worked separately — leave hours replace (or add to) ordinary hours depending on what actually happened.</p>
 <p>For <strong>salaried employees</strong>: the salary amount does not change regardless of leave taken.
-   The leave fields only update the leave balance records — leave a field blank (0) if no leave was taken.</p>
+   The leave fields only update the leave balance records — leave them at 0 if no leave was taken.</p>
 
 <h3>Leave loading (17.5%)</h3>
 <p>The NES does not require leave loading — it is award-specific.
@@ -1115,6 +1396,16 @@ A built-in verification test is also available in <a href="/dolibarr/custom/payr
       <td style="padding:0.4rem 1rem;">Gear icon missing from module card</td>
       <td style="padding:0.4rem 1rem;">Old version of modPayroll.class.php cached (OPcache) or wrong deploy path</td>
       <td style="padding:0.4rem 1rem;">Restart Apache from WAMP tray, then Ctrl+F5. Make sure files are deployed to <code>htdocs/custom/payroll/</code> (use <code>scripts/deploy.ps1</code>)</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.4rem 1rem;">Pay run blocked — "already has a pay run recorded for period ending …"</td>
+      <td style="padding:0.4rem 1rem;">That employee was already processed for the same pay period end date — either an accidental duplicate run or the dates weren't advanced correctly</td>
+      <td style="padding:0.4rem 1rem;">Check <strong>Pay Run History</strong> — if the existing run is correct, do nothing. If it was a mistake, delete the relevant rows from <code>llx_payroll_payrun_line</code> (and the matching <code>llx_payroll_leave_transaction</code> rows if leave was recorded), then re-run with the correct dates. Do not delete records from a run that has already been paid or reported to the ATO.</td>
+    </tr>
+    <tr>
+      <td style="padding:0.4rem 1rem;">Email payslip fails / not delivered</td>
+      <td style="padding:0.4rem 1rem;">Dolibarr SMTP not configured, employee has no email address, or mail server rejected the message</td>
+      <td style="padding:0.4rem 1rem;">Check <strong>Setup &gt; Emails</strong> — SMTP host, port, and credentials must be set. Confirm the employee's email address is on their Dolibarr user profile. Check the Dolibarr event log and your SMTP server's logs for the error message.</td>
     </tr>
   </tbody>
 </table>

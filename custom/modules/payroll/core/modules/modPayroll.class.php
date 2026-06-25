@@ -16,12 +16,14 @@ class modPayroll extends DolibarrModules
         $this->rights_class = 'payroll';
         $this->family       = 'hr';
         $this->picto        = 'salary';
-        $this->name            = 'Payroll';
-        $this->description     = 'Pay run entry — positions, pay periods, PAYG/HECS/super in one step.';
-        $this->version         = '2.2';
+        $this->name            = 'Australian Payroll';
+        $this->description     = 'Australian pay run entry — PAYG/HECS/super/bank in one step. Requires the Salaries module (uses its classes to create net-pay bank entries). Works best alongside the HRM module (employee profiles and positions).';
+        $this->version         = '2.3';
         $this->const_name      = 'MAIN_MODULE_PAYROLL';
         $this->editor_name     = 'South Side Supplies';
         $this->config_page_url = ['/custom/payroll/config.php?mainmenu=admintools'];
+        $this->depends         = ['modSalaries'];  // uses Salary + PaymentSalary classes for net-pay bank entries
+        // HRM module recommended but not hard-required
 
         // SQL tables to create on module init
         $this->module_parts = [];
@@ -36,6 +38,38 @@ class modPayroll extends DolibarrModules
             'mainmenu' => 'billing',
             'leftmenu' => 'payroll_run',
             'url'      => '/custom/payroll/payrun.php?mainmenu=billing&leftmenu=payroll_run',
+            'langs'    => '',
+            'position' => 900,
+            'enabled'  => '$conf->payroll->enabled',
+            'perms'    => '$user->admin',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        // Pay Run History — completed pay runs list
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=billing',
+            'type'     => 'left',
+            'titre'    => 'Pay Run History',
+            'mainmenu' => 'billing',
+            'leftmenu' => 'payroll_history',
+            'url'      => '/custom/payroll/payruns.php?mainmenu=billing&leftmenu=payroll_history',
+            'langs'    => '',
+            'position' => 900,
+            'enabled'  => '$conf->payroll->enabled',
+            'perms'    => '$user->admin',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
+        // TFN Manager — encrypted TFN admin for all payroll employees
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=billing',
+            'type'     => 'left',
+            'titre'    => 'TFN Manager',
+            'mainmenu' => 'billing',
+            'leftmenu' => 'payroll_tfn',
+            'url'      => '/custom/payroll/tfn.php?mainmenu=billing&leftmenu=payroll_tfn',
             'langs'    => '',
             'position' => 900,
             'enabled'  => '$conf->payroll->enabled',
@@ -114,6 +148,7 @@ class modPayroll extends DolibarrModules
             'llx_payroll_mla_params',       // MLA formula parameters (DB-driven, replaces hardcoded values)
             'llx_payroll_leave_balance',    // running leave balance per employee per type
             'llx_payroll_leave_transaction',// full audit ledger of all leave movements
+            'llx_payroll_payrun_line',      // persisted pay run detail for payslips and YTD
             'llx_payroll_alter',
         ];
         foreach ($tables_to_create as $table) {
@@ -136,8 +171,19 @@ class modPayroll extends DolibarrModules
             ['llx_payroll_employee',       'has_medicare_adj',      'TINYINT NOT NULL DEFAULT 0'],
             ['llx_payroll_employee',       'medicare_dependants',   'TINYINT NOT NULL DEFAULT 0'],
             ['llx_payroll_employee',       'std_weekly_hours',      'DECIMAL(5,2) NOT NULL DEFAULT 0 AFTER std_hours'],
+            ['llx_payroll_employee',       'employment_start_date', 'DATE NULL'],
             ['llx_payroll_fy_config',      'start_date',            'DATE NULL AFTER fy'],
             ['llx_payroll_fy_config',      'end_date',              'DATE NULL AFTER start_date'],
+            ['llx_payroll_payrun_line',    'leave_note',            'VARCHAR(255) NULL AFTER additions_json'],
+            ['llx_payroll_employee',       'super_fund_name',       'VARCHAR(255) NULL'],
+            ['llx_payroll_employee',       'super_fund_usi',        'VARCHAR(50) NULL'],
+            ['llx_payroll_employee',       'super_fund_abn',        'VARCHAR(20) NULL'],
+            ['llx_payroll_employee',       'super_member_number',   'VARCHAR(50) NULL'],
+            ['llx_payroll_payrun_line',    'super_fund_usi',        'VARCHAR(50) NULL AFTER super_fund'],
+            ['llx_payroll_payrun_line',    'super_member_number',   'VARCHAR(50) NULL AFTER super_fund_usi'],
+            ['llx_payroll_employee',       'tfn_encrypted',         'VARCHAR(500) NULL'],
+            ['llx_payroll_employee',       'pay_bsb',               'VARCHAR(10) NULL'],
+            ['llx_payroll_employee',       'pay_account',           'VARCHAR(20) NULL'],
         ];
         foreach ($migrations as [$table, $col, $def]) {
             $res = $this->db->query(
@@ -150,6 +196,19 @@ class modPayroll extends DolibarrModules
                 if (!$obj->cnt) {
                     $sql[] = "ALTER TABLE $table ADD COLUMN $col $def";
                 }
+            }
+        }
+
+        // Widen llx_user_extrafields.super_usi from VARCHAR(30) to VARCHAR(50) if still narrow.
+        $res_col = $this->db->query(
+            "SELECT CHARACTER_MAXIMUM_LENGTH AS len FROM information_schema.COLUMNS"
+            . " WHERE TABLE_SCHEMA = DATABASE()"
+            . " AND TABLE_NAME = 'llx_user_extrafields'"
+            . " AND COLUMN_NAME = 'super_usi'"
+        );
+        if ($res_col && $obj_col = $this->db->fetch_object($res_col)) {
+            if ((int)$obj_col->len < 50) {
+                $sql[] = "ALTER TABLE llx_user_extrafields MODIFY COLUMN super_usi VARCHAR(50) NULL";
             }
         }
 

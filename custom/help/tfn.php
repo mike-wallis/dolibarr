@@ -6,6 +6,10 @@ if (!$user->admin) {
     accessforbidden();
 }
 
+// TFN management has moved into the Payroll module
+header('Location: ' . DOL_URL_ROOT . '/custom/payroll/tfn.php?mainmenu=billing&leftmenu=payroll_tfn');
+exit;
+
 // Load .env key — file is at repo root, two levels above htdocs/
 $envFile = DOL_DOCUMENT_ROOT . '/../../.env';
 $tfnKey  = '';

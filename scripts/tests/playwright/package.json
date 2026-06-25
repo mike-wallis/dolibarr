@@ -1,0 +1,8 @@
+{
+  "name": "dolibarr-payroll-tests",
+  "type": "module",
+  "description": "Playwright tests for the Dolibarr payroll module",
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
+  }
+}

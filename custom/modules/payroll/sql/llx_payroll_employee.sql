@@ -13,7 +13,12 @@ CREATE TABLE IF NOT EXISTS llx_payroll_employee (
     ot_rate1        DECIMAL(5,2) NOT NULL DEFAULT 1.50,
     ot_rate2        DECIMAL(5,2) NOT NULL DEFAULT 2.00,
     tax_scale       VARCHAR(10)  NOT NULL DEFAULT 'scale2',
-    has_hecs        TINYINT      NOT NULL DEFAULT 0,
-    entity          INT          NOT NULL DEFAULT 1,
+    has_hecs                TINYINT      NOT NULL DEFAULT 0,
+    employment_start_date   DATE         NULL,
+    super_fund_name         VARCHAR(255) NULL,
+    super_fund_usi          VARCHAR(50)  NULL,
+    super_fund_abn          VARCHAR(20)  NULL,
+    super_member_number     VARCHAR(50)  NULL,
+    entity                  INT          NOT NULL DEFAULT 1,
     UNIQUE KEY uk_payroll_emp (fk_user, entity)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
