@@ -66,16 +66,22 @@ class pdf_brightcs extends pdf_crabe
 		$this->description = 'Bright Cleaning Solutions invoice';
 
 		// Column positions (mm from left edge of page).
-		// write_file draws in this fixed order: desc → tva → up → qty → unit → total
+		// write_file draws in this fixed order: desc → tva → up → qty → unit → total.
 		// Positions MUST increase left-to-right in that sequence.
+		//
+		// ActionsInvoicelines (custom/modules/invoicelines/) hooks the content drawn at
+		// the tva/up/qty slots so the PRINTED values read Price | Qty | GST — see that
+		// class's docblock. The widths below are sized for THAT printed content (e.g.
+		// "PRICE (ex GST)" needs the wider slot, not the narrow one GST% used to have),
+		// not for what each variable name suggests.
 		$this->posxdesc     = $this->marge_gauche + 1;
 		$this->posxpicture  = 116;
-		$this->posxtva      = 116;
-		$this->posxup       = 127;
-		$this->posxqty      = 150;
-		$this->posxunit     = 161;
-		$this->posxdiscount = 161;
-		$this->postotalht   = 174;
+		$this->posxtva      = 116; // Price column starts here (see note above)
+		$this->posxup       = 139; // Qty column starts here
+		$this->posxqty      = 152; // GST column starts here
+		$this->posxunit     = 163;
+		$this->posxdiscount = 163;
+		$this->postotalht   = 174; // Amount column starts here
 	}
 
 
@@ -289,13 +295,18 @@ class pdf_brightcs extends pdf_crabe
 		$pdf->SetTextColor(255, 255, 255);
 		$pdf->SetFont('', 'B', $fs - 2);
 
+		// Column order here is Item | Price | Qty | GST | Amount. The content drawn in
+		// each x-position below is NOT what Dolibarr's core write_file() normally puts
+		// there — ActionsInvoicelines (custom/modules/invoicelines/) hooks the three
+		// pdf_getline*() calls in core and swaps their printed values around so the
+		// physical column order matches this header without touching core files.
+		// See that class's docblock for the full explanation. Read the two together.
 		$cols = [
 			['ITEM CODE / DESCRIPTION', $ml,               $this->posxtva    - $ml,               'L'],
-			['GST %',                   $this->posxtva,    $this->posxup     - $this->posxtva,    'C'],
-			['PRICE (ex GST)',           $this->posxup,     $this->posxqty    - $this->posxup,     'C'],
-			['QTY',                     $this->posxqty,    $this->posxunit   - $this->posxqty,    'C'],
-			['UNIT',                    $this->posxunit,   $this->postotalht - $this->posxunit,   'C'],
-			['AMOUNT (ex GST)',          $this->postotalht, $pw - $mr         - $this->postotalht, 'C'],
+			['PRICE (ex GST)',          $this->posxtva,    $this->posxup     - $this->posxtva,    'C'],
+			['QTY',                     $this->posxup,     $this->posxqty    - $this->posxup,     'C'],
+			['GST',                     $this->posxqty,    $this->postotalht - $this->posxqty,    'C'],
+			['AMOUNT (ex GST)',         $this->postotalht, $pw - $mr         - $this->postotalht, 'C'],
 		];
 
 		foreach ($cols as [$label, $x, $w, $align]) {
