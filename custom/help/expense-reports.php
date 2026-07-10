@@ -29,7 +29,12 @@ claim and couldn't see how to allocate it to an expense account, this is why: th
 step below hasn't been done yet.</p>
 
 <ol>
-  <li>Go to <strong>Setup → Dictionaries</strong>, find <strong>"Type of expense report fees"</strong>
+  <li>If you can't find the dictionary in the next step, the <strong>Expense Reports</strong>
+      module probably isn't active yet — go to <strong>Setup → Modules/Applications</strong>,
+      search <strong>"Expense Reports"</strong>, and enable it. The dictionary row only appears
+      once this module is on.</li>
+  <li>Go to <strong>Setup → Dictionaries</strong>, find
+      <strong>"Expense report - Types of expense report lines"</strong>
       (this is the list of claim types: Fuel, Km allowance, Meal, Office Supplies, Other, etc.)</li>
   <li>For each type, set the <strong>Account</strong> column to the correct expense account —
       use the same accounts as the <a href="expense-invoices.php">Expense Invoices</a> table
@@ -40,10 +45,20 @@ step below hasn't been done yet.</p>
       business currently owes you, between submitting a claim and being paid back
       (think of it as a mini accounts-payable just for reimbursements)</li>
   <li><em>Optional, worth doing since more than one person claims expenses:</em> on each
-      person's own <strong>user card</strong> (Users &amp; Groups → their name), fill in the
-      <strong>Accountancy Code</strong> field. Without this, everyone's owed reimbursements get
-      pooled into one account with no way to tell whose is whose from the ledger. With it,
-      each person gets tracked separately.</li>
+      person's own <strong>user card</strong> (Users &amp; Groups → their name → Bank &amp;
+      Accounting tab), fill in the <strong>Subledger accounting code</strong> field (shown on
+      the main card as just "Accountancy Code"). Without this, everyone's owed reimbursements
+      get pooled into one account with no way to tell whose is whose from the ledger. With it,
+      each person gets tracked separately.
+      <div class="alert alert-info" style="margin:0.5rem 0;">
+        <strong>This is not a GL account — don't put an account number in it.</strong> It's a
+        short <em>subledger</em> code, the same mechanism Dolibarr uses for customer/supplier
+        codes: everyone's reimbursements still post to the <em>one</em> "Expense report account"
+        you set in step 4 above — this field just tags <em>whose</em> share of that account a
+        given entry belongs to. Use initials or an employee ID (e.g. <code>MW</code>) — a couple
+        of short letters/numbers, not a chart-of-accounts number.
+      </div>
+  </li>
 </ol>
 
 <hr>
