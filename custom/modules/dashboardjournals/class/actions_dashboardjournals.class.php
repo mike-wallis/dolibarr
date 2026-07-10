@@ -62,7 +62,7 @@ class ActionsDashboardjournals
                 // way as quickLinks below (icon via img_picto(), not DOM-cloned).
                 'staticBox' => [
                     'label'  => 'Accounting →',
-                    'href'   => 'accountancy',
+                    'url'    => '/accountancy/index.php?mainmenu=accountancy&leftmenu=',
                     'picto'  => 'accountancy',
                     'module' => ['accounting', 'comptabilite'],
                 ],
@@ -345,7 +345,7 @@ class ActionsDashboardjournals
                 if ($sbModOn) {
                     $staticBox = [
                         'label' => $def['staticBox']['label'],
-                        'href'  => dol_buildpath('/' . $def['staticBox']['href'] . '/index.php', 1),
+                        'href'  => dol_buildpath($def['staticBox']['url'], 1),
                         'icon'  => img_picto('', $def['staticBox']['picto'], 'class="paddingright pictofixedwidth"'),
                     ];
                 }
