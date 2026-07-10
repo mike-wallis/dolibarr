@@ -332,6 +332,31 @@ await context.addInitScript(() => {
 });
 ```
 
+## Playwright for Dolibarr UI Visual QA
+
+The same Playwright install used for ATO scraping (`C:\Users\mhwal\AppData\Local\Temp\pw_ato\`) can also drive a real browser against the local Dolibarr dev site — useful any time a change (custom module, PDF template, dashboard hook, CSS/JS injection) needs to be *seen* to verify it worked, not just code-reviewed. Claude can read the resulting screenshot directly (the `Read` tool displays images), so this closes the loop without the user needing to click through and report back.
+
+**When to use it**: after any change with a visual/runtime surface that can't be confirmed by reading code alone — e.g. a hook that injects HTML/CSS/JS into a page (like the `dashboardjournals` and `stickynotes` modules), a new admin setup page, a PDF template tweak. Don't bother for pure backend logic changes with no UI.
+
+**Reusable script**: `C:\Users\mhwal\AppData\Local\Temp\pw_ato\dolibarr_screenshot.mjs` — logs into the dev site (if not already) and screenshots any given page.
+
+```powershell
+# From repo root, export credentials from .env, then run:
+Set-Location "c:\wamp64\www\dolibarr"
+# (Bash) set -a && source .env && set +a
+cd "C:\Users\mhwal\AppData\Local\Temp\pw_ato"
+node dolibarr_screenshot.mjs "/index.php?mainmenu=home&leftmenu=home" out.png
+node dolibarr_screenshot.mjs "/custom/dashboardjournals/admin/setup.php" out2.png
+```
+
+- Reads `DOLIBARR_URL`, `DOLIBARR_ADMIN_USER`, `DOLIBARR_ADMIN_PASS` from the environment (source them from `.env` first — never hardcode credentials into a script).
+- Logs console errors and PHP `Fatal error`/`Warning`/`Notice` text found in the page, in addition to saving the screenshot — check that output before assuming a screenshot that "looks fine" actually is.
+- `headless: true` is fine here (unlike the ATO scraper) — this is our own local site, no bot detection to work around.
+- If the install is broken (e.g. `Cannot find package 'playwright'` — this folder lives in `%TEMP%` and can get partially cleared), just run `npm install playwright xlsx` again from that directory; it reuses the existing `node_modules` layout.
+- This only reaches `http://dolibarr.test` (the local dev site). It cannot reach the live site (`erp.southsidesupplies.com.au`) without separate credentials/session handling — don't assume a dev-site screenshot proves anything about what's live.
+
+**Known gotcha hit while building this**: Dolibarr's login form has a hidden `input[name="actionlogin"]` — don't `.click()` a selector that matches it (it's invisible, the click times out). Fill the username/password fields and `page.press('input[name="password"]', 'Enter')` instead.
+
 ## Decision-Making Standard
 
 The aim is not just to make Dolibarr work technically. The aim is to decide whether Dolibarr is reliable, understandable, maintainable, accounting-compatible, practical, and safe enough to go live on 1 July 2026.
