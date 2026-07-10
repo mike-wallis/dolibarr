@@ -89,8 +89,9 @@ print dol_get_fiche_head(
 ?>
 
 <p style="margin-bottom:1.5rem;">
-  Map each <strong>customer category</strong> to the PDF template and email From address used for that brand's invoices.
-  The hook runs automatically — users never need to select manually.
+  Map each <strong>customer category</strong> to the PDF template and email From address used for that brand's
+  invoices <em>and quotes</em> (the same template name is used for both — e.g. "brightcs" selects the BCS-branded
+  layout on both document types). The hook runs automatically — users never need to select manually.
 </p>
 
 <form method="post" action="setup.php">
@@ -102,7 +103,7 @@ print dol_get_fiche_head(
 <thead>
   <tr class="liste_titre">
     <th>Customer Category</th>
-    <th>Invoice Template</th>
+    <th>PDF Template (invoices &amp; quotes)</th>
     <th>Email From</th>
     <th class="center" style="width:6rem;"></th>
   </tr>

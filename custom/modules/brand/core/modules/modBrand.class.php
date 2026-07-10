@@ -19,16 +19,16 @@ class modBrand extends DolibarrModules
         $this->family       = 'crm';
         $this->picto        = 'generic';
         $this->name         = 'Brand';
-        $this->description  = 'Auto-selects PDF template and email From address based on customer brand category.';
-        $this->version      = '1.0';
+        $this->description  = 'Auto-selects PDF template and email From address based on customer brand category, on invoice and quote cards.';
+        $this->version      = '1.1';
         $this->const_name   = 'MAIN_MODULE_BRAND';
         $this->editor_name  = 'South Side Supplies';
 
         $this->config_page_url = ['setup.php@brand'];
 
-        // Add more card contexts here as needed, e.g. 'supplierordercard', 'propalcard'
+        // Add more card contexts here as needed, e.g. 'supplierordercard'
         $this->module_parts = [
-            'hooks' => ['invoicecard'],
+            'hooks' => ['invoicecard', 'propalcard'],
         ];
     }
 

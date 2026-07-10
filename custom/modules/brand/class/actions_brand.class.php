@@ -25,14 +25,18 @@ class ActionsBrand
 
     /**
      * Hook: formObjectOptions
-     * Called during invoice card rendering (view, presend, etc.).
+     * Called during invoice and quote card rendering (view, presend, etc.).
+     * Both doc types share the same template naming ('brightcs'/'southside'),
+     * so the one 'invoice_template' config value drives both — no separate
+     * "quote_template" setting needed.
      */
     public function formObjectOptions($parameters, &$object, &$action, $hookmanager)
     {
-        if (strpos($parameters['context'], 'invoicecard') === false) {
+        if (strpos($parameters['context'], 'invoicecard') === false
+            && strpos($parameters['context'], 'propalcard') === false) {
             return 0;
         }
-        // For new invoices $object->socid is 0 — fall back to parameters or GET/POST
+        // For new invoices/quotes $object->socid is 0 — fall back to parameters or GET/POST
         $socid = (int) ($object->socid ?: ($parameters['socid'] ?? 0) ?: GETPOSTINT('socid'));
         if (empty($socid) || empty($this->brand_map)) {
             return 0;
