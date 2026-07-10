@@ -9,7 +9,10 @@ llxHeader('', 'Help — Expense Invoices');
 
 <p>Use this workflow for regular business expenses that arrive as a bill from a supplier —
 phone, electricity, rent, fuel, office supplies, etc. It ensures GST is captured correctly
-for BAS and the cost hits the right expense account in the ledger.</p>
+for BAS and the cost hits the right expense account in the ledger. If you or a staff member
+paid for something personally and need to be paid back, use
+<a href="expense-reports.php">Expense Reports</a> instead — the supplier isn't being paid
+directly here, a person is.</p>
 
 <div class="alert alert-info" style="margin:1rem 0;">
   <strong>Why not just use a bank entry?</strong> A bank entry only records one amount to one account —

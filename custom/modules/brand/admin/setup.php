@@ -9,6 +9,8 @@ if (!$res && is_file('../../../main.inc.php'))   { require '../../../main.inc.ph
 if (!$res && is_file('../../../../main.inc.php')) { require '../../../../main.inc.php'; $res = 1; }
 if (!$res) { die('Cannot find main.inc.php'); }
 
+require_once DOL_DOCUMENT_ROOT . '/core/lib/admin.lib.php'; // for dolibarr_set_const()
+
 if (!$user->admin) {
     accessforbidden();
 }
