@@ -183,6 +183,26 @@ if ($action === 'working_csv') {
             $total += $gst;
             fputcsv($out, [date('d/m/Y', strtotime($row->dt)), $row->party ?? '', $row->ref ?? '', number_format((float)$row->paid, 2), number_format($gst, 2)]);
         }
+
+        // Staff/owner expense report reimbursements — separate table from supplier
+        // invoice payments (see Expense Reports help page), added to the same 1B total.
+        fputcsv($out, []);
+        fputcsv($out, ['1B — GST on expense report reimbursements', '', '', '', 'payment × (claim GST ÷ claim total)']);
+        fputcsv($out, ['Date', 'Claimed by', 'Expense report', 'Payment (inc. GST)', 'GST Portion']);
+        $r = $db->query(
+            "SELECT DATE(pe.datep) AS dt, CONCAT(u.firstname,' ',u.lastname) AS party, er.ref AS ref,"
+            ." pe.amount AS paid, ROUND(pe.amount * er.total_tva / NULLIF(er.total_ttc,0), 2) AS gst"
+            ." FROM ".MAIN_DB_PREFIX."payment_expensereport pe"
+            ." INNER JOIN ".MAIN_DB_PREFIX."expensereport er ON er.rowid=pe.fk_expensereport"
+            ." LEFT JOIN ".MAIN_DB_PREFIX."user u ON u.rowid=er.fk_user_author"
+            ." WHERE DATE(pe.datep) BETWEEN '$qs' AND '$qe' AND er.entity=$entity ORDER BY pe.datep"
+        );
+        while ($r && ($row = $db->fetch_object($r)) instanceof stdClass) {
+            $gst = round((float)$row->gst, 2);
+            $total += $gst;
+            fputcsv($out, [date('d/m/Y', strtotime($row->dt)), $row->party ?? '', $row->ref ?? '', number_format((float)$row->paid, 2), number_format($gst, 2)]);
+        }
+
         fputcsv($out, ['', '', '', 'Total 1B', number_format(round($total, 2), 2)]);
     } else {
         // 1A — journal credits
@@ -275,6 +295,19 @@ if ($basis === 'cash') {
         ." INNER JOIN ".MAIN_DB_PREFIX."paiementfourn_facture pf ON pf.fk_paiementfourn=p.rowid"
         ." INNER JOIN ".MAIN_DB_PREFIX."facture_fourn f ON f.rowid=pf.fk_facturefourn"
         ." WHERE DATE(p.datep) BETWEEN '$qs' AND '$qe' AND f.entity=$entity";
+
+    // Staff/owner expense report reimbursements (see Expense Reports help page) —
+    // separate table from supplier invoice payments, so they need their own query.
+    // Only informational (G11/inv_1b for the reconciliation check) — the real 1B
+    // used for field 9 already includes these via the accounting journal once
+    // transferred, see $gst_1b below.
+    $sql_purch_expense =
+        "SELECT COALESCE(SUM(pe.amount),0) AS g11,"
+        ."  COALESCE(SUM(pe.amount * er.total_tva / NULLIF(er.total_ttc,0)),0) AS inv_1b,"
+        ."  COUNT(DISTINCT pe.rowid) AS cnt"
+        ." FROM ".MAIN_DB_PREFIX."payment_expensereport pe"
+        ." INNER JOIN ".MAIN_DB_PREFIX."expensereport er ON er.rowid=pe.fk_expensereport"
+        ." WHERE DATE(pe.datep) BETWEEN '$qs' AND '$qe' AND er.entity=$entity";
 } else {
     $sql_sales =
         "SELECT COALESCE(SUM(total_ttc),0) AS g1, COALESCE(SUM(total_tva),0) AS inv_1a, COUNT(*) AS cnt"
@@ -287,19 +320,30 @@ if ($basis === 'cash') {
         ." FROM ".MAIN_DB_PREFIX."facture_fourn"
         ." WHERE DATE(datef) BETWEEN '$qs' AND '$qe'"
         ." AND fk_statut >= 1 AND entity=$entity";
+
+    // Expense reports recognised at validation date (accrual equivalent of an
+    // invoice date) rather than payment date. fk_statut >= 2 excludes drafts
+    // (0=draft; see ExpenseReport::STATUS_* in expensereport.class.php).
+    $sql_purch_expense =
+        "SELECT COALESCE(SUM(total_ttc),0) AS g11, COALESCE(SUM(total_tva),0) AS inv_1b, COUNT(*) AS cnt"
+        ." FROM ".MAIN_DB_PREFIX."expensereport"
+        ." WHERE DATE(date_valid) BETWEEN '$qs' AND '$qe'"
+        ." AND fk_statut >= 2 AND entity=$entity";
 }
 
 $r1  = $db->query($sql_sales);
 $rs  = ($r1 && ($tmp = $db->fetch_object($r1)) instanceof stdClass) ? $tmp : null;
 $r2  = $db->query($sql_purch);
 $rp  = ($r2 && ($tmp = $db->fetch_object($r2)) instanceof stdClass) ? $tmp : null;
+$r3  = $db->query($sql_purch_expense);
+$rpe = ($r3 && ($tmp = $db->fetch_object($r3)) instanceof stdClass) ? $tmp : null;
 
 $g1        = round((float)($rs?->g1     ?? 0), 2);
 $inv_1a    = round((float)($rs?->inv_1a ?? 0), 2);
 $sales_cnt = (int)($rs?->cnt ?? 0);
-$g11       = round((float)($rp?->g11    ?? 0), 2);
-$inv_1b    = round((float)($rp?->inv_1b ?? 0), 2);
-$purch_cnt = (int)($rp?->cnt ?? 0);
+$g11       = round((float)($rp?->g11 ?? 0) + (float)($rpe?->g11 ?? 0), 2);
+$inv_1b    = round((float)($rp?->inv_1b ?? 0) + (float)($rpe?->inv_1b ?? 0), 2);
+$purch_cnt = (int)($rp?->cnt ?? 0) + (int)($rpe?->cnt ?? 0);
 
 // ── Full-mode extras (G2, G3, G10) from journal ───────────────────────────────
 
@@ -540,8 +584,8 @@ print load_fiche_titre('Australian BAS &amp; PAYG Activity Statement', '', 'acco
 <?php
 // ── Section 1: GST ──────────────────────────────────────────────────────────
 $vol_note = $basis === 'cash'
-    ? $sales_cnt.' customer payment'.($sales_cnt!==1?'s':'').', '.$purch_cnt.' supplier payment'.($purch_cnt!==1?'s':'')
-    : $sales_cnt.' customer invoice'.($sales_cnt!==1?'s':'').', '.$purch_cnt.' supplier invoice'.($purch_cnt!==1?'s':'');
+    ? $sales_cnt.' customer payment'.($sales_cnt!==1?'s':'').', '.$purch_cnt.' supplier/expense payment'.($purch_cnt!==1?'s':'')
+    : $sales_cnt.' customer invoice'.($sales_cnt!==1?'s':'').', '.$purch_cnt.' supplier invoice/expense report'.($purch_cnt!==1?'s':'');
 ?>
 <div class="div-table-responsive" style="margin-bottom:1.5rem;">
 
