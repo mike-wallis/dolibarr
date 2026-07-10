@@ -63,6 +63,24 @@ class pdf_brightcs_po extends pdf_muscadet
 
 		$this->name        = 'brightcs_po';
 		$this->description = 'Bright Cleaning Solutions purchase order';
+
+		// Column positions (mm from left edge of page).
+		// write_file() (inherited from pdf_muscadet) draws in this fixed order:
+		// desc → tva → up → qty → unit → total. Positions MUST increase left-to-right.
+		//
+		// ActionsInvoicelines (custom/modules/invoicelines/) hooks the content drawn at
+		// the tva/up/qty slots so the PRINTED values read Price | Qty | GST — same trick
+		// used for the brightcs/southside invoice templates, see that class's docblock.
+		// The widths below are sized for THAT printed content, not for what each
+		// variable name suggests. There is no separate Unit column.
+		$this->posxdesc     = $this->marge_gauche + 1;
+		$this->posxpicture  = 116;
+		$this->posxtva      = 116; // Price column starts here (see note above)
+		$this->posxup       = 139; // Qty column starts here
+		$this->posxqty      = 152; // GST column starts here
+		$this->posxunit     = 163;
+		$this->posxdiscount = 163;
+		$this->postotalht   = 174; // Amount column starts here
 	}
 
 
@@ -75,7 +93,22 @@ class pdf_brightcs_po extends pdf_muscadet
 	{
 		// phpcs:enable
 
+		// Item code shows "<supplier's code> (Our Ref#. <our internal code>)". Core
+		// Dolibarr builds that combined text in pdf.lib.php's pdf_getlinedesc(), and
+		// which format it uses is driven by the global PDF_HIDE_PRODUCT_REF_IN_SUPPLIER_LINES
+		// setting (currently 2 = "supplier ref (InternalRef our ref)" — see Setup >
+		// Other Setup). There's no per-template hook to change the wording, but the
+		// "InternalRef" label IS a translation string, so we override just that below
+		// (same trick already used for VAT/TotalHT/etc in this file) rather than
+		// touching the global setting or duplicating core's ref-building logic.
+
 		// Swap in purchase_description extra field for any line that has one set.
+		// Also blank the product label/product_label for that line — otherwise
+		// core's pdf_getlinedesc() prints the raw product label ABOVE our curated
+		// description (it always shows the label unless it's empty), which defeats
+		// the point of having a separate purchase-facing description. Lines with no
+		// purchase_description set are untouched — they still show the normal label,
+		// so nothing regresses for products that haven't been given one yet.
 		if (!empty($object->lines)) {
 			require_once DOL_DOCUMENT_ROOT . '/product/class/product.class.php';
 			foreach ($object->lines as $line) {
@@ -85,7 +118,9 @@ class pdf_brightcs_po extends pdf_muscadet
 				$prod->fetch_optionals();
 				$purchDesc = trim((string) ($prod->array_options['options_purchase_description'] ?? ''));
 				if ($purchDesc !== '') {
-					$line->desc = $purchDesc;
+					$line->desc          = $purchDesc;
+					$line->label         = '';
+					$line->product_label = '';
 				}
 			}
 		}
@@ -103,6 +138,7 @@ class pdf_brightcs_po extends pdf_muscadet
 		$t['AmountHT']                         = 'Amount (excl. GST)';
 		$t['AmountTTC']                        = 'Amount (inc. GST)';
 		$t['PriceUHT']                         = 'Price (excl. GST)';
+		$t['InternalRef']                      = 'Our Ref#.';
 
 		return parent::write_file($object, $outputlangs, $srctemplatepath, $hidedetails, $hidedesc, $hideref);
 	}
@@ -190,11 +226,19 @@ class pdf_brightcs_po extends pdf_muscadet
 		$pdf->Cell($col3, $cellH, 'P.O. #', 1, 1, 'C', true);
 
 		$abn = !empty($this->emetteur->idprof1) ? $this->emetteur->idprof1 : getDolGlobalString('MAIN_INFO_SIREN');
+
+		// date_commande is only set once the order is actually placed with the
+		// supplier (status "Ordered/sent") — a PO printed before that (e.g. right
+		// after creating/validating it, which is the normal time to print one) would
+		// otherwise show a blank DATE box. Fall back to validation date, then creation
+		// date, so the box is never empty.
+		$poDate = $object->date_commande ?: $object->date_valid ?: $object->date_creation;
+
 		$pdf->SetFont('', '', $fs - 1);
 		$pdf->SetXY($rx, $tblY + $cellH);
-		$pdf->Cell($col1, $cellH, $abn,                                                                1, 0, 'C');
-		$pdf->Cell($col2, $cellH, dol_print_date($object->date_commande, 'day', false, $outputlangs), 1, 0, 'C');
-		$pdf->Cell($col3, $cellH, $object->ref,                                                        1, 1, 'C');
+		$pdf->Cell($col1, $cellH, $abn,                                                    1, 0, 'C');
+		$pdf->Cell($col2, $cellH, dol_print_date($poDate, 'day', false, $outputlangs),    1, 0, 'C');
+		$pdf->Cell($col3, $cellH, $object->ref,                                            1, 1, 'C');
 
 		$afterHeaderY = $tblY + $cellH * 2 + 4;
 
@@ -287,12 +331,17 @@ class pdf_brightcs_po extends pdf_muscadet
 		$pdf->SetTextColor(255, 255, 255);
 		$pdf->SetFont('', 'B', $fs - 2);
 
+		// Column order here is Item | Price | Qty | GST | Amount. The content drawn in
+		// each x-position below is NOT what Dolibarr's core write_file() normally puts
+		// there — ActionsInvoicelines (custom/modules/invoicelines/) hooks the three
+		// pdf_getline*() calls in core and swaps their printed values around so the
+		// physical column order matches this header without touching core files.
+		// See that class's docblock for the full explanation. Read the two together.
 		$cols = [
 			['ITEM CODE / DESCRIPTION', $ml,               $this->posxtva    - $ml,               'L'],
-			['GST %',                   $this->posxtva,    $this->posxup     - $this->posxtva,    'C'],
-			['PRICE (ex GST)',          $this->posxup,     $this->posxqty    - $this->posxup,     'C'],
-			['QTY',                     $this->posxqty,    $this->posxunit   - $this->posxqty,    'C'],
-			['UNIT',                    $this->posxunit,   $this->postotalht - $this->posxunit,   'C'],
+			['PRICE (ex GST)',          $this->posxtva,    $this->posxup     - $this->posxtva,    'C'],
+			['QTY',                     $this->posxup,     $this->posxqty    - $this->posxup,     'C'],
+			['GST',                     $this->posxqty,    $this->postotalht - $this->posxqty,    'C'],
 			['AMOUNT (ex GST)',         $this->postotalht, $pw - $mr         - $this->postotalht, 'C'],
 		];
 

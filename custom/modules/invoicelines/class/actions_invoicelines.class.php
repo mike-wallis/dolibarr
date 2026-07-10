@@ -24,8 +24,12 @@
  * The matching header labels/positions live in pdf_brightcs.modules.php's
  * _tableau() override — the two files must be read together.
  *
- * Only applies when $object->model_pdf is 'brightcs' or 'southside', so other
- * PDF models (default Dolibarr templates, other doctypes) are unaffected.
+ * Only applies when $object->model_pdf is 'brightcs', 'southside', or
+ * 'brightcs_po' (the BCS Purchase Order template — see
+ * custom/core/modules/supplier_order/doc/pdf_brightcs_po.modules.php, which
+ * extends pdf_muscadet, another write_file() built on the same three
+ * pdf_getline*() calls). Other PDF models (default Dolibarr templates, other
+ * doctypes) are unaffected.
  */
 class ActionsInvoicelines
 {
@@ -123,7 +127,7 @@ class ActionsInvoicelines
             return false;
         }
         $model = explode(':', $object->model_pdf, 2)[0];
-        return in_array($model, ['brightcs', 'southside'], true);
+        return in_array($model, ['brightcs', 'southside', 'brightcs_po'], true);
     }
 
     private function creditNoteSign($object): int

@@ -4,7 +4,8 @@
  *
  * Registers the 'pdfgeneration' hook context so ActionsInvoicelines can correct
  * the GST/Price/Qty column content on the brightcs and southside invoice PDF
- * templates. See class/actions_invoicelines.class.php for the actual logic.
+ * templates, and the brightcs_po purchase order PDF template. See
+ * class/actions_invoicelines.class.php for the actual logic.
  *
  * Enable at: Setup > Modules/Applications > Invoice Line Columns
  */
@@ -22,7 +23,7 @@ class modInvoicelines extends DolibarrModules
         $this->family       = 'other';
         $this->picto        = 'generic';
         $this->name         = 'Invoice Line Columns';
-        $this->description  = 'Fixes the GST/Price/Qty column content and order on the BCS and SSS invoice PDF templates.';
+        $this->description  = 'Fixes the GST/Price/Qty column content and order on the BCS and SSS invoice PDF templates, and the BCS Purchase Order PDF template.';
         $this->version      = '1.0';
         $this->const_name   = 'MAIN_MODULE_INVOICELINES';
         $this->editor_name  = 'South Side Supplies';
