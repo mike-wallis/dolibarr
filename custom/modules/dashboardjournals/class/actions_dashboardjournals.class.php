@@ -57,16 +57,39 @@ class ActionsDashboardjournals
                 'tiles'  => ['expensereport', 'bank_account'],
                 'module' => ['expensereport', 'bank'],
                 // Not a real dashboard tile — Accounting has no workboard entry.
-                // Shown as a small linked box alongside Bank Account when the
-                // Accounting module itself is active. menuId matches Dolibarr's
-                // own top-menu item id (#mainmenutd_{menuId}) — the JS clones that
-                // item's live markup/link rather than us reproducing its icon,
-                // colours, and href by hand.
+                // Shown as a small linked card alongside Bank Account when the
+                // Accounting module itself is active, built server-side the same
+                // way as quickLinks below (icon via img_picto(), not DOM-cloned).
                 'staticBox' => [
                     'label'  => 'Accounting →',
                     'href'   => 'accountancy',
+                    'picto'  => 'accountancy',
                     'module' => ['accounting', 'comptabilite'],
-                    'menuId' => 'accountancy',
+                ],
+                // Small one-line icon+label links shown above the group title.
+                // Unlike the tiles/staticBox above, these have no equivalent
+                // dashboard workboard entry or persistent top-menu item to find
+                // in the DOM, so they're built server-side from Dolibarr's own
+                // menu target/picto/permission (see eldy.lib.php's "Various
+                // payment" and "Loans" entries) rather than cloned from a live
+                // element. Each is only included if its module is enabled AND
+                // the current user has read permission — printCommonFooter()
+                // does that filtering before handing this list to the JS.
+                'quickLinks' => [
+                    [
+                        'label'  => 'Misc. payments',
+                        'url'    => '/compta/bank/various_payment/list.php?leftmenu=tax_various&mainmenu=billing',
+                        'picto'  => 'payment',
+                        'module' => 'bank',
+                        'perm'   => ['banque', 'lire'],
+                    ],
+                    [
+                        'label'  => 'Loans',
+                        'url'    => '/loan/list.php?leftmenu=tax_loan&mainmenu=billing',
+                        'picto'  => 'loan',
+                        'module' => 'loan',
+                        'perm'   => ['loan', 'read'],
+                    ],
                 ],
             ],
         ];
@@ -321,27 +344,53 @@ class ActionsDashboardjournals
                 }
                 if ($sbModOn) {
                     $staticBox = [
-                        'label'  => $def['staticBox']['label'],
-                        'href'   => dol_buildpath('/' . $def['staticBox']['href'] . '/index.php', 1),
-                        'menuId' => $def['staticBox']['menuId'] ?? null,
+                        'label' => $def['staticBox']['label'],
+                        'href'  => dol_buildpath('/' . $def['staticBox']['href'] . '/index.php', 1),
+                        'icon'  => img_picto('', $def['staticBox']['picto'], 'class="paddingright pictofixedwidth"'),
                     ];
                 }
             }
 
-            if (!$anyModuleOn && !$staticBox) {
+            $quickLinks = [];
+            foreach ((array) ($def['quickLinks'] ?? []) as $ql) {
+                if (!isModEnabled($ql['module'])) {
+                    continue;
+                }
+                if (!empty($ql['perm']) && !$user->hasRight($ql['perm'][0], $ql['perm'][1])) {
+                    continue;
+                }
+                $quickLinks[] = [
+                    'label' => $ql['label'],
+                    'href'  => dol_buildpath($ql['url'], 1),
+                    'icon'  => img_picto('', $ql['picto'], 'class="paddingright pictofixedwidth"'),
+                ];
+            }
+
+            if (!$anyModuleOn && !$staticBox && !$quickLinks) {
                 continue; // Nothing this group could ever show — skip it.
             }
 
             $groupCfg = $config['groups'][$key] ?? [];
+
+            // The staticBox is always the trailing slot (one past the last real
+            // tile) — its own noteBelow text now renders INSIDE the card (see
+            // buildStaticBox() in outputJs()) instead of as a separate line
+            // underneath it, so pull it out here rather than leaving it in the
+            // noteBelow array for djTileCol() to render a second time.
+            if ($staticBox) {
+                $noteBelowAll = array_map('strval', (array) ($groupCfg['noteBelow'] ?? []));
+                $staticBox['caption'] = $noteBelowAll[count($def['tiles'])] ?? '';
+            }
             $jsGroups[] = [
-                'key'       => $key,
-                'tiles'     => $def['tiles'],
-                'title'     => (string) ($groupCfg['title'] ?? ''),
-                'showAbove' => !empty($groupCfg['showAbove']),
-                'noteAbove' => array_map('strval', self::effectiveNoteAbove($key, $groupCfg, $autoAbove)),
-                'showBelow' => !empty($groupCfg['showBelow']),
-                'noteBelow' => array_map('strval', (array) ($groupCfg['noteBelow'] ?? [])),
-                'staticBox' => $staticBox,
+                'key'        => $key,
+                'tiles'      => $def['tiles'],
+                'title'      => (string) ($groupCfg['title'] ?? ''),
+                'showAbove'  => !empty($groupCfg['showAbove']),
+                'noteAbove'  => array_map('strval', self::effectiveNoteAbove($key, $groupCfg, $autoAbove)),
+                'showBelow'  => !empty($groupCfg['showBelow']),
+                'noteBelow'  => array_map('strval', (array) ($groupCfg['noteBelow'] ?? [])),
+                'staticBox'  => $staticBox,
+                'quickLinks' => $quickLinks,
             ];
         }
 
@@ -407,6 +456,10 @@ class ActionsDashboardjournals
     text-transform:uppercase;letter-spacing:.03em;
     margin-bottom:6px;
 }
+.dj-quicklinks{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:6px;
+    margin-bottom:6px;
+}
 .dj-note{
     font-size:12px;color:#5b6b7c;font-style:italic;
     margin:4px 0;
@@ -432,30 +485,34 @@ a.dj-note:hover{
     font-size:20px;color:#93a3b5;padding:0 4px;flex-shrink:0;
 }
 .dj-static-box{
-    display:inline-flex;align-items:center;justify-content:center;
-    min-width:120px;min-height:60px;
-    border:1px dashed #93a3b5;border-radius:6px;
-    padding:8px 14px;margin:4px;
-    font-size:13px;font-weight:600;color:#3b4a5a;
+    /* Shaped like a real Dolibarr dashboard tile (.info-box): coloured icon
+       panel on the left, title + caption stacked on the right. Used for the
+       quickLinks row (Misc. payments / Loans) too, without a caption — see
+       buildStaticBox() in outputJs(). align-self centers it when it's the
+       last item in the finance column's stretched tile stack. */
+    display:inline-flex;align-items:stretch;align-self:center;
+    border:1px solid #cfd8e3;border-radius:6px;
+    overflow:hidden;margin:4px;max-width:230px;
     text-decoration:none;background:#fff;
 }
 .dj-static-box:hover{background:#f3f6f9;}
-.dj-static-box-menuclone{
-    /* The real top-menu icon/label render white-on-transparent — their dark navy
-       background is the whole navbar's colour, not a per-item box, so it has to
-       be reproduced here to isolate the item the way it looks cropped out of
-       the navbar. #263c5c and white text/icon colour were read directly off
-       the live menu (getComputedStyle), not guessed. */
-    display:inline-flex !important;flex-direction:column;align-items:center;
-    background:#263c5c;border-radius:6px;padding:10px 16px;margin:4px;
-    cursor:pointer;
+.dj-static-box-icon{
+    display:flex;align-items:center;justify-content:center;
+    background:#263c5c; /* same navy as the top menu bar */
+    padding:0 12px;flex-shrink:0;
 }
-.dj-static-box-menuclone,
-.dj-static-box-menuclone *{
-    color:#fff !important;
+.dj-static-box-icon .pictofixedwidth{width:18px;}
+.dj-static-box-icon span{color:#fff !important;}
+.dj-static-box-content{
+    display:flex;flex-direction:column;justify-content:center;
+    padding:6px 10px;min-width:0;
 }
-.dj-static-box-menuclone a{
-    text-decoration:none;
+.dj-static-box-title{
+    font-size:13px;font-weight:600;color:#3b4a5a;
+}
+.dj-static-box-caption{
+    font-size:11px;color:#5b6b7c;font-style:italic;
+    margin-top:2px;
 }
 @media (max-width:900px){
     .dj-layout{grid-template-columns:1fr;}
@@ -491,29 +548,28 @@ CSS;
         }
     }
 
-    // Builds a static box (e.g. "Accounting") to look and link exactly like
-    // Dolibarr's own top-menu item, by cloning its live markup rather than
-    // reproducing the icon/colours/href by hand — stays correct automatically
-    // if the theme or the menu's link ever changes.
+    // Builds a static box (e.g. "Accounting") shaped like a real Dolibarr
+    // dashboard tile (.info-box): a coloured icon panel on the left, title +
+    // optional caption stacked on the right — rather than the plain pill used
+    // for quickLinks, since this one is meant to read as a tile in its own
+    // right at the end of the Finance Journal's tile row.
     function buildStaticBox(staticBox) {
-        var menuLi = staticBox.menuId ? document.getElementById('mainmenutd_' + staticBox.menuId) : null;
-        var center = menuLi ? menuLi.querySelector('.tmenucenter') : null;
-        var box;
-        if (center) {
-            var clone = center.cloneNode(true);
-            clone.querySelectorAll('[id]').forEach(function (el) { el.removeAttribute('id'); });
-            clone.classList.add('dj-static-box-menuclone'); // layout only — visuals come from Dolibarr's own classes
-            box = clone;
-        } else {
-            // Fallback if the menu item couldn't be found (e.g. Dolibarr theme change).
-            var sb = document.createElement('a');
-            sb.className = 'dj-static-box';
-            sb.href = staticBox.href;
-            sb.textContent = staticBox.label;
-            box = sb;
+        var box = document.createElement('a');
+        box.className = 'dj-static-box';
+        box.href = staticBox.href;
+
+        var icon = djText('span', 'dj-static-box-icon', null);
+        icon.innerHTML = staticBox.icon; // Dolibarr-rendered markup, not user input
+
+        var content = djText('span', 'dj-static-box-content', null);
+        content.appendChild(djText('span', 'dj-static-box-title', staticBox.label));
+        if (staticBox.caption) {
+            content.appendChild(djText('span', 'dj-static-box-caption', staticBox.caption));
         }
-        box.querySelectorAll('a[href]').forEach(djApplyNewTab);
-        if (box.tagName === 'A') djApplyNewTab(box);
+
+        box.appendChild(icon);
+        box.appendChild(content);
+        djApplyNewTab(box);
         return box;
     }
 
@@ -598,6 +654,13 @@ CSS;
 
             var wrap = djText('div', 'dj-group dj-group-' + group.key, null);
             if (group.title) wrap.appendChild(djText('div', 'dj-group-title', group.title));
+            if (group.quickLinks && group.quickLinks.length) {
+                var qlRow = djText('div', 'dj-quicklinks', null);
+                group.quickLinks.forEach(function (ql) {
+                    qlRow.appendChild(buildStaticBox(ql)); // same icon+title card as "Accounting", no caption
+                });
+                wrap.appendChild(qlRow);
+            }
 
             var row = djText('div', 'dj-tiles-row', null);
             found.forEach(function (item, i) {
@@ -606,9 +669,9 @@ CSS;
             });
             if (group.staticBox) {
                 if (found.length) row.appendChild(djText('span', 'dj-arrow', '\\u2192'));
-                var sb = buildStaticBox(group.staticBox);
-                // The static box is always the last slot, after every real tile.
-                row.appendChild(djTileCol(sb, group, (group.tiles || []).length));
+                // Builds its own title+caption internally (see buildStaticBox()) —
+                // no djTileCol() wrapper needed, unlike the real tiles above.
+                row.appendChild(buildStaticBox(group.staticBox));
             }
             wrap.appendChild(row);
 

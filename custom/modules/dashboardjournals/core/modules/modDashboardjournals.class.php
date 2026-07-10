@@ -25,7 +25,7 @@ class modDashboardjournals extends DolibarrModules
         $this->picto        = 'generic';
         $this->name         = 'Fancy Dashboard';
         $this->description  = 'Groups the home dashboard tiles into Sales/Purchase/Finance journal boxes with editable notes.';
-        $this->version      = '1.0';
+        $this->version      = '1.1';
         $this->const_name   = 'MAIN_MODULE_DASHBOARDJOURNALS';
         $this->editor_name  = 'South Side Supplies';
 
