@@ -69,6 +69,11 @@ llxHeader('', 'Help — South Side Supplies');
     <p>Tagging customers with the right brand, selecting the correct invoice template (brightcs or southside), and what each template prints.</p>
   </div>
 
+  <div class="div-table-responsive" style="border:1px solid #ddd;border-radius:6px;padding:1.5rem;">
+    <h3 style="margin-top:0;">📡 <a href="stp-ssp.php">STP &amp; SSP — ATO Reporting Plan</a></h3>
+    <p>Single Touch Payroll transition plan: the DSP/SSP model, what data the payroll module needs to export, SSP providers researched, and next steps.</p>
+  </div>
+
 </div>
 
 <?php if ($user->admin): ?>

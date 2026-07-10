@@ -19,6 +19,7 @@ the ATO (PAYG via BAS, super via SBSCH).</p>
   &nbsp;|&nbsp;<a href="/dolibarr/custom/payroll/payruns.php?mainmenu=billing">Pay Run History</a>
   &nbsp;|&nbsp;<a href="/dolibarr/custom/payroll/setup.php?mainmenu=billing">Payroll Setup (deductions)</a>
   &nbsp;|&nbsp;<a href="/dolibarr/custom/payroll/config.php?mainmenu=admintools">Tax Table Config</a>
+  &nbsp;|&nbsp;<a href="/dolibarr/custom/payroll/stp_export.php?mainmenu=billing">STP Export</a>
 </div>
 
 <div style="background:#fff8e1;border:1px solid #f0c060;border-radius:6px;padding:0.75rem 1.2rem;margin:1rem 0 0;max-width:800px;">
@@ -47,6 +48,7 @@ the ATO (PAYG via BAS, super via SBSCH).</p>
     <li><a href="#leave">Leave tracking — annual, sick &amp; bereavement</a></li>
     <li><a href="#hecs">STSL/HECS — how it works</a></li>
     <li><a href="#medicare">Medicare levy — scales, exemptions &amp; adjustment</a></li>
+    <li><a href="#stp-export">STP YTD Export — submitting to the ATO</a></li>
     <li><a href="#troubleshoot">Troubleshooting</a></li>
   </ol>
 </nav>
@@ -1409,6 +1411,174 @@ A built-in verification test is also available in <a href="/dolibarr/custom/payr
     </tr>
   </tbody>
 </table>
+
+<hr>
+
+<!-- ── 19. STP Export ──────────────────────────────────────────────────────── -->
+<h2 id="stp-export">19. STP YTD Export — submitting to the ATO</h2>
+
+<p>Single Touch Payroll (STP) requires you to report each employee's year-to-date (YTD) payroll figures
+to the ATO every time you run payroll, and again at EOFY for finalisation.
+The <strong>STP Export</strong> page generates a CSV file with all the required YTD data so you can
+upload it to your sending service provider (SSP).</p>
+
+<p><a href="/dolibarr/custom/payroll/stp_export.php?mainmenu=billing&amp;leftmenu=payroll_stp" class="button">Open STP Export</a>
+&nbsp; or via <strong>Billing | Payment &gt; STP Export</strong> in the left menu (requires module reinstall to appear — use the button on Pay Run History in the meantime).</p>
+
+<div class="alert alert-info" style="margin:1rem 0;max-width:700px;">
+  <strong>Background:</strong> The ATO separates two roles — the <em>DSP</em> (payroll software that
+  calculates and records pay) and the <em>SSP</em> (a gateway that wraps your data in the required
+  SBR ebMS3 XML and transmits it to the ATO). The Dolibarr payroll module is the DSP.
+  It produces a CSV; your SSP handles transmission. See the
+  <a href="stp-ssp.php">STP &amp; SSP research page</a> for full details on choosing an SSP.
+</div>
+
+<h3>How to use it</h3>
+<ol>
+  <li>Run your payroll as normal (Pay Run page → confirm → payslips generated).</li>
+  <li>Go to <strong>STP Export</strong> (link above or from Pay Run History).</li>
+  <li>Select the <strong>Financial Year</strong> — it defaults to the current FY.</li>
+  <li>Review the <strong>preview table</strong> to spot any warnings (missing TFN, no employment basis set).</li>
+  <li>Click <strong>Download CSV</strong> — the file downloads immediately.</li>
+  <li>Log in to your SSP's web portal and upload the CSV. The SSP transmits to the ATO and returns a receipt.</li>
+  <li>At EOFY: run the export one final time after the last payrun of the year. Tick "finalise" in the SSP portal — this locks the YTD figures for that employee for the year.</li>
+</ol>
+
+<h3>What's in the CSV</h3>
+<table class="noborder" style="width:100%;max-width:780px;">
+  <thead>
+    <tr style="background:#f5f5f5;">
+      <th style="padding:0.4rem 0.8rem;">Column</th>
+      <th style="padding:0.4rem 0.8rem;">Description</th>
+      <th style="padding:0.4rem 0.8rem;">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="padding:0.35rem 0.8rem;"><code>employee_id</code></td>
+      <td style="padding:0.35rem 0.8rem;">Dolibarr user ID</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 0.8rem;"><code>lastname</code>, <code>firstname</code></td>
+      <td style="padding:0.35rem 0.8rem;">Employee name from Dolibarr user record</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 0.8rem;"><code>tfn</code></td>
+      <td style="padding:0.35rem 0.8rem;">Tax File Number — decrypted for CSV only; masked in the on-screen preview (shown as ●●●-●●●-XXX)</td>
+      <td style="padding:0.35rem 0.8rem;">Populated (if stored)</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 0.8rem;"><code>employment_basis</code></td>
+      <td style="padding:0.35rem 0.8rem;">STP Phase 2 code: F (full-time), P (part-time/apprentice), C (casual). Derived from payroll profile position type.</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 0.8rem;"><code>income_type</code></td>
+      <td style="padding:0.35rem 0.8rem;">STP income type code — defaults to SAW (salary &amp; wages)</td>
+      <td style="padding:0.35rem 0.8rem;">Defaulted to SAW</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 0.8rem;"><code>tax_scale</code></td>
+      <td style="padding:0.35rem 0.8rem;">ATO withholding scale (1–6)</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 0.8rem;"><code>ytd_gross</code></td>
+      <td style="padding:0.35rem 0.8rem;">YTD gross income for the selected FY</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 0.8rem;"><code>ytd_payg</code></td>
+      <td style="padding:0.35rem 0.8rem;">YTD PAYG withholding (excluding HECS)</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 0.8rem;"><code>ytd_hecs</code></td>
+      <td style="padding:0.35rem 0.8rem;">YTD STSL/HECS component (summed from deductions_json)</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 0.8rem;"><code>ytd_payg_total</code></td>
+      <td style="padding:0.35rem 0.8rem;">YTD PAYG + HECS combined (what you remit to ATO via BAS label W2)</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 0.8rem;"><code>ytd_super</code></td>
+      <td style="padding:0.35rem 0.8rem;">YTD super guarantee paid/payable</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 0.8rem;"><code>pay_runs_in_fy</code></td>
+      <td style="padding:0.35rem 0.8rem;">Number of pay runs included in the YTD totals</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 0.8rem;"><code>address</code>, <code>suburb</code>, <code>state</code>, <code>postcode</code></td>
+      <td style="padding:0.35rem 0.8rem;">Employee address from Dolibarr user record</td>
+      <td style="padding:0.35rem 0.8rem;">Populated</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 0.8rem;"><code>ytd_salary_sacrifice</code></td>
+      <td style="padding:0.35rem 0.8rem;">YTD salary sacrifice super — not yet tracked in module</td>
+      <td style="padding:0.35rem 0.8rem;">Blank (placeholder)</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 0.8rem;"><code>ytd_reportable_super</code></td>
+      <td style="padding:0.35rem 0.8rem;">YTD reportable employer super contributions — not yet tracked</td>
+      <td style="padding:0.35rem 0.8rem;">Blank (placeholder)</td>
+    </tr>
+    <tr style="background:#fafafa;">
+      <td style="padding:0.35rem 0.8rem;"><code>ytd_fringe_benefits</code></td>
+      <td style="padding:0.35rem 0.8rem;">YTD reportable fringe benefits — not yet tracked</td>
+      <td style="padding:0.35rem 0.8rem;">Blank (placeholder)</td>
+    </tr>
+    <tr>
+      <td style="padding:0.35rem 0.8rem;"><code>employment_start_date</code>, <code>employment_end_date</code></td>
+      <td style="padding:0.35rem 0.8rem;">Employment dates — <code>employment_start_date</code> is stored on the payroll profile; <code>employment_end_date</code> is blank unless the employee has been terminated</td>
+      <td style="padding:0.35rem 0.8rem;">Start: populated if set; End: blank</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Warnings on the preview</h3>
+<ul style="margin:0.5rem 0 0.5rem 1.5rem;">
+  <li><strong>No TFN</strong> — TFN has not been entered for this employee via the TFN Manager. The CSV will have a blank TFN field; the SSP will likely reject the submission. Fix: go to <a href="/dolibarr/custom/payroll/tfn.php?mainmenu=billing">TFN Manager</a> and enter the TFN.</li>
+  <li><strong>No employment basis</strong> — position type is blank on the payroll profile. Fix: open the employee's payroll profile and set their employment type (Full Time, Part Time, Casual, etc.).</li>
+</ul>
+
+<h3>TFN security</h3>
+<p>TFNs are stored encrypted (AES-256-CBC) in the database and are <strong>never shown in full on screen</strong>.
+The on-screen preview masks each TFN as <code>●●●-●●●-XXX</code> (last 3 digits only).
+The downloaded CSV contains the decrypted TFN — treat this file with the same care as any document
+containing sensitive personal information. Do not email it unencrypted.</p>
+
+<h3>About SSPs — choosing a provider</h3>
+<p>You need to register with a <strong>Sending Service Provider (SSP)</strong> before you can submit STP.
+The SSP acts as a gateway between the payroll module's CSV and the ATO's SBR transmission system.
+See the <a href="stp-ssp.php">STP &amp; SSP research page</a> for provider options, the SSID explained,
+and the full plan for transitioning away from Reckon (~May 2027).</p>
+
+<p>The recommended SSP to investigate first is <strong>SuperChoice</strong> (superchoiceservices.com —
+ABN 78 109 509 739), which explicitly offers STP gateway services to third-party payroll software
+developers. Contact: sales@superchoice.com.au.</p>
+
+<h3>EOFY finalisation</h3>
+<p>At the end of each financial year (after the last pay run in June):</p>
+<ol>
+  <li>Run the STP Export for the completed FY.</li>
+  <li>Review the totals carefully — compare against your BAS W2 figures for the year.</li>
+  <li>Upload to the SSP portal and select the <strong>finalisation</strong> option (exact wording varies by SSP).</li>
+  <li>The ATO will then pre-fill the employees' personal income tax returns with the finalised YTD data.</li>
+  <li>Employees should be notified when finalisation is complete — they will receive an income statement in their myGov account rather than a payment summary (no paper payment summaries are required under STP).</li>
+</ol>
+
+<div class="alert alert-warning" style="margin:1rem 0;max-width:700px;">
+  <strong>EOFY deadline:</strong> Finalisation is due by <strong>14 July</strong> each year (or later if
+  the ATO grants a concession). Do not wait until August — employees cannot lodge their tax returns
+  until their income statement shows as "Tax ready" in myGov.
+</div>
 
 <hr>
 <p><a href="index.php">← Back to Help home</a></p>

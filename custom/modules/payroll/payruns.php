@@ -73,6 +73,7 @@ llxHeader('', 'Pay Run History');
 <div style="display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
   <h1 style="margin:0;">Pay Run History</h1>
   <a href="payrun.php?mainmenu=billing&leftmenu=payroll_run" class="button" style="font-size:0.88em;">New pay run</a>
+  <a href="stp_export.php?mainmenu=billing&leftmenu=payroll_stp" class="button" style="font-size:0.88em;">STP Export</a>
 </div>
 
 <?php if ($detail_rows): ?>

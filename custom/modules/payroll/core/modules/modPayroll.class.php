@@ -110,6 +110,22 @@ class modPayroll extends DolibarrModules
             'user'     => 0,
         ];
 
+        // STP Export — YTD CSV for SSP file upload
+        $this->menu[$r++] = [
+            'fk_menu'  => 'fk_mainmenu=billing',
+            'type'     => 'left',
+            'titre'    => 'STP Export',
+            'mainmenu' => 'billing',
+            'leftmenu' => 'payroll_stp',
+            'url'      => '/custom/payroll/stp_export.php?mainmenu=billing&leftmenu=payroll_stp',
+            'langs'    => '',
+            'position' => 902,
+            'enabled'  => '$conf->payroll->enabled',
+            'perms'    => '$user->admin',
+            'target'   => '',
+            'user'     => 0,
+        ];
+
         // Payroll Manual — staff-facing help page
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=billing',
