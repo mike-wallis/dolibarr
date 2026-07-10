@@ -91,12 +91,10 @@ class pdf_southside extends pdf_brightcs
 		$boxW = 88; // fixed width — narrower than the full left column
 
 		$early_pct   = (float) getDolGlobalString('SSS_DISC_EARLY', '2.5') / 100;
-		$early_days  = (int)   getDolGlobalString('SSS_EARLY_DAYS', '7');
 		$early_save  = round($object->total_ttc * $early_pct, 2);
 		$early_total = round($object->total_ttc - $early_save, 2);
-		$early_date  = dol_time_plus_duree($object->date, $early_days, 'd');
 
-		$boxH = 22;
+		$boxH = 16;
 		$pdf->SetDrawColor(...static::CLR_GREEN);
 		$pdf->SetLineWidth(0.5);
 		$pdf->Rect($ml, $posy, $boxW, $boxH);
@@ -108,14 +106,9 @@ class pdf_southside extends pdf_brightcs
 		$pdf->SetXY($ml + 2, $posy + 2);
 		$pdf->Cell($boxW - 4, 5, $epct_label . '% EARLY PAYMENT DISCOUNT', 0, 1, 'L');
 
-		$pdf->SetFont('', '', $fs + 1);
-		$pdf->SetTextColor(...static::CLR_DARK);
-		$pdf->SetXY($ml + 2, $posy + 8);
-		$pdf->Cell($boxW - 4, 5, 'Pay by ' . dol_print_date($early_date, 'day', false, $outputlangs), 0, 1, 'L');
-
 		$pdf->SetFont('', 'B', $fs + 2);
 		$pdf->SetTextColor(...static::CLR_GREEN);
-		$pdf->SetXY($ml + 2, $posy + 14);
+		$pdf->SetXY($ml + 2, $posy + 8);
 		$pdf->Cell($boxW - 4, 6, $this->bcs_price($early_total) . '   (save ' . $this->bcs_price($early_save) . ')', 0, 1, 'L');
 
 		$pdf->SetTextColor(0, 0, 0);

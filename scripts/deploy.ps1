@@ -57,6 +57,15 @@ Get-ChildItem (Join-Path $RepoRoot "custom\core\modules\propale\doc\*.php") | Fo
     Deploy-File $_.FullName (Join-Path $HtdocsDir "core\modules\propale\doc\$($_.Name)")
 }
 
+# ── Core triggers ────────────────────────────────────────────────────────────
+Write-Host "Core triggers:" -ForegroundColor Yellow
+$triggersPath = Join-Path $RepoRoot "custom\core\triggers"
+if (Test-Path $triggersPath) {
+    Get-ChildItem (Join-Path $triggersPath "*.php") | ForEach-Object {
+        Deploy-File $_.FullName (Join-Path $HtdocsDir "core\triggers\$($_.Name)")
+    }
+}
+
 # ── Custom modules ───────────────────────────────────────────────────────────
 Write-Host "Custom modules:" -ForegroundColor Yellow
 $modulesPath = Join-Path $RepoRoot "custom\modules"

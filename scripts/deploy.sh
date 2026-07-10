@@ -60,6 +60,15 @@ for f in "$REPO_DIR"/custom/core/modules/propale/doc/*.php; do
     deploy_file "$f" "$HTDOCS_DIR/core/modules/propale/doc/$(basename "$f")"
 done
 
+# ── Core triggers ────────────────────────────────────────────────────────────
+echo "Core triggers:"
+if [ -d "$REPO_DIR/custom/core/triggers" ]; then
+    for f in "$REPO_DIR"/custom/core/triggers/*.php; do
+        [ -e "$f" ] || continue
+        deploy_file "$f" "$HTDOCS_DIR/core/triggers/$(basename "$f")"
+    done
+fi
+
 # ── Custom modules ───────────────────────────────────────────────────────────
 echo "Custom modules:"
 for mod_dir in "$REPO_DIR"/custom/modules/*/; do
