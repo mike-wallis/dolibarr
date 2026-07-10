@@ -17,11 +17,19 @@ dolibarr-scripts/
 # Setup screenshots
 images/
 
-# Import data (may contain real business data)
-imports/*.csv
-imports/*.xlsx
-imports/*.xls
+# Import data (may contain real business data). ** so this also matches
+# subfolders like imports/payroll/ — a plain * only matches imports/ itself.
+imports/**/*.csv
+imports/**/*.xlsx
+imports/**/*.xls
 imports/raw_samples/
+
+# ATO reference PDFs/spreadsheets scraped for payroll tax tables — large and
+# fully reproducible from the documented URLs/Playwright scripts in CLAUDE.md
+# (see "Playwright for ATO Data Scraping"). The parsed CSV output that actually
+# matters is committed separately to custom/modules/payroll/data/.
+imports/**/*.pdf
+imports/payroll/pdf_pages/
 
 # Database dumps
 *.sql
