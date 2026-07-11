@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>How To — Correct a Wrong Price on a Purchase Order</title>
+</head>
+<body style="font-family: -apple-system, Segoe UI, Arial, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #222;">
+
+<h1 style="font-size: 1.6rem;">How To — Correct a Wrong Price on a Purchase Order</h1>
+<p style="color: #666; font-size: 0.9rem;">Dolibarr version 23.0.3. Applies to Purchase Orders (Supplier Orders) at any stage before the supplier
+invoice has been entered. Worked example below uses real steps carried out on <strong>PO2607-0001</strong> (Hanleys) on 08/07/2026.</p>
+
+<div style="background: #eef6ff; border-left: 4px solid #5b9bd5; padding: 0.75rem 1rem; border-radius: 4px; margin: 1rem 0;">
+<p><strong>Golden rule:</strong> Dolibarr only lets you edit a purchase order line's price while the order status is
+<strong>Draft</strong>. If the order has moved past Draft (Approved, Ordered, Received&hellip;), you must step it back to
+Draft first, fix the price, then move it forward through the workflow again.</p>
+</div>
+
+<h2 style="font-size: 1.2rem; margin-top: 2rem; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem;">The full PO workflow, and where you can/can't edit prices</h2>
+
+<table style="border-collapse: collapse; width: 100%; margin: 1rem 0;">
+  <tr>
+    <th style="border: 1px solid #ddd; padding: 0.5rem; text-align: left; background: #f6f8fa;">Status</th>
+    <th style="border: 1px solid #ddd; padding: 0.5rem; text-align: left; background: #f6f8fa;">Can you edit the price directly?</th>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;"><strong>Draft</strong></td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem; background: #eefbf0;">Yes &mdash; prices fully editable</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">Approved</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem; background: #fff5f5;">No &mdash; locked</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">Ordered</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem; background: #fff5f5;">No &mdash; locked</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">Received</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem; background: #fff5f5;">No &mdash; locked, and stock cost is now posted</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">Invoiced</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem; background: #fff5f5;">No &mdash; but the PO itself no longer matters at this point</td>
+  </tr>
+</table>
+
+<p>Once a PO is <strong>Approved</strong> or later, the "Add/edit line" form disappears from the page entirely &mdash; there
+is no direct way to change a unit price. You have to use one of the buttons on the order card to send it back a step.</p>
+
+<h2 style="font-size: 1.2rem; margin-top: 2rem; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem;">How to send an order back to Draft</h2>
+
+<table style="border-collapse: collapse; width: 100%; margin: 1rem 0;">
+  <tr>
+    <th style="border: 1px solid #ddd; padding: 0.5rem; text-align: left; background: #f6f8fa;">Current status</th>
+    <th style="border: 1px solid #ddd; padding: 0.5rem; text-align: left; background: #f6f8fa;">Button to click</th>
+    <th style="border: 1px solid #ddd; padding: 0.5rem; text-align: left; background: #f6f8fa;">What happens</th>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">Approved</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;"><span style="display: inline-block; background: #6c5ce7; color: #fff; border-radius: 4px; padding: 0.2rem 0.6rem; font-size: 0.85rem; font-weight: bold;">REJECT</span> (also shown as "Disapprove" in some Dolibarr configs)</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">Goes straight back to Draft in one click.</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">Ordered / Partially received / Received</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;"><span style="display: inline-block; background: #6c5ce7; color: #fff; border-radius: 4px; padding: 0.2rem 0.6rem; font-size: 0.85rem; font-weight: bold;">REJECT</span> / <span style="display: inline-block; background: #6c5ce7; color: #fff; border-radius: 4px; padding: 0.2rem 0.6rem; font-size: 0.85rem; font-weight: bold;">ReOpen</span></td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">Only moves back <strong>one status at a time</strong> (e.g. Received &rarr; Ordered &rarr; Approved). Click it
+    repeatedly, and once it's back at Approved, click it once more to reach Draft.</td>
+  </tr>
+</table>
+
+<div style="background: #fff3cd; border-left: 4px solid #f0ad4e; padding: 0.75rem 1rem; border-radius: 4px; margin: 1rem 0;">
+<p><strong>The exact button label can vary</strong> (we've seen both "Disapprove" and "REJECT" for the same action on
+this Dolibarr install &mdash; it depends on the site's language pack). Whatever it's called, Dolibarr always shows a <strong>confirmation popup</strong> before
+anything actually changes &mdash; read the popup wording before confirming. If it talks about the order being sent back for
+correction, that's the right one. If it talks about the <em>supplier</em> refusing/declining to fulfil the order,
+that's a different action &mdash; cancel out and don't use it.</p>
+</div>
+
+<h3 style="font-size: 1.05rem; margin-top: 1.5rem;">Once you're back at Draft</h3>
+<ol>
+  <li>Click the pencil (&#9998;) icon on the right of the line with the wrong price.</li>
+  <li>Correct the <strong>U.P. (net)</strong> unit price.</li>
+  <li>Save the line. Repeat for any other wrong lines.</li>
+  <li>Check the totals at the top right of the page have recalculated correctly.</li>
+  <li>Click <strong>Validate and Approve</strong> (or Validate, then Approve, depending on the order's value/workflow)
+  to send it forward again.</li>
+  <li>Continue the normal workflow from there: <strong>Make Order</strong> &rarr; record the <strong>Item receipt</strong>
+  &rarr; <strong>Create Invoice</strong>.</li>
+</ol>
+
+<div style="background: #fff3cd; border-left: 4px solid #f0ad4e; padding: 0.75rem 1rem; border-radius: 4px; margin: 1rem 0;">
+<h3 style="margin-top:0; font-size: 1.05rem;">&#9888; If the goods were already received in Dolibarr with the wrong price</h3>
+<p>Recording a goods receipt posts a permanent stock movement using whatever price was on the order line
+<em>at that moment</em>, and immediately updates the product's weighted-average cost (AVCO). That stock movement is
+<strong>not linked back</strong> to the order line &mdash; correcting the price on the PO afterwards will fix the PO
+document, but it will <strong>not</strong> retroactively fix the stock value already posted.</p>
+<p>If this happens: fixing the PO is still worth doing for accurate records, but the stock valuation itself needs a
+separate manual correction (Products &rarr; the item &rarr; Stock tab &rarr; <strong>Correct Stock</strong>). This
+touches inventory valuation, so check the size of the discrepancy and, if it's material, flag it for the accountant/BAS
+agent rather than guessing at the right adjustment.</p>
+</div>
+
+<div style="background: #eefbf0; border-left: 4px solid #3aa757; padding: 0.75rem 1rem; border-radius: 4px; margin: 1rem 0;">
+<h3 style="margin-top:0; font-size: 1.05rem;">If the supplier invoice has already been entered in Dolibarr</h3>
+<p>You don't need to touch the PO at all. A supplier invoice's line prices don't have to match the PO &mdash; enter the
+correct prices straight from the vendor's actual invoice. The invoice (not the PO) is what matters for accounts
+payable and GST/BAS. If the invoice was already validated with the wrong price, it needs a credit note or a
+<strong>Modify</strong>/correction on the invoice itself, not a fix on the PO.</p>
+</div>
+
+<h2 style="font-size: 1.2rem; margin-top: 2rem; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem;">Worked example &mdash; PO2607-0001 (Hanleys)</h2>
+<p>Two lines had the wrong unit price after the order was already <strong>Approved</strong>, but before "Make Order" or
+any goods receipt had been recorded in Dolibarr &mdash; the simplest case.</p>
+
+<table style="border-collapse: collapse; width: 100%; margin: 1rem 0;">
+  <tr>
+    <th style="border: 1px solid #ddd; padding: 0.5rem; text-align: left; background: #f6f8fa;">Product</th>
+    <th style="border: 1px solid #ddd; padding: 0.5rem; text-align: left; background: #f6f8fa;">Wrong price (net)</th>
+    <th style="border: 1px solid #ddd; padding: 0.5rem; text-align: left; background: #f6f8fa;">Correct price (net)</th>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">AUPR240LT &mdash; Wheelie Bin Liner 240 Lt Black</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">$38.00</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">$37.01</td>
+  </tr>
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">CC0051879PK &mdash; BLEACH 4% 5 Lt</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">$12.83</td>
+    <td style="border: 1px solid #ddd; padding: 0.5rem;">$9.41</td>
+  </tr>
+</table>
+
+<ol>
+  <li>On the PO card (status: Approved), clicked <span style="display: inline-block; background: #6c5ce7; color: #fff; border-radius: 4px; padding: 0.2rem 0.6rem; font-size: 0.85rem; font-weight: bold;">REJECT</span> &mdash; confirmed via the popup &mdash; order
+  returned to <strong>Draft (needs to be validated)</strong>.</li>
+  <li>Edited the two wrong lines using the pencil icon, corrected the unit prices.</li>
+  <li>Clicked <strong>VALIDATE AND APPROVE</strong> &mdash; order returned to <strong>Approved</strong>, totals recalculated
+  to $585.78 excl. tax / $644.36 inc. tax.</li>
+  <li>Regenerated the PO PDF (Linked files tab &rarr; Generate) &mdash; confirmed it showed the corrected prices.</li>
+  <li>Clicked <strong>Make Order</strong>, then went to <strong>Item receipts</strong> and clicked <strong>Create
+  Reception</strong> for the full quantities (16 / 4 / 6), confirmed the reception, then clicked
+  <strong>Validate</strong> on the reception.</li>
+  <li>Checked the product's Stock tab (e.g. AUPR240LT) &mdash; <strong>Weighted average price now $37.01</strong>, correctly
+  reflecting the fixed price, since the reception hadn't happened yet when the fix was made.</li>
+  <li>Clicked <strong>Create Invoice</strong> from the PO &mdash; the supplier invoice (SI2607-0001) picked up the corrected
+  prices automatically, totalling $644.36 inc. tax.</li>
+  <li>Checked the vendor reference, invoice date, and line-by-line amounts against Hanleys' actual paper invoice before
+  validating the invoice.</li>
+</ol>
+
+<h2 style="font-size: 1.2rem; margin-top: 2rem; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem;">Quick reference &mdash; what to check before you validate anything</h2>
+<ul>
+  <li>Totals at top of the PO/invoice match what you expect after the edit.</li>
+  <li>Regenerate the PDF if you're about to send/re-send it &mdash; don't rely on a previously generated copy.</li>
+  <li>If stock has already been received with a wrong price, the PO fix alone is not enough &mdash; see the warning above.</li>
+  <li>Supplier invoice line prices are independent of the PO &mdash; always compare the final invoice against the vendor's
+  actual paper/PDF invoice before validating, regardless of whether the PO was ever wrong.</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,5 @@
+
+SSH SouthSideSupplies
+cd ~/erp_dolibarr/repo
+git pull
+HTDOCS_DIR=~/erp_dolibarr/public_html bash scripts/deploy.sh
