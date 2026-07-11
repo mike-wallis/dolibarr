@@ -31,6 +31,10 @@ class modPayroll extends DolibarrModules
         $r = 0;
 
         // Pay Run — main pay entry page
+        // Icon: FA "money-bill-wave" (cash in motion) — distinct from the module's
+        // own picto ('salary' = wallet, used on the module card), and evokes the
+        // repeating pay-cycle action rather than a static amount. Same img_picto()
+        // technique already used elsewhere in this repo for menu icons.
         $this->menu[$r++] = [
             'fk_menu'  => 'fk_mainmenu=billing',
             'type'     => 'left',
@@ -44,6 +48,7 @@ class modPayroll extends DolibarrModules
             'perms'    => '$user->admin',
             'target'   => '',
             'user'     => 0,
+            'prefix'   => img_picto('', 'fa-money-bill-wave', 'class="paddingright pictofixedwidth"'),
         ];
 
         // Pay Run History — completed pay runs list
