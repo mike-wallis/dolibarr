@@ -26,9 +26,10 @@ $config = ActionsDashboardjournals::loadConfig();
 
 if ($action === 'save') {
     $newConfig  = [
-        'enabled'      => (GETPOST('enabled', 'alpha') === '1'),
-        'openInNewTab' => (GETPOST('openInNewTab', 'alpha') === '1'),
-        'groups'       => [],
+        'enabled'              => (GETPOST('enabled', 'alpha') === '1'),
+        'openInNewTab'         => (GETPOST('openInNewTab', 'alpha') === '1'),
+        'showEmployeesSection' => (GETPOST('showEmployeesSection', 'alpha') === '1'),
+        'groups'               => [],
     ];
     $tileLabels = ActionsDashboardjournals::tileLabels();
 
@@ -96,6 +97,14 @@ print dol_get_fiche_head(
   <label>
     <input type="checkbox" name="openInNewTab" value="1" <?php echo !empty($config['openInNewTab']) ? 'checked' : ''; ?>>
     Open caption links (and the Accounting box) in a new tab
+  </label>
+</div>
+<div class="marginbottomonly">
+  <label>
+    <input type="checkbox" name="showEmployeesSection" value="1" <?php echo !empty($config['showEmployeesSection']) ? 'checked' : ''; ?>>
+    <strong>Show the Employees Management section</strong> (Users &amp; Groups, Employees,
+    Skills management, Leaves, Salaries, Pay Run — each link only shown if its own module
+    is active and you have permission for it)
   </label>
 </div>
 

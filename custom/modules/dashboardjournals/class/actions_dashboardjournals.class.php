@@ -113,8 +113,13 @@ class ActionsDashboardjournals
     public static function defaultConfig(): array
     {
         return [
-            'enabled'      => true,
-            'openInNewTab' => false,
+            'enabled'              => true,
+            'openInNewTab'         => false,
+            // Employees Management is a separately-toggleable bonus section (not
+            // part of the sales/purchase/finance journal concept), built by
+            // resolveEmployeesColumns() rather than the generic groupDefinitions()
+            // loop — see printCommonFooter().
+            'showEmployeesSection' => true,
             'groups'  => [
                 'sales' => [
                     'title'      => 'Sales Journal',
@@ -276,7 +281,8 @@ class ActionsDashboardjournals
         // Shallow-merge saved values over defaults so a partially-saved config
         // (or a config saved by an older version of this module) can't blow up.
         $config = $defaults;
-        $config['enabled']      = $saved['enabled'] ?? $defaults['enabled'];
+        $config['enabled']              = $saved['enabled'] ?? $defaults['enabled'];
+        $config['showEmployeesSection'] = $saved['showEmployeesSection'] ?? $defaults['showEmployeesSection'];
         $config['openInNewTab'] = $saved['openInNewTab'] ?? $defaults['openInNewTab'];
         foreach ($defaults['groups'] as $key => $groupDefaults) {
             if (isset($saved['groups'][$key]) && is_array($saved['groups'][$key])) {
@@ -353,17 +359,9 @@ class ActionsDashboardjournals
 
             $quickLinks = [];
             foreach ((array) ($def['quickLinks'] ?? []) as $ql) {
-                if (!isModEnabled($ql['module'])) {
-                    continue;
+                if ($resolved = $this->resolveLink($ql)) {
+                    $quickLinks[] = $resolved;
                 }
-                if (!empty($ql['perm']) && !$user->hasRight($ql['perm'][0], $ql['perm'][1])) {
-                    continue;
-                }
-                $quickLinks[] = [
-                    'label' => $ql['label'],
-                    'href'  => dol_buildpath($ql['url'], 1),
-                    'icon'  => img_picto('', $ql['picto'], 'class="paddingright pictofixedwidth"'),
-                ];
             }
 
             if (!$anyModuleOn && !$staticBox && !$quickLinks) {
@@ -392,6 +390,34 @@ class ActionsDashboardjournals
                 'staticBox'  => $staticBox,
                 'quickLinks' => $quickLinks,
             ];
+        }
+
+        // Employees Management — a separately-toggleable bonus section, not part
+        // of the sales/purchase/finance journal concept, so it isn't in
+        // groupDefinitions(). Four fixed columns (Users & Groups | Employees +
+        // Skills management | Leaves | Salaries + Pay Run); the "Leaves" tile is
+        // a real Dolibarr dashboard tile (found via the same .bg-infobox-holiday
+        // mechanism as every other group's tiles — see 'tiles' below), the rest
+        // are built server-side like the finance group's quickLinks.
+        if (!empty($config['showEmployeesSection'])) {
+            $columns   = $this->resolveEmployeesColumns();
+            $leavesOn  = isModEnabled('holiday');
+            $hasLinks  = false;
+            foreach ($columns as $col) {
+                if ($col) {
+                    $hasLinks = true;
+                    break;
+                }
+            }
+            if ($hasLinks || $leavesOn) {
+                $jsGroups[] = [
+                    'key'     => 'employees',
+                    'title'   => 'Employees Management',
+                    'tiles'   => $leavesOn ? ['holiday'] : [],
+                    'columns' => $columns,
+                    'tileCol' => 2, // 0-indexed — Leaves lands in the 3rd column
+                ];
+            }
         }
 
         if (empty($jsGroups)) {
@@ -425,6 +451,70 @@ class ActionsDashboardjournals
         return $scriptDir === $rootDir;
     }
 
+    /**
+     * Resolves one link definition (label/url/picto/module/perm/adminOnly) into
+     * the {label, href, icon} shape the JS card-builder expects, or null if the
+     * current user shouldn't see it — module off, missing permission, or
+     * (for payroll links, which gate on admin like the rest of that module's
+     * menu — see modPayroll.class.php) not an admin. Shared by the finance
+     * group's quickLinks and resolveEmployeesColumns() below.
+     */
+    private function resolveLink(array $item): ?array
+    {
+        global $user;
+
+        if (!empty($item['module']) && !isModEnabled($item['module'])) {
+            return null;
+        }
+        if (!empty($item['adminOnly']) && empty($user->admin)) {
+            return null;
+        }
+        if (!empty($item['perm']) && !$user->hasRight(...$item['perm'])) {
+            return null;
+        }
+        return [
+            'label' => $item['label'],
+            'href'  => dol_buildpath($item['url'], 1),
+            'icon'  => img_picto('', $item['picto'], 'class="paddingright pictofixedwidth"'),
+        ];
+    }
+
+    /**
+     * Four columns for the Employees Management section. Column 3 (index 2) is
+     * deliberately left empty — it's reserved for the "Leaves" tile, a real
+     * Dolibarr dashboard tile moved into place by the JS (see printCommonFooter()
+     * and buildEmployeesGroup() in outputJs()), not a built card like the rest.
+     * URLs/picto/perms match Dolibarr's own menu entries for these pages
+     * (eldy.lib.php) exactly, so these look and behave like the native links.
+     */
+    private function resolveEmployeesColumns(): array
+    {
+        $defs = [
+            [
+                ['label' => 'Users & Groups', 'url' => '/user/home.php?leftmenu=users&mainmenu=home', 'picto' => 'user', 'module' => null, 'perm' => ['user', 'user', 'read']],
+            ],
+            [
+                ['label' => 'Employees', 'url' => '/user/list.php?mainmenu=hrm&leftmenu=hrm&contextpage=employeelist', 'picto' => 'user', 'module' => 'hrm', 'perm' => ['user', 'user', 'read']],
+                ['label' => 'Skills management', 'url' => '/hrm/skill_list.php?mainmenu=hrm&leftmenu=hrm_sm', 'picto' => 'shapes', 'module' => 'hrm', 'perm' => ['hrm', 'all', 'read']],
+            ],
+            [], // reserved for the Leaves tile
+            [
+                ['label' => 'Salaries', 'url' => '/salaries/list.php?leftmenu=tax_salary&mainmenu=billing', 'picto' => 'salary', 'module' => 'salaries', 'perm' => ['salaries', 'read']],
+                ['label' => 'Pay Run', 'url' => '/custom/payroll/payrun.php?mainmenu=billing&leftmenu=payroll_run', 'picto' => 'fa-money-bill-wave', 'module' => 'payroll', 'adminOnly' => true],
+            ],
+        ];
+
+        return array_map(function ($col) {
+            $resolved = [];
+            foreach ($col as $item) {
+                if ($r = $this->resolveLink($item)) {
+                    $resolved[] = $r;
+                }
+            }
+            return $resolved;
+        }, $defs);
+    }
+
     private function outputCss(): void
     {
         echo <<<CSS
@@ -451,6 +541,31 @@ class ActionsDashboardjournals
 }
 .dj-group-finance .dj-tiles-row{flex-direction:column;align-items:stretch;}
 .dj-group-finance .dj-arrow{align-self:center;transform:rotate(90deg);}
+.dj-group-employees{
+    grid-column: 1 / -1; /* full width, below both journal columns above it */
+}
+.dj-emp-grid{
+    display:grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap:8px;
+}
+.dj-emp-col{
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    min-width:0; /* same overflow fix as .dj-group-finance — a column must stay
+                    at its grid track width even when empty ("not collapse"),
+                    and must not let a wide child (the Leaves tile) push it out. */
+}
+.dj-emp-col:nth-child(2){
+    align-items:flex-start; /* Employees + Skills management — left-align so their
+                                left edges line up instead of each being centered
+                                independently (they're different widths). */
+}
+.dj-emp-col:nth-child(2) .dj-static-box{
+    align-self:flex-start; /* .dj-static-box has its own align-self:center (set
+                               for its other use in the finance quicklinks row),
+                               which overrides the parent's align-items above —
+                               this puts the left-alignment back for these two. */
+}
 .dj-group-title{
     font-weight:bold;font-size:13px;color:#c2703d;
     text-transform:uppercase;letter-spacing:.03em;
@@ -615,6 +730,29 @@ CSS;
         return col;
     }
 
+    // Builds the Employees Management section: a fixed 4-column grid (see
+    // .dj-emp-grid), each column a vertical stack of icon+label cards (built
+    // the same way as the finance group's quickLinks) — except group.tileCol,
+    // which gets the "Leaves" tile moved into it instead, if found.
+    function buildEmployeesGroup(group, found) {
+        var wrap = djText('div', 'dj-group dj-group-employees', null);
+        if (group.title) wrap.appendChild(djText('div', 'dj-group-title', group.title));
+
+        var grid = djText('div', 'dj-emp-grid', null);
+        (group.columns || []).forEach(function (colLinks, colIndex) {
+            var colEl = djText('div', 'dj-emp-col', null);
+            colLinks.forEach(function (link) {
+                colEl.appendChild(buildStaticBox(link));
+            });
+            if (colIndex === group.tileCol && found.length) {
+                colEl.appendChild(found[0].el); // moves the existing Leaves tile node, doesn't clone it
+            }
+            grid.appendChild(colEl);
+        });
+        wrap.appendChild(grid);
+        return wrap;
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         // Pass 1: just find each group's tiles — don't move anything yet. Moving a
         // tile changes its parentNode, so the anchor used to position the whole
@@ -631,7 +769,8 @@ CSS;
                 var tile = span.closest('.box-flex-item');
                 if (tile) found.push({ el: tile, slotIndex: slotIndex });
             });
-            if (found.length === 0 && !group.staticBox) return; // nothing this group could show
+            var hasColumnLinks = group.columns && group.columns.some(function (c) { return c.length; });
+            if (found.length === 0 && !group.staticBox && !hasColumnLinks) return; // nothing this group could show
             withTiles.push({ group: group, found: found });
         });
         if (withTiles.length === 0) return;
@@ -651,6 +790,11 @@ CSS;
         // Pass 2: now build each group box and move its tiles into it.
         withTiles.forEach(function (entry) {
             var group = entry.group, found = entry.found;
+
+            if (group.columns) {
+                layout.appendChild(buildEmployeesGroup(group, found));
+                return;
+            }
 
             var wrap = djText('div', 'dj-group dj-group-' + group.key, null);
             if (group.title) wrap.appendChild(djText('div', 'dj-group-title', group.title));
