@@ -182,21 +182,19 @@ class modPayroll extends DolibarrModules
         }
 
         // Schema migrations — done in PHP because MySQL 9.x lacks ADD COLUMN IF NOT EXISTS.
+        // Only for columns NOT already in the CREATE TABLE statements above (used to
+        // upgrade an existing install created before that column existed). A column
+        // that's both in the CREATE TABLE and listed here fails with "Duplicate column
+        // name" on a brand-new install: the information_schema check below runs before
+        // any of the $sql[] statements have actually executed, so it sees the table as
+        // not-yet-existing (cnt=0) and queues a redundant ALTER, which then collides
+        // with the CREATE TABLE that already added the column moments later. Found
+        // 2026-07-11 when activating on a fresh (live) database — see
+        // docs/decisions/payroll-duplicate-column-fix.md.
         $migrations = [
-            ['llx_payroll_deduction_type', 'is_super_applicable',  'TINYINT NOT NULL DEFAULT 0'],
             ['llx_payroll_employee',       'has_medicare_adj',      'TINYINT NOT NULL DEFAULT 0'],
             ['llx_payroll_employee',       'medicare_dependants',   'TINYINT NOT NULL DEFAULT 0'],
             ['llx_payroll_employee',       'std_weekly_hours',      'DECIMAL(5,2) NOT NULL DEFAULT 0 AFTER std_hours'],
-            ['llx_payroll_employee',       'employment_start_date', 'DATE NULL'],
-            ['llx_payroll_fy_config',      'start_date',            'DATE NULL AFTER fy'],
-            ['llx_payroll_fy_config',      'end_date',              'DATE NULL AFTER start_date'],
-            ['llx_payroll_payrun_line',    'leave_note',            'VARCHAR(255) NULL AFTER additions_json'],
-            ['llx_payroll_employee',       'super_fund_name',       'VARCHAR(255) NULL'],
-            ['llx_payroll_employee',       'super_fund_usi',        'VARCHAR(50) NULL'],
-            ['llx_payroll_employee',       'super_fund_abn',        'VARCHAR(20) NULL'],
-            ['llx_payroll_employee',       'super_member_number',   'VARCHAR(50) NULL'],
-            ['llx_payroll_payrun_line',    'super_fund_usi',        'VARCHAR(50) NULL AFTER super_fund'],
-            ['llx_payroll_payrun_line',    'super_member_number',   'VARCHAR(50) NULL AFTER super_fund_usi'],
             ['llx_payroll_employee',       'tfn_encrypted',         'VARCHAR(500) NULL'],
             ['llx_payroll_employee',       'pay_bsb',               'VARCHAR(10) NULL'],
             ['llx_payroll_employee',       'pay_account',           'VARCHAR(20) NULL'],

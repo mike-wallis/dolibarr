@@ -1,6 +1,6 @@
 -- Schema seed for addition deduction types.
--- The ALTER TABLE for is_super_applicable is handled in init() PHP code
--- (MySQL 9.x does not support ADD COLUMN IF NOT EXISTS).
+-- is_super_applicable is a column on llx_payroll_deduction_type, defined
+-- directly in that table's own CREATE TABLE statement (llx_payroll_deduction_type.sql).
 -- INSERT IGNORE is idempotent: safe to run on every module enable.
 
 -- Seed built-in addition types (commission, allowances, bonus).
