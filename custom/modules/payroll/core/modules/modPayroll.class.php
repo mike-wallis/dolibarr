@@ -20,7 +20,8 @@ class modPayroll extends DolibarrModules
         $this->description     = 'Australian pay run entry — PAYG/HECS/super/bank in one step. Requires the Salaries module (uses its classes to create net-pay bank entries). Works best alongside the HRM module (employee profiles and positions).';
         $this->version         = '2.3';
         $this->const_name      = 'MAIN_MODULE_PAYROLL';
-        $this->editor_name     = 'South Side Supplies';
+        $this->editor_name     = 'Dolibarr User Australia';
+        $this->editor_url      = 'mailto:dolibarruseraustralia@gmail.com';
         $this->config_page_url = ['/custom/payroll/config.php?mainmenu=admintools'];
         $this->depends         = ['modSalaries'];  // uses Salary + PaymentSalary classes for net-pay bank entries
         // HRM module recommended but not hard-required

@@ -210,6 +210,12 @@ Do not guess where the issue is if it can be inspected.
 - Avoid hardcoding business-specific values — use the `BCS_*`/`SSS_*` constants pattern (Setup > Other Setup) for brand-specific values.
 - Never expose secrets, passwords, API keys, or database credentials. Never commit `.env` or real business data.
 - Do not make production assumptions from the local dev environment.
+- New custom modules under `custom/modules/`: set `$this->editor_name = 'Dolibarr User Australia';` and
+  `$this->editor_url = 'mailto:dolibarruseraustralia@gmail.com';` in the module descriptor (matches all 7
+  existing modules as of 2026-07-12 — several were originally published as author "South Side Supplies" and
+  later renamed for public release, see `C:\wamp64\www\dolibarr_user_aus\`). Only skip this for a module that's
+  genuinely business-specific and never intended for public release (e.g. `brand`, `invoicelines` — see that
+  folder's README for which modules are public-safe).
 
 ## Documentation Requirements
 

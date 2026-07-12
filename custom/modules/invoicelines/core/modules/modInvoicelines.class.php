@@ -26,7 +26,8 @@ class modInvoicelines extends DolibarrModules
         $this->description  = 'Fixes the GST/Price/Qty column content and order on the BCS and SSS invoice PDF templates, and the BCS Purchase Order PDF template.';
         $this->version      = '1.0';
         $this->const_name   = 'MAIN_MODULE_INVOICELINES';
-        $this->editor_name  = 'South Side Supplies';
+        $this->editor_name  = 'Dolibarr User Australia';
+        $this->editor_url   = 'mailto:dolibarruseraustralia@gmail.com';
 
         $this->module_parts = [
             'hooks' => ['pdfgeneration'],

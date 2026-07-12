@@ -27,7 +27,8 @@ class modDashboardjournals extends DolibarrModules
         $this->description  = 'Groups the home dashboard tiles into Sales/Purchase/Finance journal boxes with editable notes, plus an optional Employees Management section.';
         $this->version      = '1.2';
         $this->const_name   = 'MAIN_MODULE_DASHBOARDJOURNALS';
-        $this->editor_name  = 'South Side Supplies';
+        $this->editor_name  = 'Dolibarr User Australia';
+        $this->editor_url   = 'mailto:dolibarruseraustralia@gmail.com';
 
         $this->config_page_url = ['setup.php@dashboardjournals'];
 

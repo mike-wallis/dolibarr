@@ -21,7 +21,8 @@ class modSearchbox extends DolibarrModules
         $this->description     = 'Google-style autocomplete suggestions on Dolibarr list pages.';
         $this->version         = '1.0';
         $this->const_name      = 'MAIN_MODULE_SEARCHBOX';
-        $this->editor_name     = 'South Side Supplies';
+        $this->editor_name     = 'Dolibarr User Australia';
+        $this->editor_url      = 'mailto:dolibarruseraustralia@gmail.com';
         $this->config_page_url = ['setup.php@searchbox'];
 
         $this->module_parts = [

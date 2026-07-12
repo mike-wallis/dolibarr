@@ -21,7 +21,8 @@ class modStickynotes extends DolibarrModules
         $this->description    = 'Add draggable, resizable sticky notes to any Dolibarr page.';
         $this->version        = '1.0';
         $this->const_name     = 'MAIN_MODULE_STICKYNOTES';
-        $this->editor_name    = 'South Side Supplies';
+        $this->editor_name    = 'Dolibarr User Australia';
+        $this->editor_url     = 'mailto:dolibarruseraustralia@gmail.com';
         $this->config_page_url = ['setup.php@stickynotes'];
 
         $this->module_parts = [

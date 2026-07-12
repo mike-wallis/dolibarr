@@ -22,7 +22,8 @@ class modBrand extends DolibarrModules
         $this->description  = 'Auto-selects PDF template and email From address based on customer brand category, on invoice and quote cards.';
         $this->version      = '1.1';
         $this->const_name   = 'MAIN_MODULE_BRAND';
-        $this->editor_name  = 'South Side Supplies';
+        $this->editor_name  = 'Dolibarr User Australia';
+        $this->editor_url   = 'mailto:dolibarruseraustralia@gmail.com';
 
         $this->config_page_url = ['setup.php@brand'];
 
