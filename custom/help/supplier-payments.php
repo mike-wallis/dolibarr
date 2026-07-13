@@ -132,6 +132,42 @@ check them against your open invoices, and pay the total in one hit.</p>
 a formal remittance advice PDF, this can be built as a custom Dolibarr template — ask Michael.</p>
 
 <hr>
+
+<h2>5 — Prepaying a supplier before the bill arrives</h2>
+
+<p>Sometimes you need to pay a supplier a deposit or prepayment before their actual invoice
+exists — a deposit on a large order, for example. Don't just wait and enter it as a normal
+payment later; record it properly so it's a real, dated transaction that automatically reduces
+what you owe once the real bill turns up.</p>
+
+<ol>
+  <li>Go to <strong>Billing | Payment</strong> in the top menu, then under <strong>Vendor invoices</strong>
+      in the left sidebar, click <strong>New invoice</strong></li>
+  <li>Select the supplier as normal</li>
+  <li>For <strong>Type</strong>, choose <strong>Deposit</strong> instead of the default
+      "Standard invoice"</li>
+  <li>Enter the prepayment amount and <strong>Validate</strong></li>
+  <li>Click <strong>Enter Payment</strong> and record it exactly like paying any other invoice —
+      this is the real money leaving the bank account now</li>
+  <li>Once the deposit invoice is validated and paid, a <strong>"Convert to Reduction"</strong>
+      button appears on it — click it. This turns the paid deposit into a standing credit against
+      that supplier (Dolibarr calls it an "absolute discount"), no longer tied to the deposit
+      invoice itself</li>
+  <li>When the supplier's <strong>real invoice</strong> eventually arrives, create it as a normal
+      <strong>Standard</strong> invoice. Dolibarr will show that supplier's available credit in
+      the <strong>"Relative and absolute discounts"</strong> section on the invoice — tick it to
+      apply it, and it reduces what you actually owe by the amount already prepaid</li>
+</ol>
+
+<div class="alert alert-info" style="margin:1rem 0;">
+  <strong>Why bother with the Deposit type instead of just waiting?</strong> It keeps the
+  prepayment as its own proper, auditable transaction — money out, GST if applicable, dated when
+  it actually happened — rather than a note stuck to a bill that doesn't exist yet. The credit
+  just sits there cleanly until there's a real invoice to apply it against, however long that
+  takes.
+</div>
+
+<hr>
 <p><a href="index.php">← Back to Help home</a></p>
 
 </div>
