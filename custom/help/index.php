@@ -70,6 +70,11 @@ llxHeader('', 'Help — South Side Supplies');
   </div>
 
   <div class="div-table-responsive" style="border:1px solid #ddd;border-radius:6px;padding:1.5rem;">
+    <h3 style="margin-top:0;">🚚 <a href="delivery-addresses.php">Delivery Addresses</a></h3>
+    <p>Shipping an invoice to a different site than the billing address — adding extra customer addresses and linking one per invoice.</p>
+  </div>
+
+  <div class="div-table-responsive" style="border:1px solid #ddd;border-radius:6px;padding:1.5rem;">
     <h3 style="margin-top:0;">📡 <a href="stp-ssp.php">STP &amp; SSP — ATO Reporting Plan</a></h3>
     <p>Single Touch Payroll transition plan: the DSP/SSP model, what data the payroll module needs to export, SSP providers researched, and next steps.</p>
   </div>
