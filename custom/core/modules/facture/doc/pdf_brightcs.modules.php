@@ -441,13 +441,30 @@ class pdf_brightcs extends pdf_crabe
 		$carac_client .= pdf_build_address($outputlangs, $this->emetteur, $object->thirdparty, '', 0, 'target', $object);
 		$pdf->MultiCell($boxW, 4, $carac_client, 1, 'L');
 
+		// SHIP TO — uses a contact linked to THIS invoice with role "Shipping" (set on
+		// the invoice's own Contacts/Addresses tab, drawn from the customer's own
+		// Contacts/Addresses list) if one is set, so different invoices for the same
+		// customer can ship to different addresses. Falls back to the same address as
+		// Bill To otherwise. Mirrors core Dolibarr's own logic (pdf_crabe.modules.php)
+		// so this behaves exactly like stock Dolibarr once a shipping contact is linked.
+		$idaddressshipping = $object->getIdContact('external', 'SHIPPING');
+		if (!empty($idaddressshipping)) {
+			$object->fetch_Contact($idaddressshipping[0]);
+			$shipto_company = new Societe($this->db);
+			$shipto_company->fetch($object->contact->fk_soc);
+			$carac_client_shipping  = pdfBuildThirdpartyName($object->contact, $outputlangs) . "\n";
+			$carac_client_shipping .= pdf_build_address($outputlangs, $this->emetteur, $shipto_company, $object->contact, 1, 'target', $object);
+		} else {
+			$carac_client_shipping = $carac_client;
+		}
+
 		$pdf->SetFont('', 'B', $fs - 1);
 		$pdf->SetXY($ml + $boxW + 4, $boxY);
 		$pdf->SetFillColor(...static::CLR_HDRFILL);
 		$pdf->Cell($boxW, 5, 'SHIP TO', 1, 1, 'L', true);
 		$pdf->SetFont('', '', $fs - 1);
 		$pdf->SetXY($ml + $boxW + 4, $boxY + 5);
-		$pdf->MultiCell($boxW, 4, $carac_client, 1, 'L');
+		$pdf->MultiCell($boxW, 4, $carac_client_shipping, 1, 'L');
 
 		// ── 5. P.O.# | TERMS | DUE DATE | REP | SHIP | VIA ──────────────────
 		$metaY = $boxY + $boxH + 2;
