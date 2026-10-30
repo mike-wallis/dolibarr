@@ -65,6 +65,8 @@ class LoanTest extends CommonClassTest
 
 		$localobject = new Loan($db);
 		$localobject->initAsSpecimen();
+		$localobject->charge_tva_tx = 10;
+		$localobject->charge_vat_src_code = 'TEST-VAT';
 		$result = $localobject->create($user);
 
 		$this->assertGreaterThan(0, $result);
@@ -94,6 +96,8 @@ class LoanTest extends CommonClassTest
 
 		$this->assertGreaterThan(0, $result);
 		print __METHOD__." id=".$id." result=".$result."\n";
+		$this->assertEqualsWithDelta(10.0, $localobject->charge_tva_tx, 0.00001);
+		$this->assertSame('TEST-VAT', $localobject->charge_vat_src_code);
 		return $localobject;
 	}
 
@@ -119,6 +123,27 @@ class LoanTest extends CommonClassTest
 		print __METHOD__." id=".$localobject->id." result=".$result."\n";
 		$this->assertLessThan($result, 0);
 		return $localobject->id;
+	}
+
+	/**
+	 * testLoanVatHelpers: VAT included in the charge, and the "rate (code)" keys of the VAT lists
+	 *
+	 * @return	void
+	 */
+	public function testLoanVatHelpers()
+	{
+		// The VAT is part of the charge amount, not added on top
+		$this->assertEqualsWithDelta(0.17, loanVatIncluded(1.84, 10), 0.00001);
+		$this->assertEqualsWithDelta(10.0, loanVatIncluded(110, 10), 0.00001);
+		$this->assertEqualsWithDelta(0.0, loanVatIncluded(5, 0), 0.00001);
+
+		// Same keys as Form::load_tva() with $mode = 1; no VAT is "0"
+		$this->assertSame('10 (TEST-VAT)', loanVatKey(10, 'TEST-VAT'));
+		$this->assertSame('8.5', loanVatKey(8.5, ''));
+		$this->assertSame('0', loanVatKey(0, ''));
+		$this->assertSame(array(10.0, 'TEST-VAT'), loanParseVatKey(loanVatKey(10, 'TEST-VAT')));
+		$this->assertSame(array(8.5, ''), loanParseVatKey('8.5'));
+		$this->assertSame(array(0.0, ''), loanParseVatKey(''));
 	}
 
 	/**

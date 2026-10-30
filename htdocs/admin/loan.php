@@ -29,6 +29,7 @@ require '../main.inc.php';
 
 // Class
 require_once DOL_DOCUMENT_ROOT.'/core/lib/admin.lib.php';
+require_once DOL_DOCUMENT_ROOT.'/core/lib/loan.lib.php';
 if (isModEnabled('accounting')) {
 	require_once DOL_DOCUMENT_ROOT.'/core/class/html.formaccounting.class.php';
 }
@@ -71,6 +72,11 @@ if ($action == 'update') {
 		if (!dolibarr_set_const($db, $constname, $constvalue, 'chaine', 0, '', $conf->entity)) {
 			$error++;
 		}
+	}
+
+	// Default VAT rate of the charge (insurance / fee), key "rate (code)" (see loanVatKey())
+	if (!dolibarr_set_const($db, 'LOAN_DEFAULT_VAT_RATE_INSURANCE', GETPOST('LOAN_DEFAULT_VAT_RATE_INSURANCE', 'alphanohtml'), 'chaine', 0, '', $conf->entity)) {
+		$error++;
 	}
 
 	if (!$error) {
@@ -125,6 +131,12 @@ foreach ($list as $key) {
 	}
 	print '</td></tr>';
 }
+
+// Default VAT rate of the charge (insurance / fee): interest and capital are not subject to VAT
+print '<tr class="oddeven value">';
+print '<td><label for="LOAN_DEFAULT_VAT_RATE_INSURANCE">'.$form->textwithpicto($langs->trans('LOAN_DEFAULT_VAT_RATE_INSURANCE'), $langs->trans('LoanChargeVatHelp')).'</label></td>';
+// Purchase VAT rates (type_vat 2) of the company's country, key "rate (code)" (mode 1)
+print '<td>'.$form->load_tva('LOAN_DEFAULT_VAT_RATE_INSURANCE', getDolGlobalString('LOAN_DEFAULT_VAT_RATE_INSURANCE', '0'), $mysoc, null, 0, 0, 1, false, 1, 2).'</td></tr>';
 
 print '</tr>';
 

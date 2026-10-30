@@ -27,6 +27,7 @@ global $conf,$user,$langs,$db,$mysoc;
 require_once dirname(__FILE__).'/CommonClassTest.class.php';
 require_once dirname(__FILE__).'/../../htdocs/loan/class/loan.class.php';
 require_once dirname(__FILE__).'/../../htdocs/loan/class/paymentloan.class.php';
+require_once dirname(__FILE__).'/../../htdocs/core/lib/loan.lib.php';
 
 if (empty($user->id)) {
 	print "Load permissions for admin user nb 1\n";
@@ -106,6 +107,9 @@ class PaymentLoanTest extends CommonClassTest
 		$localobject->amount_capital = 100;
 		$localobject->amount_insurance = 5;
 		$localobject->amount_interest = 10;
+		$localobject->tva_tx = 10;
+		$localobject->vat_src_code = 'TEST-VAT';
+		$localobject->total_tva = loanVatIncluded(5, 10);	// 0.45, included in amount_insurance
 		$result = $localobject->create($user);
 
 		$this->assertGreaterThan(0, $result, $localobject->errorsToString());
@@ -143,6 +147,9 @@ class PaymentLoanTest extends CommonClassTest
 		$this->assertEqualsWithDelta(5.0, (float) $localobject->amount_insurance, 0.00001);
 		$this->assertEqualsWithDelta(10.0, (float) $localobject->amount_interest, 0.00001);
 		$this->assertSame('VIR', $localobject->type_code);
+		$this->assertEqualsWithDelta(10.0, $localobject->tva_tx, 0.00001);
+		$this->assertSame('TEST-VAT', $localobject->vat_src_code);
+		$this->assertEqualsWithDelta(0.45, $localobject->total_tva, 0.00001);
 
 		return $localobject;
 	}
@@ -167,6 +174,9 @@ class PaymentLoanTest extends CommonClassTest
 		// update() (unlike create()) does use fk_loan/fk_typepayment, both already set by fetch() above
 		$localobject->amount_capital = 120;
 		$localobject->note_private = 'New note private after update';
+		$localobject->tva_tx = 0;
+		$localobject->vat_src_code = '';
+		$localobject->total_tva = 0;
 		$result = $localobject->update($user);
 
 		$this->assertGreaterThan(0, $result, $localobject->errorsToString());
@@ -175,6 +185,9 @@ class PaymentLoanTest extends CommonClassTest
 		$localobject->fetch($localobject->id);
 		$this->assertEqualsWithDelta(120.0, (float) $localobject->amount_capital, 0.00001);
 		$this->assertSame('New note private after update', $localobject->note_private);
+		$this->assertEqualsWithDelta(0.0, $localobject->tva_tx, 0.00001);
+		$this->assertSame('', $localobject->vat_src_code);
+		$this->assertEqualsWithDelta(0.0, $localobject->total_tva, 0.00001);
 
 		return $localobject;
 	}

@@ -803,6 +803,7 @@ if ($resql) {
 				//------------------------------------------
 				$sql = "SELECT l.rowid, l.capital AS loan_capital, l.accountancy_account_capital, l.accountancy_account_interest, l.accountancy_account_insurance, l.label, l.charge_type,";
 				$sql .= " pl.amount_capital, pl.rowid as payment_id, pl.amount_interest, pl.amount_insurance,";
+				$sql .= " pl.tva_tx, pl.vat_src_code, pl.total_tva,";
 				$sql .= " bu.fk_bank, bu.url_id AS bu_url_id, bu.type AS bu_type";
 				$sql .= " FROM ".$db->prefix()."payment_loan as pl";
 				$sql .= " INNER JOIN ".$db->prefix()."loan as l ON pl.fk_loan = l.rowid";
@@ -827,9 +828,12 @@ if ($resql) {
 					$account_pay_loan_interest = getDolGlobalString('LOAN_ACCOUNTING_ACCOUNT_INTEREST', 'NotDefined'); // NotDefined is a reserved word
 					$account_pay_loan_insurance = getDolGlobalString('LOAN_ACCOUNTING_ACCOUNT_INSURANCE', 'NotDefined'); // NotDefined is a reserved word
 					$prefix_ref = getDolGlobalString('MAIN_PAYMENT_LOAN_REF_PREFIX', 'L');
+					$account_vat_buy = getDolGlobalString('ACCOUNTING_VAT_BUY_ACCOUNT', 'NotDefined'); // NotDefined is a reserved word
 
 					while ($obj = $db->fetch_object($resql)) {
-						$object_key = $obj->bu_type.'_'.$obj->rowid;
+						// One object per payment, not per loan: the split between capital, interest and charge (and its VAT)
+						// differs from one payment to the next, so several payments of a loan must not share one split
+						$object_key = $obj->bu_type.'_'.$obj->payment_id;
 
 						// Add object in payment
 						$payment_amount = $obj->amount_capital + $obj->amount_interest + $obj->amount_insurance;
@@ -840,6 +844,10 @@ if ($resql) {
 							);
 						}
 
+						// VAT included in the charge (interest and capital are not subject to VAT), on the same virtual scale
+						// as the operations below: virtual amount = loan_capital * amount / payment_amount
+						$virtual_vat = ($payment_amount != 0 ? $obj->loan_capital * (float) $obj->total_tva / $payment_amount : 0);
+
 						// Set object infos
 						if (!isset($tabobject[$object_key])) {
 							$static_loan->id = $obj->rowid;
@@ -847,7 +855,7 @@ if ($resql) {
 							$tabobject[$object_key] = array(
 								'id' => $obj->rowid,
 								'ref' => $prefix_ref.$obj->rowid,
-								'total_ht' => -$obj->loan_capital,
+								'total_ht' => -($obj->loan_capital - $virtual_vat),
 								'total_ttc' => -$obj->loan_capital,
 								'url' => $static_loan->getNomUrl(1),
 								'operations' => array(),
@@ -876,10 +884,24 @@ if ($resql) {
 						// Add amount for the accountancy code
 						$accountancy_account_insurance = !empty($obj->accountancy_account_insurance) ? $obj->accountancy_account_insurance : $account_pay_loan_insurance;
 						$tabobject[$object_key]['operations'][$accountancy_account_insurance] = array(
-							// virtual total = loan_capital * amount_insurance / payment_amount
-							'total_ht' => -($obj->loan_capital * $obj->amount_insurance / $payment_amount),
+							// virtual total = loan_capital * amount_insurance / payment_amount, VAT excluded
+							'total_ht' => -($obj->loan_capital * $obj->amount_insurance / $payment_amount - $virtual_vat),
 							'label' => $obj->label.' '.loanChargeLabel($obj->charge_type, $langs),
 						);
+
+						// VAT of the charge, to the purchase account of its VAT rate (as for supplier invoices)
+						if ($virtual_vat != 0) {
+							if (!isset($tabvatdata[$obj->tva_tx][$obj->vat_src_code])) {
+								$tabvatdata[$obj->tva_tx][$obj->vat_src_code] = getTaxesFromId($obj->tva_tx.($obj->vat_src_code ? ' ('.$obj->vat_src_code.')' : ''), $mysoc, $mysoc, 0);
+							}
+							$compta_tva = (!empty($tabvatdata[$obj->tva_tx][$obj->vat_src_code]['accountancy_code_buy']) ? $tabvatdata[$obj->tva_tx][$obj->vat_src_code]['accountancy_code_buy'] : $account_vat_buy);
+							$tabobject[$object_key]['vats'][$compta_tva][$obj->tva_tx] = array(
+								'tva_tx' => $obj->tva_tx,
+								'total_tva' => -$virtual_vat,
+								'total_localtax1' => 0,
+								'total_localtax2' => 0,
+							);
+						}
 					}
 				} else {
 					dol_print_error($db);

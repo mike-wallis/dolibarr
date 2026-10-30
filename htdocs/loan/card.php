@@ -157,6 +157,7 @@ if (empty($reshook)) {
 				$object->note_public = GETPOST('note_public', 'restricthtml');
 				$object->fk_project = GETPOSTINT('projectid');
 				$object->insurance_amount = GETPOSTFLOAT('insurance_amount');
+				list($object->charge_tva_tx, $object->charge_vat_src_code) = loanParseVatKey(GETPOST('charge_vat', 'alphanohtml'));
 
 				$accountancy_account_capital = GETPOST('accountancy_account_capital');
 				$accountancy_account_insurance = GETPOST('accountancy_account_insurance');
@@ -215,6 +216,7 @@ if (empty($reshook)) {
 				$object->insurance_amount = GETPOSTFLOAT('insurance_amount');
 				$object->charge_type = GETPOSTINT('charge_type');
 				$object->charge_per_payment = GETPOSTINT('charge_per_payment') ? 1 : 0;
+				list($object->charge_tva_tx, $object->charge_vat_src_code) = loanParseVatKey(GETPOST('charge_vat', 'alphanohtml'));
 
 				$accountancy_account_capital = GETPOST('accountancy_account_capital');
 				$accountancy_account_insurance = GETPOST('accountancy_account_insurance');
@@ -362,6 +364,11 @@ if ($action == 'create') {
 	print $form->selectarray('charge_type', $chargetypes, GETPOSTINT('charge_type')).' ';
 	print '<input name="insurance_amount" size="10" value="'.dol_escape_htmltag(GETPOST("insurance_amount")).'" placeholder="'.$langs->trans('Amount').'"> ';
 	print $form->selectarray('charge_per_payment', array(0 => $langs->trans('LoanChargeTotal'), 1 => $langs->trans('LoanChargePerPayment')), GETPOSTINT('charge_per_payment'));
+	print '</td></tr>';
+
+	// VAT on the charge (interest and capital are not subject to VAT)
+	print '<tr><td>'.$form->textwithpicto($langs->trans("LoanChargeVat", $langs->transnoentitiesnoconv("LoanCharge")), $langs->trans("LoanChargeVatHelp")).'</td><td>';
+	print $form->load_tva('charge_vat', GETPOSTISSET('charge_vat') ? GETPOST('charge_vat', 'alphanohtml') : getDolGlobalString('LOAN_DEFAULT_VAT_RATE_INSURANCE', '0'), $mysoc, null, 0, 0, 1, false, 1, 2);
 	print '</td></tr>';
 
 	// Project
@@ -527,7 +534,7 @@ if ($id > 0) {
 		// Capital
 		if ($action == 'edit') {
 			print '<tr><td class="fieldrequired titlefield">'.$langs->trans("LoanCapital").'</td><td>';
-			print '<input name="capital" size="10" value="'.$object->capital.'"></td></tr>';
+			print '<input name="capital" size="10" value="'.price((float) $object->capital, 0, '', 1, -1, 'MT').'"></td></tr>';
 			print '</td></tr>';
 		} else {
 			print '<tr><td class="titlefield">'.$langs->trans("LoanCapital").'</td><td><span class="amount">'.price($object->capital, 0, $outputlangs, 1, -1, -1, $conf->currency).'</span></td></tr>';
@@ -541,13 +548,25 @@ if ($id > 0) {
 			}
 			print '<tr><td class="titlefield">'.$form->textwithpicto($langs->trans("LoanCharge"), $langs->trans("LoanChargeHelp")).'</td><td>';
 			print $form->selectarray('charge_type', $chargetypes, (int) $object->charge_type).' ';
-			print '<input name="insurance_amount" size="10" value="'.$object->insurance_amount.'"> ';
+			print '<input name="insurance_amount" size="10" value="'.price((float) $object->insurance_amount, 0, '', 1, -1, 'MT').'"> ';
 			print $form->selectarray('charge_per_payment', array(0 => $langs->trans('LoanChargeTotal'), 1 => $langs->trans('LoanChargePerPayment')), (int) $object->charge_per_payment);
 			print '</td></tr>';
 			print '</td></tr>';
 		} else {
 			print '<tr><td class="titlefield">'.loanChargeLabel($object->charge_type, $langs).'</td><td><span class="amount">'.price($object->insurance_amount, 0, $outputlangs, 1, -1, -1, $conf->currency).'</span>'.((float) $object->insurance_amount ? ' <span class="opacitymedium">'.$langs->trans($object->charge_per_payment ? 'LoanChargePerPayment' : 'LoanChargeTotal').'</span>' : '').'</td></tr>';
 		}
+
+		// VAT on the charge (interest and capital are not subject to VAT)
+		$chargevatkey = loanVatKey($object->charge_tva_tx, $object->charge_vat_src_code);
+		// Same wording as the charge row above: "Insurance / fee" when editing, the charge's own label otherwise
+		$chargevatlabel = $langs->trans("LoanChargeVat", ($action == 'edit' ? $langs->transnoentitiesnoconv("LoanCharge") : loanChargeLabel($object->charge_type, $langs)));
+		print '<tr><td class="titlefield">'.$form->textwithpicto($chargevatlabel, $langs->trans("LoanChargeVatHelp")).'</td><td>';
+		if ($action == 'edit') {
+			print $form->load_tva('charge_vat', $chargevatkey, $mysoc, null, 0, 0, 1, false, 1, 2);
+		} else {
+			print $chargevatkey !== '0' ? vatrate((string) $object->charge_tva_tx, true).($object->charge_vat_src_code !== '' ? ' ('.dol_escape_htmltag($object->charge_vat_src_code).')' : '') : '<span class="opacitymedium">'.$langs->trans('LoanNoVat').'</span>';
+		}
+		print '</td></tr>';
 
 		// Date start
 		print '<tr><td>'.$langs->trans("DateStart")."</td>";
