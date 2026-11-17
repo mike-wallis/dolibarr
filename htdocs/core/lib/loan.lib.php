@@ -374,6 +374,21 @@ function loanParseVatKey($key)
 }
 
 /**
+ * VAT included in a charge amount (the amount includes the VAT).
+ *
+ * @param	float	$amount		Charge amount, VAT included
+ * @param	float	$rate		VAT rate
+ * @return	float
+ */
+function loanVatIncluded($amount, $rate)
+{
+	if ((float) $rate == 0) {
+		return 0.0;
+	}
+	return (float) price2num((float) $amount * (float) $rate / (100 + (float) $rate), 'MT');
+}
+
+/**
  * Charge of each payment of a loan.
  *
  * @param	float	$amount				insurance_amount of the loan
